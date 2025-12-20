@@ -70,23 +70,27 @@ const BentoCardRoot = forwardRef<HTMLDivElement, BentoCardProps>((props, ref) =>
     const sizeConfig = bentoSizes[size]
     const borderConfig = dark ? bentoBorder.dark : bentoBorder.light
 
-    // 构建样式
-    const cardStyles: React.CSSProperties = {
-        ...bentoCardBase,
-        width: sizeConfig.width,
-        height: sizeConfig.height,
-        ...borderConfig,
-        cursor: clickable || href ? 'pointer' : 'default',
-        transition: 'none', // Figma 原版没有位移/旋转/缩放动画
-        ...(backgroundColor && { background: backgroundColor }),
-        ...(backgroundGradient && { background: backgroundGradient }),
-        ...(backgroundImage && {
-            backgroundImage: `url(${backgroundImage})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-        }),
-        ...style,
-    }
+        // 构建样式
+        const cardStyles: React.CSSProperties = {
+            ...bentoCardBase,
+            width: sizeConfig.width,
+            height: sizeConfig.height,
+            ...borderConfig,
+            cursor: clickable || href ? 'pointer' : 'default',
+            transition: 'opacity 0.2s ease, box-shadow 0.2s ease', // Smooth hover transitions
+            ...(backgroundColor && { background: backgroundColor }),
+            ...(backgroundGradient && { background: backgroundGradient }),
+            ...(backgroundImage && {
+                backgroundImage: `url(${backgroundImage})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+            }),
+            // Edit mode hover: subtle shadow lift (when not clickable, i.e., in edit mode)
+            ...(!clickable && !disableHover && isHovered && {
+                boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
+            }),
+            ...style,
+        }
 
     // 点击处理
     const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -109,14 +113,14 @@ const BentoCardRoot = forwardRef<HTMLDivElement, BentoCardProps>((props, ref) =>
                 className={cn('bento-card', `bento-${size}`, className)}
                 style={{ ...cardStyles, ...gridStyles }}
                 onClick={clickable || href ? handleClick : onClick}
-                onMouseEnter={() => setIsHovered(true)}
+                onMouseEnter={() => !disableHover && setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
                 role={clickable || href ? 'button' : undefined}
                 tabIndex={clickable || href ? 0 : undefined}
                 {...restProps}
             >
-                {/* 悬停叠加层 (Figma: 15% 灰色涂层) */}
-                {clickable && (
+                {/* 悬停叠加层 (Figma: 15% 灰色涂层) - Preview mode */}
+                {clickable && !disableHover && (
                     <div
                         className="bento-card-hover-overlay"
                         style={{
@@ -130,6 +134,7 @@ const BentoCardRoot = forwardRef<HTMLDivElement, BentoCardProps>((props, ref) =>
                         }}
                     />
                 )}
+                {/* Edit mode hover: shadow lift only (no overlay) */}
 
                 {children}
 

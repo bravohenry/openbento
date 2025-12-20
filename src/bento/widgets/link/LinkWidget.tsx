@@ -1,0 +1,469 @@
+'use client'
+
+/**
+ * OpenBento - Link Widget
+ * 
+ * 基于 BentoCard 组件的链接 Widget
+ * 支持 5 种尺寸变体 (from Figma)
+ */
+
+import React from 'react'
+import { BentoCard } from '@/bento/core'
+import type { LinkWidgetConfig, WidgetProps, WidgetSize } from '../types'
+import { PLATFORM_REGISTRY, extractPlatformInfo } from '../registry'
+
+// ============ Size-Responsive Platform Card Content ============
+
+interface PlatformCardContentProps {
+    icon: React.ReactNode
+    iconBg?: string
+    iconShadow?: string
+    title: string
+    subtitle?: string
+    action?: {
+        label: string
+        count?: number | string
+        color?: string
+        textColor?: string
+        shape?: 'rounded' | 'pill'
+        borderRadius?: number
+    }
+    textColor?: string
+    subtitleColor?: string
+    widgetSize: WidgetSize // 新增：响应尺寸
+}
+
+// 根据尺寸获取布局配置
+function getSizeLayout(size: WidgetSize) {
+    switch (size) {
+        case '1x1':
+            return {
+                iconSize: 40,
+                titleTop: 52,
+                subtitleTop: 69,
+                actionTop: 97,
+                fontSize: 14,
+                lineClamp: 3,
+                horizontal: false,
+                isBar: false,
+            }
+        case '2x1':
+            return {
+                iconSize: 40,
+                titleTop: 52,
+                subtitleTop: 69,
+                actionTop: 97,
+                fontSize: 14,
+                lineClamp: 2,
+                horizontal: true,
+                rightContentWidth: '50%',
+                isBar: false,
+            }
+        case '1x2':
+            return {
+                iconSize: 40,
+                titleTop: 52,
+                subtitleTop: 69,
+                actionTop: 97,
+                fontSize: 14,
+                lineClamp: 6,
+                horizontal: false,
+                hasExtraContent: true,
+                isBar: false,
+            }
+        case '2x2':
+            return {
+                iconSize: 56,
+                titleTop: 72,
+                subtitleTop: 94,
+                actionTop: 120,
+                fontSize: 18,
+                lineClamp: 4,
+                horizontal: false,
+                hasExtraContent: true,
+                isBar: false,
+            }
+        case 'bar':
+            // 390×68 细横条布局
+            return {
+                iconSize: 28,
+                titleTop: 0,
+                subtitleTop: 0,
+                actionTop: 0,
+                fontSize: 14,
+                lineClamp: 1,
+                horizontal: true,
+                isBar: true, // 特殊紧凑布局
+            }
+        default:
+            return {
+                iconSize: 40,
+                titleTop: 52,
+                subtitleTop: 69,
+                actionTop: 97,
+                fontSize: 14,
+                lineClamp: 3,
+                horizontal: false,
+                isBar: false,
+            }
+    }
+}
+
+
+const PlatformCardContent: React.FC<PlatformCardContentProps> = ({
+    icon,
+    iconBg = '#fff',
+    iconShadow = '0px 1px 2px rgba(0, 0, 0, 0.1)',
+    title,
+    subtitle,
+    action,
+    textColor = '#000000',
+    subtitleColor = 'rgba(0, 0, 0, 0.6)',
+    widgetSize
+}) => {
+    const layout = getSizeLayout(widgetSize)
+    const iconRadius = layout.iconSize >= 40 ? (layout.iconSize === 56 ? 12 : 10) : 8
+
+    // Bar size: 特殊紧凑水平布局
+    if (layout.isBar) {
+        return (
+            <div style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                padding: '0 16px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 12,
+                pointerEvents: 'none',
+            }}>
+                {/* Icon */}
+                <div style={{
+                    width: layout.iconSize,
+                    height: layout.iconSize,
+                    borderRadius: iconRadius,
+                    backgroundColor: iconBg,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    boxShadow: iconBg === 'transparent' ? 'none' : iconShadow,
+                    overflow: 'hidden',
+                    flexShrink: 0,
+                }}>
+                    {icon}
+                </div>
+
+                {/* Title */}
+                <div style={{
+                    flex: 1,
+                    fontFamily: 'Inter, sans-serif',
+                    fontSize: layout.fontSize,
+                    fontWeight: 500,
+                    color: textColor,
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                }}>
+                    {title}
+                </div>
+
+                {/* Action Button (if exists) */}
+                {action && (
+                    <button style={{
+                        height: 26,
+                        paddingInline: 12,
+                        borderRadius: action.borderRadius || 6,
+                        backgroundColor: action.color || '#4093ef',
+                        border: 'none',
+                        cursor: 'pointer',
+                        fontFamily: 'Inter, sans-serif',
+                        fontSize: 11,
+                        fontWeight: 600,
+                        color: action.textColor || '#ffffff',
+                        pointerEvents: 'auto',
+                        flexShrink: 0,
+                    }}>
+                        {action.label}
+                    </button>
+                )}
+            </div>
+        )
+    }
+
+    // 标准布局 (1x1, 2x1, 1x2, 2x2)
+    return (
+        <div style={{
+            position: 'absolute',
+            top: 24,
+            left: 24,
+            right: 24,
+            bottom: 24,
+            pointerEvents: 'none',
+        }}>
+            {/* Icon */}
+            <div style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: layout.iconSize,
+                height: layout.iconSize,
+                borderRadius: iconRadius,
+                backgroundColor: iconBg,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: iconBg === 'transparent' ? 'none' : iconShadow,
+                overflow: 'hidden',
+                // 如果是透明背景（Full-bleed 图标），不需要外边框可见性
+                border: iconBg === 'transparent' ? 'none' : 'none',
+            }}>
+                {icon}
+                {/* 仅在非透明背景时显示内边框高光 */}
+                {iconBg !== 'transparent' && (
+                    <div style={{
+                        position: 'absolute',
+                        inset: 0,
+                        borderRadius: iconRadius,
+                        boxShadow: 'inset 0 0 0 1px rgba(0, 0, 0, 0.06)',
+                        pointerEvents: 'none',
+                    }} />
+                )}
+            </div>
+
+
+            {/* Title */}
+            <div style={{
+                position: 'absolute',
+                top: layout.titleTop,
+                left: 0,
+                right: layout.horizontal ? layout.rightContentWidth : 0,
+                fontFamily: 'Inter, sans-serif',
+                fontSize: layout.fontSize,
+                fontWeight: 500,
+                lineHeight: '1.2',
+                color: textColor,
+                display: '-webkit-box',
+                WebkitLineClamp: layout.lineClamp,
+                WebkitBoxOrient: 'vertical',
+                overflow: 'hidden',
+                whiteSpace: 'pre-wrap',
+            }}>
+                {title}
+            </div>
+
+            {/* Subtitle */}
+            {subtitle && (
+                <div style={{
+                    position: 'absolute',
+                    top: layout.subtitleTop,
+                    left: 0,
+                    right: layout.horizontal ? layout.rightContentWidth : 0,
+                    fontFamily: 'Inter, sans-serif',
+                    fontSize: 12,
+                    fontWeight: 400,
+                    lineHeight: '16px',
+                    color: subtitleColor,
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                }}>
+                    {subtitle}
+                </div>
+            )}
+
+            {/* Action Button */}
+            {action && (
+                <button style={{
+                    position: 'absolute',
+                    top: layout.actionTop,
+                    left: 0,
+                    minWidth: action.shape === 'pill' ? 70 : 66,
+                    height: 30,
+                    borderRadius: action.borderRadius || (action.shape === 'pill' ? 23 : 8),
+                    backgroundColor: action.color || '#4093ef',
+                    border: 'none',
+                    cursor: 'pointer',
+                    fontFamily: 'Inter, sans-serif',
+                    fontSize: 12,
+                    fontWeight: 600,
+                    color: action.textColor || '#ffffff',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 4,
+                    padding: '0 12px',
+                    pointerEvents: 'auto',
+                }}>
+                    <span>{action.label}</span>
+                    {action.count !== undefined && (
+                        <span style={{ fontWeight: 400, opacity: 0.8 }}>{action.count}</span>
+                    )}
+                </button>
+            )}
+        </div>
+    )
+}
+
+
+// ============ Platform Icons (from public/icons/social) ============
+
+// 映射平台名称到 SVG 文件
+const PLATFORM_ICON_FILES: Record<string, string> = {
+    instagram: '/icons/social/instagram.svg',
+    twitter: '/icons/social/twitter.svg',
+    tiktok: '/icons/social/unknown.svg', // 暂无 tiktok，使用 unknown
+    youtube: '/icons/social/youtube.svg',
+    spotify: '/icons/social/unknown.svg', // 暂无 spotify
+    github: '/icons/social/github.svg',
+    linkedin: '/icons/social/linkedin.svg',
+    discord: '/icons/social/discord.svg',
+    twitch: '/icons/social/twitch.svg',
+    behance: '/icons/social/behance.svg',
+    dribbble: '/icons/social/dribbble.svg',
+    pinterest: '/icons/social/pinterest.svg',
+    reddit: '/icons/social/reddit.svg',
+    whatsapp: '/icons/social/whatsapp.svg',
+    medium: '/icons/social/medium.svg',
+    patreon: '/icons/social/patreon.svg',
+    buymeacoffee: '/icons/social/buymeacoffee.svg',
+    generic: '/icons/social/unknown.svg',
+}
+
+function getPlatformIconComponent(platform: string, iconSize: number = 40) {
+    const iconFile = PLATFORM_ICON_FILES[platform] || PLATFORM_ICON_FILES.generic
+
+    return (
+        <img
+            src={iconFile}
+            alt={platform}
+            style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'contain',
+                display: 'block',
+            }}
+        />
+    )
+}
+
+
+// ============ Platform Configs ============
+
+const PLATFORM_ACTIONS: Record<string, PlatformCardContentProps['action']> = {
+    instagram: { label: 'Follow', color: '#4093ef', borderRadius: 8 },
+    twitter: { label: 'Follow', color: '#4093ef', borderRadius: 8 },
+    tiktok: { label: 'Follow', color: '#ea435a', borderRadius: 4 },
+    youtube: { label: 'Subscribe', color: '#FF0000', shape: 'pill' },
+    spotify: undefined,
+    github: { label: 'Follow', color: '#24292e', borderRadius: 8 },
+    linkedin: { label: 'Connect', color: '#0A66C2', borderRadius: 8 },
+}
+
+const PLATFORM_BACKGROUNDS: Record<string, string> = {
+    instagram: '#ffffff',
+    twitter: '#ffffff',
+    tiktok: '#ffffff',
+    youtube: '#FFF5F5',
+    spotify: '#E6FBF0',
+    github: '#ffffff',
+    linkedin: '#F0F5FF',
+    generic: '#ffffff',
+}
+
+const PLATFORM_ICON_BACKGROUNDS: Record<string, string> = {
+    instagram: 'transparent', // SVG includes background
+    twitter: '#55ACEE',      // Logo is white on blue, but our SVG might include blue? Checked twitter.svg
+    tiktok: '#ffffff',
+    youtube: 'transparent',   // SVG includes background
+    spotify: '#1DB954',
+    github: 'transparent',    // SVG includes background
+    linkedin: 'transparent',  // SVG includes background
+    discord: 'transparent',   // SVG includes background
+    twitch: 'transparent',
+    behance: 'transparent',
+    dribbble: 'transparent',
+    pinterest: 'transparent',
+    reddit: 'transparent',
+    whatsapp: 'transparent',
+    medium: 'transparent',
+    patreon: 'transparent',
+    buymeacoffee: 'transparent',
+    generic: '#6B7280',
+}
+
+
+// ============ Link Widget Component ============
+
+export const LinkWidget: React.FC<WidgetProps<LinkWidgetConfig>> = ({
+    config,
+    onClick,
+    isEditing = false,
+}) => {
+    const { url, size, platform: configPlatform, title, subtitle, ctaLabel, customColor } = config
+
+    // Auto-detect platform if not provided
+    const platform = configPlatform || extractPlatformInfo(url).platform
+    
+    // Ensure platform exists in registry, fallback to generic
+    const platformConfig = PLATFORM_REGISTRY[platform] || PLATFORM_REGISTRY.generic
+    const displayTitle = title || platformConfig.name
+    const displaySubtitle = subtitle
+    const backgroundColor = customColor || PLATFORM_BACKGROUNDS[platform] || PLATFORM_BACKGROUNDS.generic || '#ffffff'
+    const iconBg = PLATFORM_ICON_BACKGROUNDS[platform] || PLATFORM_ICON_BACKGROUNDS.generic || '#ffffff'
+
+    // Get action config
+    const defaultAction = PLATFORM_ACTIONS[platform]
+    const action = ctaLabel
+        ? { ...defaultAction, label: ctaLabel }
+        : defaultAction
+
+    // Get icon size based on widget size
+    const layout = getSizeLayout(size)
+
+    return (
+        <BentoCard
+            size={size}
+            backgroundColor={backgroundColor}
+            clickable={!isEditing}
+            href={isEditing ? undefined : url}
+            target={isEditing ? undefined : "_blank"}
+        >
+            <PlatformCardContent
+                icon={getPlatformIconComponent(platform, layout.iconSize)}
+                iconBg={iconBg}
+                title={displayTitle}
+                subtitle={displaySubtitle}
+                action={action}
+                widgetSize={size}
+            />
+        </BentoCard>
+    )
+}
+
+// ============ Exports ============
+
+export { PlatformCardContent, getSizeLayout }
+
+export function createLinkWidgetConfig(
+    url: string,
+    size: LinkWidgetConfig['size'] = '1x1',
+    overrides?: Partial<LinkWidgetConfig>
+): LinkWidgetConfig {
+    const info = extractPlatformInfo(url)
+
+    return {
+        id: `link-${Date.now()}`,
+        category: 'link',
+        size,
+        url,
+        platform: info.platform,
+        title: info.title,
+        subtitle: info.subtitle,
+        ctaLabel: info.ctaLabel,
+        ...overrides,
+    }
+}
+
+export default LinkWidget

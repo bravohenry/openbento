@@ -1,37 +1,51 @@
 /**
  * OpenBento - Drag and Drop Module
  * 
- * 导出所有拖放相关组件和工具
+ * 基于 @dnd-kit + Framer Motion 的专业拖放系统
  */
 
-// Provider
-export { DndProvider, useDndContext, useIsDragging, useActiveItem, useDragPosition, useGridPreviewPosition, registerDroppable } from './DndProvider'
+// 新系统 - 基于 @dnd-kit
+export { BentoDndProvider, useBentoDndState } from './BentoDndContext'
+export type { BentoItem, BentoDndContextValue, BentoDndProviderProps } from './BentoDndContext'
 
-// Components
-export { Draggable, useDraggable } from './Draggable'
-export { Droppable, useDroppable } from './Droppable'
-export { DragOverlay, GridPreviewOverlay, DropIndicator } from './DragOverlay'
+export { SortableCard, CardOverlay, DragHandle } from './SortableCard'
+export type { SortableCardProps, CardOverlayProps, DragHandleProps } from './SortableCard'
 
-// Hooks
-export { useDragAndDrop, autoArrangeItems } from './useDragAndDrop'
+// 速度感知碰撞检测
+export {
+    velocityAwareCollision,
+    createVelocityAwareCollision,
+    updateVelocity,
+    resetVelocity,
+    getVelocity,
+} from './velocityAwareCollision'
 
-// Types
+// 重新导出 @dnd-kit 常用组件
+export {
+    DndContext,
+    DragOverlay,
+    closestCenter,
+    closestCorners,
+    rectIntersection,
+    pointerWithin,
+} from '@dnd-kit/core'
+
+export {
+    SortableContext,
+    useSortable,
+    arrayMove,
+    rectSortingStrategy,
+    verticalListSortingStrategy,
+    horizontalListSortingStrategy,
+} from '@dnd-kit/sortable'
+
+export { CSS } from '@dnd-kit/utilities'
+
 export type {
-    DragItemType,
-    DragItem,
-    DropResult,
-    DndState,
-    DndAction,
-    DndContextValue,
-    DndProviderProps,
-    DraggableProps,
-    DraggableRenderProps,
-    DroppableProps,
-    DroppableRenderProps,
-    DragOverlayProps,
-    SensorOptions,
-    PointerSensorOptions,
-    KeyboardSensorOptions,
-} from './dnd.types'
+    DragStartEvent,
+    DragEndEvent,
+    DragMoveEvent,
+    DragOverEvent,
+    UniqueIdentifier,
+} from '@dnd-kit/core'
 
-export type { DragAndDropItem, UseDragAndDropOptions, UseDragAndDropReturn } from './useDragAndDrop'

@@ -25,17 +25,21 @@ export const bentoColors = {
   textSecondary: 'rgba(0, 0, 0, 0.6)',
 }
 
-// ============ 尺寸映射 ============
+// ============ 尺寸映射 (5 种主要变体 + 扩展) ============
 
 export const bentoSizes: Record<BentoSize, { width: number; height: number; columns: number; rows: number }> = {
+  // 5 种主要变体 (from Figma)
   '1x1': { width: 175, height: 175, columns: 1, rows: 1 },
   '2x1': { width: 390, height: 175, columns: 2, rows: 1 },  // 175*2 + 40
   '1x2': { width: 175, height: 390, columns: 1, rows: 2 },
   '2x2': { width: 390, height: 390, columns: 2, rows: 2 },
+  'bar': { width: 390, height: 68, columns: 2, rows: 1 },   // 细横条 (390×68)
+  // 扩展尺寸
   '2x3': { width: 390, height: 605, columns: 2, rows: 3 },  // 175*3 + 40*2
   '3x2': { width: 605, height: 390, columns: 3, rows: 2 },
   '4x2': { width: 820, height: 390, columns: 4, rows: 2 },  // 175*4 + 40*3
 }
+
 
 // ============ 边框样式 (from Figma 19:2332) ============
 
