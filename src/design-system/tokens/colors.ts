@@ -97,18 +97,18 @@ export const socialColors = {
 
 export const gradients = {
     // 品牌渐变
-    brand: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
-    brandHover: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)',
+    brand: 'linear-gradient(135deg, #FF6B35 0%, #FF9F1C 100%)',
+    brandHover: 'linear-gradient(135deg, #F05A28 0%, #F7931E 100%)',
 
     // 彩虹渐变
-    rainbow: 'linear-gradient(135deg, #f43f5e, #f97316, #eab308, #22c55e, #3b82f6, #8b5cf6)',
+    rainbow: 'linear-gradient(135deg, #f43f5e, #f97316, #eab308, #22c55e, #3b82f6, #0ea5e9)',
 
     // 温暖渐变
     warm: 'linear-gradient(135deg, #f97316 0%, #ec4899 100%)',
     sunset: 'linear-gradient(135deg, #f59e0b 0%, #ef4444 100%)',
 
     // 冷色渐变
-    cool: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
+    cool: 'linear-gradient(135deg, #3b82f6 0%, #0ea5e9 100%)',
     ocean: 'linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%)',
 
     // 自然渐变
@@ -117,7 +117,7 @@ export const gradients = {
 
     // 暗色渐变
     dark: 'linear-gradient(135deg, #1f2937 0%, #111827 100%)',
-    midnight: 'linear-gradient(135deg, #312e81 0%, #1e1b4b 100%)',
+    midnight: 'linear-gradient(135deg, #0f172a 0%, #020617 100%)',
 
     // 光泽渐变 (用于 Glass 效果)
     glass: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)',

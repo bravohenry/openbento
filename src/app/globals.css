@@ -26,9 +26,9 @@
   --color-text-inverse: #ffffff;
 
   /* Brand Colors */
-  --color-brand-primary: #6366f1;
-  --color-brand-secondary: #8b5cf6;
-  --color-brand-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  --color-brand-primary: #FF6B35;
+  --color-brand-secondary: #FF9F1C;
+  --color-brand-gradient: linear-gradient(135deg, #FF6B35 0%, #FF9F1C 100%);
 
   /* Accent Colors */
   --color-accent-blue: #3b82f6;
@@ -36,7 +36,7 @@
   --color-accent-red: #ef4444;
   --color-accent-yellow: #f59e0b;
   --color-accent-pink: #ec4899;
-  --color-accent-purple: #8b5cf6;
+  --color-accent-purple: #C084FC;
 
   /* Social Brand Colors */
   --color-twitter: #1da1f2;
@@ -127,7 +127,7 @@
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
   --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-  --shadow-glow: 0 0 40px rgba(99, 102, 241, 0.15);
+  --shadow-glow: 0 0 40px rgba(255, 107, 53, 0.15);
   --shadow-widget: 0 2px 8px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0, 0, 0, 0.04);
   --shadow-widget-hover: 0 8px 24px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.06);
 
@@ -270,7 +270,7 @@ body {
 /* Focus Ring */
 .focus-ring {
   outline: none;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.3);
+  box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.3);
 }
 
 /* Animation Classes */
@@ -405,7 +405,7 @@ body {
 .input:focus {
   outline: none;
   border-color: var(--color-brand-primary);
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
 }
 
 .input::placeholder {
@@ -653,7 +653,7 @@ body {
 /* Input focus styles */
 input:focus {
   border-color: var(--color-brand-primary) !important;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+  box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.15);
 }
 
 input:focus-visible {

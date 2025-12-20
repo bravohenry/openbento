@@ -31,13 +31,13 @@ export const lightTheme: ThemeConfig = {
         border: {
             default: 'rgba(0, 0, 0, 0.08)',
             hover: 'rgba(0, 0, 0, 0.12)',
-            focus: '#6366f1',
+            focus: '#FF6B35',
             divider: 'rgba(0, 0, 0, 0.06)',
         },
         brand: {
-            primary: '#6366f1',
-            secondary: '#8b5cf6',
-            gradient: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+            primary: '#FF6B35',
+            secondary: '#FF9F1C',
+            gradient: 'linear-gradient(135deg, #FF6B35 0%, #FF9F1C 100%)',
         },
         semantic: {
             success: '#10b981',

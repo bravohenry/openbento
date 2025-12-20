@@ -142,8 +142,8 @@ const BentoCardRoot = forwardRef<HTMLDivElement, BentoCardProps>((props, ref) =>
                         borderRadius: `${BENTO_RADIUS}px`,
                         pointerEvents: 'none',
                         boxShadow: dark
-                            ? 'inset 0 0 0 1px rgba(255, 255, 255, 0.32)'
-                            : 'inset 0 0 0 1px rgba(255, 255, 255, 0.18)',
+                            ? 'inset 0 0 0 1.5px rgba(255, 255, 255, 0.22)'
+                            : 'inset 0 0 0 1.5px rgba(255, 255, 255, 0.18)',
                         zIndex: 2, // 确保边框在最上层
                     }}
                 />

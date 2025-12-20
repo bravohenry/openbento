@@ -8,15 +8,146 @@
 
 import React from 'react'
 import { BentoCard, BENTO_GAP } from '@/bento/core'
-import { Button, InstagramGradientIcon, TwitterIcon, WhatsAppIcon, MapPinIcon, SpotifyIcon, YouTubeIcon } from '@/design-system/patterns'
+import { Button, InstagramGradientIcon, TwitterIcon, TikTokIcon, WhatsAppIcon, MapPinIcon, SpotifyIcon, YouTubeIcon } from '@/design-system/patterns'
 import { ThemeProvider } from '@/design-system/foundation/theme'
 import { Text } from '@/design-system/primitives'
 
-// Instagram 渐变色
-const instagramGradient = 'linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%)'
+// ============ Standard Card Content Component ============
 
-// Spotify 绿色
-const spotifyGreen = '#1DB954'
+interface PlatformCardContentProps {
+    icon: React.ReactNode;
+    iconBg?: string;
+    iconShadow?: string;
+    title: string;
+    subtitle?: string;
+    action?: {
+        label: string;
+        count?: number | string;
+        color?: string;
+        textColor?: string;
+        shape?: 'rounded' | 'pill';
+        borderRadius?: number;
+    };
+    textColor?: string;
+    subtitleColor?: string;
+    is2x1?: boolean;
+}
+
+const PlatformCardContent = ({
+    icon,
+    iconBg = '#fff',
+    iconShadow = '0px 1px 2px rgba(0, 0, 0, 0.1)',
+    title,
+    subtitle,
+    action,
+    textColor = '#000000',
+    subtitleColor = 'rgba(0, 0, 0, 0.6)',
+    is2x1 = false
+}: PlatformCardContentProps) => (
+    <div style={{
+        position: 'absolute',
+        top: 24,
+        left: 24,
+        right: 24,
+        bottom: 24,
+        pointerEvents: 'none',
+    }}>
+        {/* Icon: 40x40, rounded 10px */}
+        <div style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: 40,
+            height: 40,
+            borderRadius: 10,
+            backgroundColor: iconBg,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            boxShadow: iconShadow,
+            overflow: 'hidden',
+        }}>
+            {icon}
+            <div style={{
+                position: 'absolute',
+                inset: 0,
+                borderRadius: 10,
+                boxShadow: 'inset 0 0 0 1px rgba(0, 0, 0, 0.06)',
+                pointerEvents: 'none',
+            }} />
+        </div>
+
+        {/* Title: 14px, Starts at y=52 */}
+        <div style={{
+            position: 'absolute',
+            top: 52,
+            left: 0,
+            right: is2x1 ? '50%' : 0,
+            fontFamily: 'Inter, sans-serif',
+            fontSize: 14,
+            fontWeight: 500,
+            lineHeight: '1.2',
+            color: textColor,
+            display: '-webkit-box',
+            WebkitLineClamp: is2x1 ? 2 : 3,
+            WebkitBoxOrient: 'vertical',
+            overflow: 'hidden',
+            whiteSpace: 'pre-wrap',
+        }}>
+            {title}
+        </div>
+
+        {/* Subtitle: 12px, Starts at y=69 or below Title */}
+        {subtitle && (
+            <div style={{
+                position: 'absolute',
+                top: 69,
+                left: 0,
+                right: is2x1 ? '50%' : 0,
+                fontFamily: 'Inter, sans-serif',
+                fontSize: 12,
+                fontWeight: 400,
+                lineHeight: '16px',
+                color: subtitleColor,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+            }}>
+                {subtitle}
+            </div>
+        )}
+
+        {/* Action Button: Starts at y=97, height 30px */}
+        {action && (
+            <button style={{
+                position: 'absolute',
+                top: 97,
+                left: 0,
+                minWidth: action.shape === 'pill' ? 70 : 66,
+                height: 30,
+                borderRadius: action.borderRadius || (action.shape === 'pill' ? 23 : 8),
+                backgroundColor: action.color || '#4093ef',
+                border: 'none',
+                cursor: 'pointer',
+                fontFamily: 'Inter, sans-serif',
+                fontSize: 12,
+                fontWeight: 600,
+                color: action.textColor || '#ffffff',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 4,
+                padding: '0 12px',
+                pointerEvents: 'auto',
+            }}>
+                <span>{action.label}</span>
+                {action.count !== undefined && (
+                    <span style={{ fontWeight: 400, opacity: 0.8 }}>{action.count}</span>
+                )}
+            </button>
+        )}
+    </div>
+);
 
 // 示例图片
 const sampleImage = 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop'
@@ -34,7 +165,7 @@ export default function BentoShowcasePage() {
                 <div style={{ maxWidth: 900, margin: '0 auto' }}>
                     {/* Header */}
                     <div style={{ textAlign: 'center', marginBottom: 48 }}>
-                        <Text variant="display" gradient="linear-gradient(135deg, #6366f1, #8b5cf6)">
+                        <Text variant="display" color="primary">
                             BentoCard Component
                         </Text>
                         <Text variant="bodyLarge" color="secondary" style={{ marginTop: 12 }}>
@@ -61,272 +192,186 @@ export default function BentoShowcasePage() {
                             </BentoCard.Overlay>
                         </BentoCard>
 
-                        {/* 2. Instagram 卡片 1x1 - 精确复刻 Figma 25:943 */}
+                        {/* 2. Instagram 卡片 1x1 - 标准架构 */}
                         <BentoCard size="1x1" backgroundColor="#ffffff" clickable>
-                            {/* 内容容器：精确 24px 内边距，127×127 内容区域 */}
-                            <div style={{
-                                position: 'absolute',
-                                top: 24,
-                                left: 24,
-                                width: 127,
-                                height: 127,
-                                pointerEvents: 'none',
-                            }}>
-                                {/* 图标：绝对定位 x=0, y=0, 40×40 */}
-                                <div style={{
-                                    position: 'absolute',
-                                    top: 0,
-                                    left: 0,
-                                    width: 40,
-                                    height: 40,
-                                    borderRadius: 10,
-                                    overflow: 'hidden',
-                                    boxShadow: '0px 1px 2px rgba(0, 0, 0, 0.1)',
-                                }}>
-                                    <InstagramGradientIcon size={40} />
-                                    {/* 内边框 overlay */}
-                                    <div style={{
-                                        position: 'absolute',
-                                        inset: 0,
-                                        borderRadius: 10,
-                                        boxShadow: 'inset 0 0 0 1px rgba(0, 0, 0, 0.06)',
-                                        pointerEvents: 'none',
-                                    }} />
-                                </div>
-
-                                {/* 标题：绝对定位 y=52 (Figma: Margin y=40 + Container pt=4 + Title p=8) */}
-                                <div style={{
-                                    position: 'absolute',
-                                    top: 52,
-                                    left: 0,
-                                    fontFamily: 'Inter, sans-serif',
-                                    fontSize: 14,
-                                    fontWeight: 400,
-                                    lineHeight: '16.8px',
-                                    color: '#000000',
-                                }}>
-                                    Instagram
-                                </div>
-
-                                {/* 按钮：绝对定位 x=0, y=97, 66×30, 8px 圆角 */}
-                                <button style={{
-                                    position: 'absolute',
-                                    top: 97,
-                                    left: 0,
-                                    width: 66,
-                                    height: 30,
-                                    borderRadius: 8,
-                                    backgroundColor: '#4093ef',
-                                    border: 'none',
-                                    cursor: 'pointer',
-                                    fontFamily: 'Inter, sans-serif',
-                                    fontSize: 12,
-                                    fontWeight: 700,
-                                    lineHeight: '16px',
-                                    color: '#ffffff',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    pointerEvents: 'auto',
-                                }}>
-                                    Follow
-                                </button>
-                            </div>
+                            <PlatformCardContent
+                                icon={<InstagramGradientIcon size={40} />}
+                                title="Instagram"
+                                action={{
+                                    label: "Follow",
+                                    color: "#4093ef",
+                                    shape: "rounded",
+                                    borderRadius: 8
+                                }}
+                            />
                         </BentoCard>
 
-                        {/* 3. Twitter 卡片 1x1 - 精确复刻 Figma 19:2332 */}
+                        {/* 3. Twitter 卡片 1x1 - 标准架构 */}
                         <BentoCard size="1x1" clickable>
-                            {/* 内容容器：精确 24px 内边距，127×127 内容区域 */}
+                            <PlatformCardContent
+                                icon={<TwitterIcon size={24} color="#fff" />}
+                                iconBg="#55ACEE"
+                                title="Twitter"
+                                subtitle="@biutyai"
+                                action={{
+                                    label: "Follow",
+                                    color: "#4093ef",
+                                    shape: "rounded",
+                                    borderRadius: 8
+                                }}
+                            />
+                        </BentoCard>
+
+                        {/* TikTok 卡片 1x1 - 标准架构 */}
+                        <BentoCard size="1x1" backgroundColor="#ffffff" clickable>
+                            <PlatformCardContent
+                                icon={<TikTokIcon size={24} />}
+                                title="TikTok"
+                                subtitle="@biuty.ai"
+                                action={{
+                                    label: "Follow",
+                                    count: 8,
+                                    color: "#ea435a",
+                                    borderRadius: 4 // Figma 原产设计是较方圆角
+                                }}
+                            />
+                        </BentoCard>
+
+
+
+
+
+
+                        {/* 4. WhatsApp 链接卡片 2x1 - 标准架构 */}
+                        <BentoCard size="2x1" backgroundColor="#ffffff" clickable href="https://chat.whatsapp.com" target="_blank">
+                            <PlatformCardContent
+                                is2x1
+                                icon={<WhatsAppIcon size={24} color="#25d366" />}
+                                title={`Join Biuty🌸\nCommunity`}
+                                subtitle="chat.whatsapp.com"
+                            />
+                            {/* 2x1 卡片特有的右侧媒体 */}
                             <div style={{
                                 position: 'absolute',
                                 top: 24,
-                                left: 24,
-                                width: 127,
+                                right: 24,
+                                width: 178,
                                 height: 127,
+                                borderRadius: 16,
+                                overflow: 'hidden',
                                 pointerEvents: 'none',
                             }}>
-                                {/* 图标：绝对定位 x=0, y=0, 40×40 */}
-                                <div style={{
-                                    position: 'absolute',
-                                    top: 0,
-                                    left: 0,
-                                    width: 40,
-                                    height: 40,
-                                    borderRadius: 10,
-                                    backgroundColor: '#55ACEE',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    boxShadow: '0px 1px 2px rgba(0, 0, 0, 0.1)',
-                                }}>
-                                    <TwitterIcon size={24} color="#fff" />
-                                    {/* 内边框 overlay */}
-                                    <div style={{
-                                        position: 'absolute',
-                                        inset: 0,
-                                        borderRadius: 10,
-                                        boxShadow: 'inset 0 0 0 1px rgba(0, 0, 0, 0.06)',
-                                        pointerEvents: 'none',
-                                    }} />
-                                </div>
-
-                                {/* 标题：绝对定位 y=52 */}
-                                <div style={{
-                                    position: 'absolute',
-                                    top: 52,
-                                    left: 0,
-                                    fontFamily: 'Inter, sans-serif',
-                                    fontSize: 14,
-                                    fontWeight: 400,
-                                    lineHeight: '16.8px',
-                                    color: '#000000',
-                                }}>
-                                    Twitter
-                                </div>
-
-                                {/* Handle：绝对定位 y=69, Inter 12px, rgba(0,0,0,0.6) */}
-                                <div style={{
-                                    position: 'absolute',
-                                    top: 69,
-                                    left: 0,
-                                    fontFamily: 'Inter, sans-serif',
-                                    fontSize: 12,
-                                    fontWeight: 400,
-                                    lineHeight: '16px',
-                                    color: 'rgba(0, 0, 0, 0.6)',
-                                }}>
-                                    @biutyai
-                                </div>
-
-                                {/* 按钮：绝对定位 x=0, y=97, 70×30, 8px 圆角 */}
-                                <button style={{
-                                    position: 'absolute',
-                                    top: 97,
-                                    left: 0,
-                                    width: 70,
-                                    height: 30,
-                                    borderRadius: 8,
-                                    backgroundColor: '#4093ef',
-                                    border: 'none',
-                                    cursor: 'pointer',
-                                    fontFamily: 'Inter, sans-serif',
-                                    fontSize: 12,
-                                    fontWeight: 700,
-                                    lineHeight: '16px',
-                                    color: '#ffffff',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    pointerEvents: 'auto',
-                                }}>
-                                    Follow
-                                </button>
+                                <img
+                                    src="http://localhost:3845/assets/fbb01462716d8c3c050e75f55746393567eb2e55.png"
+                                    alt="WhatsApp hand"
+                                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                />
                             </div>
                         </BentoCard>
 
-
-
-
-
-                        {/* 4. WhatsApp 链接卡片 2x1 */}
-                        <BentoCard size="2x1" clickable href="https://chat.whatsapp.com" target="_blank">
-                            <BentoCard.Content padding="md" align="start" justify="center">
-                                <BentoCard.Icon
-                                    icon={<WhatsAppIcon size={24} color="#fff" />}
-                                    backgroundColor="#25d366"
-                                    style={{ borderRadius: '13px', marginBottom: 12 }}
-                                />
-                                <div>
-                                    <BentoCard.Title size="lg" style={{ fontSize: '20px' }}>Join Biuty🌸 Community</BentoCard.Title>
-                                    <BentoCard.Subtitle>chat.whatsapp.com</BentoCard.Subtitle>
-                                </div>
-                            </BentoCard.Content>
-                        </BentoCard>
-
-                        {/* 5. 地图卡片 2x1 */}
+                        {/* 5. 地图卡片 2x2 - 精确复刻 Figma 25:1345 */}
                         <BentoCard
-                            size="2x1"
-                            backgroundGradient="linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
-                            dark
+                            size="2x2"
+                            backgroundImage="http://localhost:3845/assets/08a1f114b3b221fab78b6cc18d90533f69de7a1d.png"
                             clickable
                         >
-                            <BentoCard.Content padding="md" justify="end">
-                                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                                    <MapPinIcon size={20} color="#fff" />
-                                    <BentoCard.Title color="inverse" size="lg">Berlin, Germany</BentoCard.Title>
-                                </div>
-                            </BentoCard.Content>
-                            <div
-                                style={{
-                                    position: 'absolute',
-                                    top: 32,
-                                    right: 48,
-                                    width: 54,
-                                    height: 54,
-                                    borderRadius: '50%',
-                                    background: 'rgba(74, 222, 128, 0.4)',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                }}
-                            >
-                                <div style={{ width: 14, height: 14, borderRadius: '50%', background: '#4ade80', boxShadow: '0 0 15px #4ade80' }} />
-                            </div>
-                        </BentoCard>
-
-                        {/* 6. Spotify 卡片 1x1 */}
-                        <BentoCard size="1x1" backgroundColor={spotifyGreen} dark clickable>
-                            <BentoCard.Content padding="md" justify="between">
-                                <BentoCard.Icon
-                                    icon={<SpotifyIcon size={24} color="#fff" />}
-                                    backgroundColor="rgba(255,255,255,0.2)"
-                                />
-                                <BentoCard.Footer>
-                                    <div>
-                                        <BentoCard.Title color="inverse">Spotify</BentoCard.Title>
-                                        <BentoCard.Subtitle color="inverse" style={{ opacity: 0.8 }}>Now Playing</BentoCard.Subtitle>
-                                    </div>
-                                    <Button variant="secondary" size="xs" shape="pill" style={{ background: 'white', color: spotifyGreen, fontSize: '12px', padding: '4px 12px' }}>
-                                        Listen
-                                    </Button>
-                                </BentoCard.Footer>
-                            </BentoCard.Content>
-                        </BentoCard>
-
-                        {/* 7. YouTube 卡片 1x1 - Pixel-perfect (原版结构) */}
-                        <BentoCard size="1x1" clickable>
-                            <BentoCard.Content padding="md" align="start" justify="start" style={{ gap: 0 }}>
-                                <BentoCard.Icon
-                                    icon={<YouTubeIcon size={28} color="#fff" />}
-                                    backgroundColor="#ff0000"
-                                    size="lg"
-                                    style={{ borderRadius: '13px' }}
-                                />
-                                <BentoCard.Title style={{ marginTop: 20, fontSize: '18px', fontWeight: 500 }}>YouTube</BentoCard.Title>
-                            </BentoCard.Content>
-                            {/* 按钮居中在卡片底部 (红色) */}
+                            {/* 中央定位点 */}
                             <div style={{
                                 position: 'absolute',
-                                bottom: 24,
+                                top: '50%',
                                 left: '50%',
-                                transform: 'translateX(-50%)',
+                                transform: 'translate(-50%, -50%)',
+                                width: 26,
+                                height: 26,
+                                borderRadius: '50%',
+                                backgroundColor: '#5871FF',
+                                border: '3px solid white',
+                                boxShadow: '0 4px 24px rgba(0,0,0,0.3)',
+                                zIndex: 1,
+                            }} />
+
+                            {/* 扩散光晕 (Figma node I25:1345;19:93) */}
+                            <div style={{
+                                position: 'absolute',
+                                top: '50%',
+                                left: '50%',
+                                transform: 'translate(-50%, -50%)',
+                                width: 234,
+                                height: 234,
+                                borderRadius: '50%',
+                                background: 'radial-gradient(circle, rgba(88, 113, 255, 0.1) 0%, rgba(88, 113, 255, 0) 70%)',
+                                pointerEvents: 'none',
+                            }} />
+
+                            {/* "Where I live" 标签 (Figma 风格) */}
+                            <div style={{
+                                position: 'absolute',
+                                bottom: 20,
+                                left: 20,
+                                height: 38, // 匹配 md 按钮高度
+                                backgroundColor: 'rgba(255, 255, 255, 0.7)',
+                                backdropFilter: 'blur(20px) saturate(160%)',
+                                padding: '0 16px', // 匹配 md 按钮内边距
+                                borderRadius: 12, // 非纯圆角 (pill)，匹配 buttonShapes.rounded / radii.lg
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 8, // 匹配 md 按钮 gap
+                                border: '1px solid rgba(255, 255, 255, 0.4)',
+                                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.05)',
+                                pointerEvents: 'none',
+                                zIndex: 2,
                             }}>
-                                <Button
-                                    variant="youtube"
-                                    size="sm"
-                                    shape="pill"
-                                    style={{
-                                        borderRadius: '12px',
-                                        padding: '10px 24px',
-                                        fontSize: '15px',
-                                        fontWeight: 700,
-                                        background: '#ff0000',
-                                        color: 'white'
-                                    }}
-                                >
-                                    Subscribe
-                                </Button>
+                                <span style={{ fontSize: 18, lineHeight: 1 }}>🏡</span>
+                                <span style={{
+                                    fontFamily: 'Inter, sans-serif',
+                                    fontSize: 14, // 匹配 md 按钮
+                                    fontWeight: 500,
+                                    color: '#000',
+                                    letterSpacing: '-0.01em'
+                                }}>
+                                    Where I live
+                                </span>
                             </div>
+                        </BentoCard>
+
+
+
+                        {/* 6. Spotify 卡片 1x1 - 标准架构 (基于上传图片) */}
+                        <BentoCard size="1x1" backgroundColor="#E6FBF0" clickable>
+                            <PlatformCardContent
+                                icon={<SpotifyIcon size={24} color="#fff" />}
+                                iconBg="#1DB954"
+                                title={`Spotify - Web\nPlayer: Music for\neveryone`}
+                                subtitle="spotify.com"
+                            />
+                        </BentoCard>
+
+                        {/* 7. YouTube 卡片 1x1 - 标准架构 */}
+                        <BentoCard size="1x1" backgroundColor="#FFF5F5" clickable>
+                            <PlatformCardContent
+                                icon={<YouTubeIcon size={24} color="#fff" />}
+                                iconBg="#FF0000"
+                                title={`Сергей\nСерпиченко`}
+                                action={{
+                                    label: "Subscribe",
+                                    count: 5,
+                                    color: "#FF0000",
+                                    shape: "pill"
+                                }}
+                            />
+                        </BentoCard>
+
+                        {/* 8. 个人品牌卡片 1x1 - 标准架构 (基于上传图片 Zihan) */}
+                        <BentoCard size="1x1" backgroundColor="#ffffff" clickable>
+                            <PlatformCardContent
+                                icon={
+                                    <div style={{ backgroundColor: '#FFD700', width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                        <img src="http://localhost:3845/assets/08a1f114b3b221fab78b6cc18d90533f69de7a1d.png" style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="Avatar" />
+                                    </div>
+                                }
+                                title={`Zihan | Branding,\nDesigning &\nBeyond`}
+                                subtitle="bravohenry.com"
+                            />
                         </BentoCard>
                     </div>
 
@@ -376,6 +421,6 @@ export default function BentoShowcasePage() {
                     </div>
                 </div>
             </div>
-        </ThemeProvider>
+        </ThemeProvider >
     )
 }

@@ -103,7 +103,7 @@ export default function ShowcasePage() {
                 <div style={{ maxWidth: 1200, margin: '0 auto' }}>
                     {/* Header */}
                     <div style={{ textAlign: 'center', marginBottom: 64 }}>
-                        <Text variant="display" gradient="linear-gradient(135deg, #6366f1, #8b5cf6)">
+                        <Text variant="display" color="primary">
                             OpenBento Design System
                         </Text>
                         <Text
@@ -413,7 +413,7 @@ export default function ShowcasePage() {
                                             width: 48,
                                             height: 48,
                                             borderRadius: 12,
-                                            background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+                                            background: 'linear-gradient(135deg, #FF6B35, #FF9F1C)',
                                             display: 'flex',
                                             alignItems: 'center',
                                             justifyContent: 'center',
