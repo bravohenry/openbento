@@ -46,7 +46,7 @@ export interface UseBentoCardReturn {
     isResizing: boolean
 
     // Refs
-    cardRef: React.RefObject<HTMLDivElement>
+    cardRef: React.RefObject<HTMLDivElement | null>
 
     // Handlers
     handleMouseEnter: () => void
