@@ -1,8 +1,12 @@
 /**
- * OpenBento - BentoCard Component
- * 
+ * 🔄 UPDATE ME: If this file changes, update this header AND /src/bento/core/ARCHITECTURE.md
+ *
+ * @input  - BentoCard.styles (样式常量), BentoCard.types (类型定义), cn (样式工具)
+ * @output - BentoCard compound component (Icon, Title, Subtitle, Image, Overlay, Action, Content)
+ * @pos    - Bento 系统的原子卡片组件，所有 Widget 都基于此构建
+ *
  * 基于 Figma 设计 (node-id: 25-1023)
- * Bento 风格卡片组件 - Compound Component 模式
+ * Compound Component 模式实现
  */
 
 import React, { forwardRef, createContext, useContext, useState } from 'react'
@@ -70,27 +74,27 @@ const BentoCardRoot = forwardRef<HTMLDivElement, BentoCardProps>((props, ref) =>
     const sizeConfig = bentoSizes[size]
     const borderConfig = dark ? bentoBorder.dark : bentoBorder.light
 
-        // 构建样式
-        const cardStyles: React.CSSProperties = {
-            ...bentoCardBase,
-            width: sizeConfig.width,
-            height: sizeConfig.height,
-            ...borderConfig,
-            cursor: clickable || href ? 'pointer' : 'default',
-            transition: 'opacity 0.2s ease, box-shadow 0.2s ease', // Smooth hover transitions
-            ...(backgroundColor && { background: backgroundColor }),
-            ...(backgroundGradient && { background: backgroundGradient }),
-            ...(backgroundImage && {
-                backgroundImage: `url(${backgroundImage})`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-            }),
-            // Edit mode hover: subtle shadow lift (when not clickable, i.e., in edit mode)
-            ...(!clickable && !disableHover && isHovered && {
-                boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
-            }),
-            ...style,
-        }
+    // 构建样式
+    const cardStyles: React.CSSProperties = {
+        ...bentoCardBase,
+        width: sizeConfig.width,
+        height: sizeConfig.height,
+        ...borderConfig,
+        cursor: clickable || href ? 'pointer' : 'default',
+        transition: 'opacity 0.2s ease, box-shadow 0.2s ease', // Smooth hover transitions
+        ...(backgroundColor && { background: backgroundColor }),
+        ...(backgroundGradient && { background: backgroundGradient }),
+        ...(backgroundImage && {
+            backgroundImage: `url(${backgroundImage})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+        }),
+        // Edit mode hover: subtle shadow lift (when not clickable, i.e., in edit mode)
+        ...(!clickable && !disableHover && isHovered && {
+            boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
+        }),
+        ...style,
+    }
 
     // 点击处理
     const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -119,14 +123,14 @@ const BentoCardRoot = forwardRef<HTMLDivElement, BentoCardProps>((props, ref) =>
                 tabIndex={clickable || href ? 0 : undefined}
                 {...restProps}
             >
-                {/* 悬停叠加层 (Figma: 15% 灰色涂层) - Preview mode */}
+                {/* 悬停叠加层 (Bento.me: 15% 灰色涂层) - Preview mode */}
                 {clickable && !disableHover && (
                     <div
                         className="bento-card-hover-overlay"
                         style={{
                             position: 'absolute',
                             inset: 0,
-                            backgroundColor: 'rgba(0, 0, 0, 0.03)', 
+                            backgroundColor: 'rgba(0, 0, 0, 0.15)',
                             opacity: isHovered ? 1 : 0,
                             transition: 'opacity 0.2s ease',
                             pointerEvents: 'none',
@@ -147,8 +151,8 @@ const BentoCardRoot = forwardRef<HTMLDivElement, BentoCardProps>((props, ref) =>
                         borderRadius: `${BENTO_RADIUS}px`,
                         pointerEvents: 'none',
                         boxShadow: dark
-                            ? 'inset 0 0 0 1.5px rgba(255, 255, 255, 0.22)'
-                            : 'inset 0 0 0 1.5px rgba(255, 255, 255, 0.18)',
+                            ? 'inset 0 0 0 1px rgba(255, 255, 255, 0.22)'
+                            : 'inset 0 0 0 1px rgba(255, 255, 255, 0.22)',
                         zIndex: 2, // 确保边框在最上层
                     }}
                 />

@@ -1,12 +1,13 @@
 'use client'
 
-import React, { useEffect, useRef, useMemo } from 'react'
+import React, { useEffect, useRef, useMemo, useCallback } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 import { motion } from 'framer-motion'
-import { EditorProvider, EditorToolbar, useEditor } from '@/bento/editor'
+
+import { EditorProvider, EditorToolbar, useEditor, ProfileSection, EditorFooter } from '@/bento/editor'
 import { WidgetEditOverlay } from '@/bento/editor'
 import { BentoGrid } from '@/bento/grid'
-import { BentoDndProvider, SortableCard, type BentoItem } from '@/bento/dnd'
+import { GridDndProvider, DraggableGridItem, swapItems, type GridItem } from '@/bento/dnd'
 import {
     WidgetRenderer,
     createLinkWidgetConfig,
@@ -23,32 +24,20 @@ const EditorView: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const { viewMode } = useEditor()
 
     return (
-        <div className="min-h-screen bg-[#F5F5F7] pb-40 transition-colors duration-500">
-            {/* Header / Nav Placeholder */}
-            <div className="h-16 flex items-center justify-between px-8 bg-white border-b border-black/5">
-                <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 bg-black rounded-lg" />
-                    <span className="font-bold text-lg">OpenBento Editor</span>
-                </div>
-                <div className="flex items-center gap-4">
-                    <button className="text-[14px] font-medium text-black/60">Help</button>
-                    <button className="px-4 h-9 bg-black text-white text-[14px] font-medium rounded-full">Publish</button>
-                </div>
-            </div>
-
+        <div className="min-h-screen bg-[#F5F5F7] pb-32 transition-colors duration-500">
             {/* Main Content Area */}
-            <div className="flex justify-center p-12 overflow-x-hidden">
+            <div className="flex justify-center px-8 py-12 overflow-x-hidden">
                 <div
                     className={cn(
                         "transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)]",
                         viewMode === 'mobile'
-                            ? "w-[430px] bg-white rounded-[48px] shadow-[0_40px_100px_rgba(0,0,0,0.1)] ring-[12px] ring-black/5 p-4 min-h-[844px]"
+                            ? "w-[430px] bg-white rounded-[48px] shadow-[0_40px_100px_rgba(0,0,0,0.1)] ring-[12px] ring-black/5 p-6 min-h-[844px]"
                             : "w-full max-w-[1200px]"
                     )}
                 >
-                    {/* Viewport Label */}
+                    {/* Viewport Label for Mobile */}
                     <div className={cn(
-                        "text-center mb-8 transition-opacity duration-300",
+                        "text-center mb-6 transition-opacity duration-300",
                         viewMode === 'mobile' ? "opacity-100" : "opacity-0 h-0 overflow-hidden"
                     )}>
                         <span className="text-[12px] font-semibold text-black/20 uppercase tracking-widest">Mobile View (iPhone 14 Pro)</span>
@@ -56,7 +45,7 @@ const EditorView: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
                     <div className={cn(
                         "transition-all duration-500",
-                        viewMode === 'mobile' ? "scale-[0.9] origin-top" : "scale-100"
+                        viewMode === 'mobile' ? "scale-[0.85] origin-top" : "scale-100"
                     )}>
                         {children}
                     </div>
@@ -64,11 +53,30 @@ const EditorView: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             </div>
 
             <EditorToolbar />
+            <EditorFooter />
         </div>
     )
 }
 
-// ============ Editable Widget Wrapper ============
+// ============ Widget Dimensions Map ============
+
+const WIDGET_DIMENSIONS: Record<WidgetSize, { width: number; height: number }> = {
+    '1x1': { width: 175, height: 175 },
+    '2x1': { width: 390, height: 175 },
+    '1x2': { width: 175, height: 390 },
+    '2x2': { width: 390, height: 390 },
+    'bar': { width: 390, height: 68 },
+}
+
+const parseWidgetSize = (size: WidgetSize): { cols: number; rows: number } => {
+    if (size === 'bar') {
+        return { cols: 2, rows: 1 }
+    }
+    const [cols, rows] = size.split('x').map(Number)
+    return { cols, rows }
+}
+
+// ============ Editable Widget ============
 
 interface EditableWidgetProps {
     widget: WidgetConfig
@@ -79,45 +87,28 @@ interface EditableWidgetProps {
     isEditing: boolean
 }
 
-// Helper to parse WidgetSize (subset of BentoSize)
-const parseWidgetSize = (size: WidgetSize): { cols: number; rows: number } => {
-    if (size === 'bar') {
-        return { cols: 2, rows: 0.4 }
-    }
-    const [cols, rows] = size.split('x').map(Number)
-    return { cols, rows }
-}
-
-const EditableWidget: React.FC<EditableWidgetProps & { isDragging?: boolean }> = ({
+const EditableWidget: React.FC<EditableWidgetProps> = ({
     widget,
     isSelected,
     onSelect,
     onDelete,
     onSizeChange,
     isEditing,
-    isDragging = false,
 }) => {
     const { cols, rows } = parseWidgetSize(widget.size)
 
-    const widgetContent = (
+    const content = (
         <div
             className="relative w-full h-full"
             onClick={(e) => {
-                if (isEditing && !isDragging) {
+                if (isEditing) {
                     e.stopPropagation()
                     onSelect()
                 }
             }}
-            style={{
-                // Remove any extra borders/outlines in edit mode
-                outline: 'none',
-            }}
         >
-            <WidgetRenderer
-                config={widget}
-                isEditing={isEditing}
-            />
-            {isEditing && isSelected && !isDragging && (
+            <WidgetRenderer config={widget} isEditing={isEditing} />
+            {isEditing && isSelected && (
                 <WidgetEditOverlay
                     widget={widget}
                     onDelete={onDelete}
@@ -127,33 +118,34 @@ const EditableWidget: React.FC<EditableWidgetProps & { isDragging?: boolean }> =
         </div>
     )
 
+    // Use Framer Motion for smooth layout animations with CSS Grid dense flow
     return (
         <motion.div
-            className="relative"
+            layout
+            layoutId={`widget-${widget.id}`}
+            id={`widget-${widget.id}`}
+            transition={{
+                layout: {
+                    type: 'spring',
+                    stiffness: 400,
+                    damping: 35,
+                },
+            }}
             style={{
                 gridColumn: `span ${cols}`,
                 gridRow: `span ${rows}`,
-                // Remove any extra borders/outlines
-                outline: 'none',
-                border: 'none',
-            }}
-            layout
-            transition={{
-                type: 'tween',
-                duration: 0.3,
-                ease: [0.32, 0.72, 0, 1], // Apple easing
             }}
         >
             {isEditing ? (
-                <SortableCard id={widget.id}>
-                    {({ isDragging: cardIsDragging }) => (
-                        <div style={{ pointerEvents: cardIsDragging ? 'none' : 'auto' }}>
-                            {widgetContent}
-                        </div>
-                    )}
-                </SortableCard>
+                <DraggableGridItem id={widget.id}>
+                    <motion.div layout className="w-full h-full">
+                        {content}
+                    </motion.div>
+                </DraggableGridItem>
             ) : (
-                widgetContent
+                <motion.div layout className="w-full h-full">
+                    {content}
+                </motion.div>
             )}
         </motion.div>
     )
@@ -179,27 +171,16 @@ const EditorContent: React.FC = () => {
     useEffect(() => {
         if (!hasInitialized.current && widgets.length === 0) {
             hasInitialized.current = true
-            
-            // Add example widgets matching the target design
+
             const exampleWidgets: WidgetConfig[] = [
-                // WhatsApp LinkWidget (2x1)
-                { ...createLinkWidgetConfig('https://chat.whatsapp.com/I9T0thvByFK84LILHNczp7', '2x1'), id: uuidv4() },
-                // LinkedIn LinkWidget (2x2)
-                { ...createLinkWidgetConfig('https://linkedin.com/company/biutyai', '2x2'), id: uuidv4() },
-                // Instagram LinkWidget (1x1)
                 { ...createLinkWidgetConfig('https://instagram.com/biuty.ai', '1x1'), id: uuidv4() },
-                // Twitter LinkWidget (1x1)
-                { ...createLinkWidgetConfig('https://twitter.com/biutyai', '1x1'), id: uuidv4() },
-                // TikTok LinkWidget (1x1)
                 { ...createLinkWidgetConfig('https://tiktok.com/@biuty.ai', '1x1'), id: uuidv4() },
-                // Biuty LinkWidget (1x2)
-                { ...createLinkWidgetConfig('https://biuty.ai', '1x2'), id: uuidv4() },
-                // TextWidget (1x1, "Add note...")
+                { ...createLinkWidgetConfig('https://biuty.ai', '1x1'), id: uuidv4() },
+                { ...createLinkWidgetConfig('https://linkedin.com/company/biutyai', '1x1'), id: uuidv4() },
                 { ...createTextWidgetConfig('', 'note', '1x1'), id: uuidv4() },
-                // MapWidget (2x2, Berlin)
-                { ...createMapWidgetConfig('Berlin, Germany', '2x2', { lat: 52.52, lng: 13.405, label: 'Berlin' }), id: uuidv4() },
-                // ImageWidget (1x1) - placeholder
                 { ...createImageWidgetConfig('https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop', '1x1'), id: uuidv4() },
+                { ...createLinkWidgetConfig('https://twitter.com/biutyai', '2x2'), id: uuidv4() },
+                { ...createMapWidgetConfig('Berlin, Germany', '2x2', { lat: 52.52, lng: 13.405, label: 'Berlin, Germany' }), id: uuidv4() },
             ]
 
             exampleWidgets.forEach((widget) => addWidget(widget))
@@ -220,55 +201,24 @@ const EditorContent: React.FC = () => {
         return () => document.removeEventListener('mousedown', handleClickOutside)
     }, [isEditing, setSelectedWidgetId])
 
-    const handleSizeChange = (widgetId: string, newSize: WidgetSize) => {
+    const handleSizeChange = useCallback((widgetId: string, newSize: WidgetSize) => {
         updateWidget(widgetId, { size: newSize })
-    }
+    }, [updateWidget])
 
-    // Convert WidgetConfig to BentoItem for drag and drop
-    const bentoItems: BentoItem[] = useMemo(() => {
+    // Convert to GridItem for DnD
+    const gridItems: GridItem[] = useMemo(() => {
         return widgets.map((widget) => ({
             id: widget.id,
-            size: widget.size === 'bar' ? '2x1' : widget.size, // Map 'bar' to '2x1' for compatibility
-            content: null,
+            size: widget.size,
             data: widget,
         }))
     }, [widgets])
 
-    // Internal state for drag preview (to avoid infinite loops)
-    const [dragPreviewItems, setDragPreviewItems] = React.useState<BentoItem[]>(bentoItems)
-    const isDraggingRef = React.useRef(false)
-
-    // Sync preview items when widgets change (but not during drag)
-    React.useEffect(() => {
-        if (!isDraggingRef.current) {
-            setDragPreviewItems(bentoItems)
-        }
-    }, [bentoItems])
-
-    // Handle drag and drop reordering - update preview only
-    const handleItemsChange = React.useCallback((newItems: BentoItem[]) => {
-        // Update preview state only, not the actual widgets
-        setDragPreviewItems(newItems)
-    }, [])
-
-    // Handle drag start
-    const handleDragStart = React.useCallback(() => {
-        isDraggingRef.current = true
-    }, [])
-
-    // Handle final reorder on drag end
-    const handleDragEnd = React.useCallback((item: BentoItem, fromIndex: number, toIndex: number) => {
-        isDraggingRef.current = false
-        
-        // Use the final preview order to update actual widgets
-        const finalOrder = dragPreviewItems
-            .map((item) => widgets.find((w) => w.id === item.id))
-            .filter((w): w is WidgetConfig => w !== undefined)
-        
-        if (finalOrder.length === widgets.length) {
-            reorderWidgets(finalOrder)
-        }
-    }, [dragPreviewItems, widgets, reorderWidgets])
+    // Handle swap - exchange positions of two widgets
+    const handleSwap = useCallback((fromId: string, toId: string) => {
+        const newWidgets = swapItems(widgets, fromId, toId)
+        reorderWidgets(newWidgets)
+    }, [widgets, reorderWidgets])
 
     const gridContent = (
         <BentoGrid columns={4} centered>
@@ -287,39 +237,51 @@ const EditorContent: React.FC = () => {
     )
 
     return (
-        <div className="flex flex-col gap-12" ref={containerRef}>
-            {/* Hero Section */}
-            <div className="flex flex-col items-center text-center gap-4">
-                <h1 className="text-[44px] font-bold leading-[52.8px] tracking-[-2px] text-black">
-                    Biuty AI
-                </h1>
-                <p className="text-[20px] leading-[28px] text-[#565656] max-w-[500px]">
-                    Don't waste another dollar on products that don't work.{' '}
-                    <span className="font-bold">Let AI analyze your skin.</span>
-                </p>
-            </div>
+        <div
+            className="flex gap-16 items-start justify-center"
+            ref={containerRef}
+        >
+            {/* Left Column: Profile Section (Fixed) */}
+            <ProfileSection
+                name="Biuty AI"
+                description={
+                    <>
+                        Don't waste another dollar on products that don't work.{' '}
+                        <strong>Let AI analyze your skin.</strong>
+                    </>
+                }
+            />
+            
+            {/* Placeholder to maintain layout spacing */}
+            <div className="w-[380px] shrink-0" aria-hidden="true" />
 
-            {/* Bento Grid with DnD */}
-            {isEditing ? (
-                <BentoDndProvider
-                    items={dragPreviewItems}
-                    onItemsChange={handleItemsChange}
-                    onDragStart={handleDragStart}
-                    onDragEnd={handleDragEnd}
-                    renderOverlay={(item) => {
-                        const widget = item.data as WidgetConfig
-                        return (
-                            <div className="opacity-90">
-                                <WidgetRenderer config={widget} isEditing={isEditing} />
-                            </div>
-                        )
-                    }}
-                >
-                    {gridContent}
-                </BentoDndProvider>
-            ) : (
-                gridContent
-            )}
+            {/* Right Column: Widget Grid */}
+            <div className="flex-1 max-w-[780px]">
+                {isEditing ? (
+                    <GridDndProvider
+                        items={gridItems}
+                        onSwap={handleSwap}
+                        renderOverlay={(item) => {
+                            const widget = item.data as WidgetConfig
+                            const dims = WIDGET_DIMENSIONS[widget.size] || WIDGET_DIMENSIONS['1x1']
+                            return (
+                                <div style={{
+                                    width: dims.width,
+                                    height: dims.height,
+                                    borderRadius: '27px',
+                                    overflow: 'hidden',
+                                }}>
+                                    <WidgetRenderer config={widget} isEditing={false} />
+                                </div>
+                            )
+                        }}
+                    >
+                        {gridContent}
+                    </GridDndProvider>
+                ) : (
+                    gridContent
+                )}
+            </div>
         </div>
     )
 }

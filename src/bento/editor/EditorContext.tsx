@@ -1,3 +1,13 @@
+/**
+ * [INPUT]: (WidgetConfig[], localStorage) - Widget 配置数组和本地存储接口
+ * [OUTPUT]: (EditorProvider, useEditor, useSelectedWidget, useWidgets) - 编辑器上下文提供者和相关 Hooks
+ * [POS]: 位于 /bento/editor 的状态管理层，管理编辑模式、选中 Widget、Widgets CRUD 操作。
+ * 
+ * [PROTOCOL]:
+ * 1. 一旦本文件逻辑变更，必须同步更新此 Header。
+ * 2. 更新后必须上浮检查 /src/bento/editor/.folder.md 的描述是否依然准确。
+ */
+
 import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react'
 import type { WidgetConfig } from '../widgets/types'
 
@@ -87,7 +97,7 @@ export const EditorProvider: React.FC<{ children: ReactNode }> = ({ children }) 
 
     const updateWidget = useCallback((id: string, updates: Partial<WidgetConfig>) => {
         setWidgets((prev) =>
-            prev.map((w) => (w.id === id ? { ...w, ...updates } : w))
+            prev.map((w) => (w.id === id ? { ...w, ...updates } as WidgetConfig : w))
         )
     }, [])
 

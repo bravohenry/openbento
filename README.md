@@ -15,7 +15,23 @@
 
 ---
 
-## 📖 The Story
+## � Documentation Mandate
+
+> **⚠️ CRITICAL: Any change to functionality, architecture, or implementation patterns MUST be followed by updating the relevant `ARCHITECTURE.md` in affected directories.**
+
+This project uses a **fractal, self-referential documentation system** inspired by *Gödel, Escher, Bach*:
+
+- **每个文件夹** contains an `ARCHITECTURE.md` describing its contents
+- **每个文件** contains header comments declaring `@input` / `@output` / `@pos`
+- **Changes propagate upward**: file → folder → module → root
+
+*局部影响整体，整体影响局部。*
+
+> 📖 **详细文档**：查看 [FRACTAL_DOCS.md](./FRACTAL_DOCS.md) 了解完整的分形文档系统规范。
+
+---
+
+## �📖 The Story
 
 > **"Preserving the aesthetic that Linktree sunsetted."**
 

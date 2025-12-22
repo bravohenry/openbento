@@ -1,7 +1,11 @@
 /**
- * OpenBento - Bento Context
+ * [INPUT]: (initialCards, defaultTheme) - 初始卡片状态和主题配置
+ * [OUTPUT]: (BentoProvider, useBentoContext, useBentoCard, useSelectedCard, useIsEditing) - 上下文提供者和相关 Hooks
+ * [POS]: 位于 /bento/core 的状态管理层，作为整个 Bento 系统的状态中枢，管理编辑模式、卡片状态、网格配置等。
  * 
- * 全局 Bento 系统上下文，管理主题、编辑模式、卡片状态等
+ * [PROTOCOL]:
+ * 1. 一旦本文件逻辑变更，必须同步更新此 Header。
+ * 2. 更新后必须上浮检查 /src/bento/core/.folder.md 的描述是否依然准确。
  */
 
 import React, { createContext, useContext, useReducer, useCallback, ReactNode } from 'react'

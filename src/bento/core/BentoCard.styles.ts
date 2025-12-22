@@ -11,13 +11,13 @@ import type { BentoSize } from './BentoCard.types'
 
 export const BENTO_UNIT = 175      // 基础单元尺寸
 export const BENTO_GAP = 40        // 网格间距
-export const BENTO_RADIUS = 23     // 圆角 (Figma: 23px)
+export const BENTO_RADIUS = 27     // 圆角 (Bento.me: 27px)
 export const BENTO_PADDING = 24    // 内边距
 
 // ============ Figma 颜色令牌 ============
 export const bentoColors = {
-  // 背景色 (Selago - 淡蓝灰)
-  cardBackground: '#F5FAFE',
+  // 背景色 (Bento.me: 白色)
+  cardBackground: '#ffffff',
   // Twitter 蓝 (Picton Blue)
   twitterBlue: '#55ACEE',
   // 文本颜色
@@ -67,7 +67,7 @@ export const bentoCardBase: React.CSSProperties = {
   overflow: 'hidden',
   cursor: 'default',
   transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-  background: bentoColors.cardBackground,  // #F5FAFE (Selago)
+  background: bentoColors.cardBackground,  // #ffffff (Bento.me)
 }
 
 // ============ Hover 样式 ============

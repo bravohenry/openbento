@@ -1,8 +1,9 @@
 /**
- * OpenBento - BentoGrid Component
- * 
- * 响应式 Bento 网格布局组件
- * 基于 CSS Grid，支持多种卡片尺寸的自动布局
+ * 🔄 UPDATE ME: If this file changes, update this header AND /src/bento/grid/ARCHITECTURE.md
+ *
+ * @input  - BentoGrid.types (类型), BentoSizeMap (尺寸常量), cn (样式工具)
+ * @output - BentoGrid, ResponsiveBentoGrid, AutoLayoutGrid, useGridContext
+ * @pos    - 网格布局系统核心，提供 CSS Grid 容器和响应式支持
  */
 
 import React, { createContext, useContext, forwardRef, useMemo } from 'react'
@@ -61,6 +62,7 @@ export const BentoGrid = forwardRef<HTMLDivElement, BentoGridProps>((props, ref)
         display: 'grid',
         gridTemplateColumns: `repeat(${columns}, ${unit}px)`,
         gridTemplateRows: rows ? `repeat(${rows}, ${unit}px)` : 'auto',
+        gridAutoFlow: 'dense', // Auto-fill gaps - items flow to fill empty spaces
         gap: `${gap}px`,
         width: 'fit-content',
         maxWidth: maxWidth ?? 'none',

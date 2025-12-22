@@ -1,7 +1,9 @@
 /**
- * OpenBento - Widgets Module
- * 
- * 导出所有 Widget 组件和工具函数
+ * 🔄 UPDATE ME: If this file changes, update this header AND /src/bento/widgets/ARCHITECTURE.md
+ *
+ * @input  - 各 Widget 子模块 (link, text, map, image, section), types
+ * @output - WidgetRenderer, 所有 Widget 组件和工厂函数
+ * @pos    - Widget 系统的统一入口，动态分发渲染不同类型的卡片
  */
 
 // Types
@@ -41,15 +43,15 @@ export const WidgetRenderer: React.FC<WidgetProps<WidgetConfig>> = (props) => {
 
     switch (config.category) {
         case 'link':
-            return <LinkWidget { ...props as WidgetProps<typeof config> } />
+            return <LinkWidget {...props as WidgetProps<typeof config>} />
         case 'text':
-            return <TextWidget { ...props as WidgetProps<typeof config> } />
+            return <TextWidget {...props as WidgetProps<typeof config>} />
         case 'map':
-            return <MapWidget { ...props as WidgetProps<typeof config> } />
+            return <MapWidget {...props as WidgetProps<typeof config>} />
         case 'image':
-            return <ImageWidget { ...props as WidgetProps<typeof config> } />
+            return <ImageWidget {...props as WidgetProps<typeof config>} />
         case 'section':
-            return <SectionTitleWidget { ...props as WidgetProps<typeof config> } />
+            return <SectionTitleWidget {...props as WidgetProps<typeof config>} />
         default:
             return null
     }

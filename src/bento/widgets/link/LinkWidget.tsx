@@ -1,10 +1,13 @@
 'use client'
 
 /**
- * OpenBento - Link Widget
+ * [INPUT]: (LinkWidgetConfig, onClick, isEditing) - 链接配置、点击处理、编辑模式标志
+ * [OUTPUT]: (LinkWidget, PlatformCardContent, createLinkWidgetConfig) - 链接卡片组件和相关工具函数
+ * [POS]: 位于 /bento/widgets/link 的 Widget 实现，基于 BentoCard 构建，提供平台链接展示功能。
  * 
- * 基于 BentoCard 组件的链接 Widget
- * 支持 5 种尺寸变体 (from Figma)
+ * [PROTOCOL]:
+ * 1. 一旦本文件逻辑变更，必须同步更新此 Header。
+ * 2. 更新后必须上浮检查 /src/bento/widgets/.folder.md 的描述是否依然准确。
  */
 
 import React from 'react'
@@ -113,11 +116,11 @@ function getSizeLayout(size: WidgetSize) {
 const PlatformCardContent: React.FC<PlatformCardContentProps> = ({
     icon,
     iconBg = '#fff',
-    iconShadow = '0px 1px 2px rgba(0, 0, 0, 0.1)',
+    iconShadow = '0px 0.6px 2px rgba(0, 0, 0, 0.16)',
     title,
     subtitle,
     action,
-    textColor = '#000000',
+    textColor = '#1a1a1a',
     subtitleColor = 'rgba(0, 0, 0, 0.6)',
     widgetSize
 }) => {
@@ -161,6 +164,8 @@ const PlatformCardContent: React.FC<PlatformCardContentProps> = ({
                     fontFamily: 'Inter, sans-serif',
                     fontSize: layout.fontSize,
                     fontWeight: 500,
+                    lineHeight: '18px',
+                    letterSpacing: '-0.01em',
                     color: textColor,
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
@@ -242,7 +247,8 @@ const PlatformCardContent: React.FC<PlatformCardContentProps> = ({
                 fontFamily: 'Inter, sans-serif',
                 fontSize: layout.fontSize,
                 fontWeight: 500,
-                lineHeight: '1.2',
+                lineHeight: layout.fontSize === 18 ? '22px' : '18px',
+                letterSpacing: layout.fontSize === 18 ? '-0.02em' : '-0.01em',
                 color: textColor,
                 display: '-webkit-box',
                 WebkitLineClamp: layout.lineClamp,

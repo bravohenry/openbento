@@ -1,26 +1,16 @@
 /**
- * OpenBento - Drag and Drop Module
- * 
- * 基于 @dnd-kit + Framer Motion 的专业拖放系统
+ * 🔄 UPDATE ME: If this file changes, update this header AND /src/bento/dnd/ARCHITECTURE.md
+ *
+ * @input  - GridDndProvider, @dnd-kit/core
+ * @output - GridDndProvider, DraggableGridItem, swapItems, useGridDnd
+ * @pos    - DnD 模块入口，只导出基于 swap 的网格拖拽系统
  */
 
-// 新系统 - 基于 @dnd-kit
-export { BentoDndProvider, useBentoDndState } from './BentoDndContext'
-export type { BentoItem, BentoDndContextValue, BentoDndProviderProps } from './BentoDndContext'
+// Grid-based swap DnD system (主力系统)
+export { GridDndProvider, DraggableGridItem, swapItems, useGridDnd } from './GridDndProvider'
+export type { GridItem } from './GridDndProvider'
 
-export { SortableCard, CardOverlay, DragHandle } from './SortableCard'
-export type { SortableCardProps, CardOverlayProps, DragHandleProps } from './SortableCard'
-
-// 速度感知碰撞检测
-export {
-    velocityAwareCollision,
-    createVelocityAwareCollision,
-    updateVelocity,
-    resetVelocity,
-    getVelocity,
-} from './velocityAwareCollision'
-
-// 重新导出 @dnd-kit 常用组件
+// 重新导出 @dnd-kit 常用组件 (供外部扩展使用)
 export {
     DndContext,
     DragOverlay,
@@ -48,4 +38,3 @@ export type {
     DragOverEvent,
     UniqueIdentifier,
 } from '@dnd-kit/core'
-
