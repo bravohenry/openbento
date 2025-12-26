@@ -2,18 +2,18 @@
 
 # Design System
 
-> **OpenBento 的设计系统。提供设计令牌、原子组件和复合组件模式。**
-> 遵循 Atomic Design 原则：Tokens → Primitives → Patterns。
+> **OpenBento's design system. Provides design tokens, atomic components, and composite component patterns.**
+> Follows Atomic Design principles: Tokens → Primitives → Patterns.
 
 ## Submodules
 
 | Submodule | Layer | Purpose |
 |-----------|-------|---------|
-| `tokens/` | Foundation | 设计令牌 (颜色、间距、阴影等) |
-| `foundation/` | Foundation | 基础设施 (主题、网格) |
-| `primitives/` | Atoms | 原子组件 (Box, Flex, Text, Stack) |
-| `patterns/` | Molecules | 复合组件 (Button, Card, Modal 等) |
-| `utils/` | Utilities | 工具函数 (cn, polymorphic) |
+| `tokens/` | Foundation | Design tokens (colors, spacing, shadows, etc.) |
+| `foundation/` | Foundation | Infrastructure (theme, grid) |
+| `primitives/` | Atoms | Atomic components (Box, Flex, Text, Stack) |
+| `patterns/` | Molecules | Composite components (Button, Card, Modal, etc.) |
+| `utils/` | Utilities | Utility functions (cn, polymorphic) |
 
 ## Design Philosophy
 
@@ -24,4 +24,4 @@ tokens/  ──► foundation/  ──► primitives/  ──► patterns/
 
 ## Entry Point
 
-`index.ts` — 重新导出所有公开 API
+`index.ts` — Re-exports all public APIs

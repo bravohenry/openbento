@@ -2,11 +2,11 @@
 
 # types/
 
-> **全局 TypeScript 类型定义。存放跨模块共享的类型。**
-> 单一入口点，所有共享类型都在 index.ts 中导出。
+> **Global TypeScript type definitions. Stores types shared across modules.**
+> Single entry point, all shared types are exported from index.ts.
 
 ## Files
 
 | File | Role | Purpose |
 |------|------|---------|
-| `index.ts` | Entry | 所有共享类型定义 |
+| `index.ts` | Entry | All shared type definitions |

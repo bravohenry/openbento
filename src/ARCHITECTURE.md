@@ -2,21 +2,21 @@
 
 # OpenBento Source Architecture
 
-> **系统核心代码目录。包含所有业务逻辑、UI 组件和设计系统。**
-> 每个子模块都有独立的 `ARCHITECTURE.md`，遵循分形文档结构。
+> **Core source code directory. Contains all business logic, UI components, and design system.**
+> Each submodule has its own `ARCHITECTURE.md`, following the fractal documentation structure.
 
 ## Modules
 
 | Module | Purpose | Key Exports |
 |--------|---------|-------------|
-| `app/` | Next.js 路由和页面 | Pages, Layouts |
-| `bento/` | Bento 卡片核心系统 | BentoCard, BentoGrid, DnD, Widgets |
-| `design-system/` | 设计系统 | Tokens, Primitives, Patterns |
-| `components/` | 通用 UI 组件 | Shared components |
-| `lib/` | 工具函数库 | Utilities, Helpers |
-| `stores/` | 状态管理 | Zustand stores |
-| `styles/` | 全局样式 | CSS, Themes |
-| `types/` | TypeScript 类型定义 | Shared types |
+| `app/` | Next.js routes and pages | Pages, Layouts |
+| `bento/` | Bento card core system | BentoCard, BentoGrid, DnD, Widgets |
+| `design-system/` | Design system | Tokens, Primitives, Patterns |
+| `components/` | Generic UI components | Shared components |
+| `lib/` | Utility functions library | Utilities, Helpers |
+| `stores/` | State management | Zustand stores |
+| `styles/` | Global styles | CSS, Themes |
+| `types/` | TypeScript type definitions | Shared types |
 
 ## Dependency Flow
 
@@ -31,7 +31,7 @@ app/ ──────────────┐
 
 ## File Naming Conventions
 
-- `index.ts` — 模块入口，重新导出公开 API
-- `*.types.ts` — 类型定义
-- `*.styles.ts` — 样式常量
-- `*.test.ts` — 测试文件
+- `index.ts` — Module entry point, re-exports public API
+- `*.types.ts` — Type definitions
+- `*.styles.ts` — Style constants
+- `*.test.ts` — Test files

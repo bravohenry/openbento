@@ -2,18 +2,18 @@
 
 # Bento Module
 
-> **Bento 卡片系统的核心实现。提供卡片渲染、网格布局、拖拽交互和编辑器功能。**
-> 这是 OpenBento 的心脏，所有用户可见的卡片功能都在这里。
+> **Core implementation of the Bento card system. Provides card rendering, grid layout, drag-and-drop interactions, and editor functionality.**
+> This is the heart of OpenBento, where all user-visible card functionality resides.
 
 ## Submodules
 
 | Submodule | Purpose | Key Exports |
 |-----------|---------|-------------|
-| `core/` | 卡片原子组件 | BentoCard, BentoContext, useBentoCard |
-| `dnd/` | 拖拽交互系统 | DndProvider, Draggable, Droppable |
-| `editor/` | 编辑器 UI | EditorContext, EditorToolbar, WidgetEditOverlay |
-| `grid/` | 网格布局 | BentoGrid, BentoCell, useGridLayout |
-| `widgets/` | 具体卡片类型 | LinkWidget, TextWidget, MapWidget... |
+| `core/` | Atomic card components | BentoCard, BentoContext, useBentoCard |
+| `dnd/` | Drag-and-drop interaction system | DndProvider, Draggable, Droppable |
+| `editor/` | Editor UI | EditorContext, EditorToolbar, WidgetEditOverlay |
+| `grid/` | Grid layout | BentoGrid, BentoCell, useGridLayout |
+| `widgets/` | Specific card types | LinkWidget, TextWidget, MapWidget... |
 
 ## Dependency Flow
 
@@ -28,4 +28,4 @@ editor/ ──► widgets/
 
 ## Entry Point
 
-`index.ts` — 重新导出所有公开 API
+`index.ts` — Re-exports all public APIs

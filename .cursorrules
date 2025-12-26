@@ -1,84 +1,88 @@
 # OpenBento - Cursor Rules
 
-## 📌 分形文档系统守护者规则
+## 📌 Fractal Documentation System Guardian Rules
 
-**你是这个分形系统的守护者。任何时候你感到逻辑模糊，请先通过更新各级 MD 来校准你的认知。**
+**You are the guardian of this fractal system. Whenever you feel logic is unclear, first calibrate your understanding by updating the relevant MD files at all levels.**
 
-### 核心同步协议（Mandatory）
+### Core Synchronization Protocol (Mandatory)
 
-1. **"原子更新规则"**：任何功能、架构、写法更新，必须在代码修改完成后，【立即同步更新】对应目录或子文档。
-2. **"逆向触发链"**：文件变更 → 更新文件 Header → 更新所属文件夹 `.folder.md` →（若影响全局）更新主 `README.md`。
-3. **"分形自洽"**：确保系统在任何一个子目录下，都能通过该目录的 MD 重建局部世界观。
+1. **"Atomic Update Rule"**: Any update to functionality, architecture, or implementation patterns MUST be immediately synchronized with the corresponding directory or sub-document after code changes are completed.
+2. **"Reverse Trigger Chain"**: File change → Update file Header → Update parent folder `.folder.md` → (If global impact) Update main `README.md`.
+3. **"Fractal Self-Consistency"**: Ensure that at any subdirectory level, the system can rebuild its local worldview through that directory's MD file.
 
-### 文档层级结构
+### Documentation Hierarchy Structure
 
-- **层级一：根目录主控文档**（`README.md`）- 系统的"灵魂"与强制法规
-- **层级二：文件夹级架构说明**（`.folder.md`）- 局部地图（三行极简原则：地位、逻辑、约束）
-- **层级三：文件开头注释**（文件 Header）- 细粒度信息（In/Out/Pos 协议）
+- **Level 1: Root Directory Master Document** (`README.md`) - The "soul" and mandatory regulations of the system
+- **Level 2: Folder-Level Architecture Documentation** (`.folder.md`) - Local map (Three-line minimalism principle: Status, Logic, Constraints)
+- **Level 3: File Header Comments** (File Header) - Fine-grained information (In/Out/Pos protocol)
 
-### 文件 Header 格式
+### File Header Format
 
-所有关键文件必须包含以下格式的 Header：
+All critical files must include a Header in the following format:
 
 ```typescript
 /**
- * [INPUT]: (参数列表) - 输入说明
- * [OUTPUT]: (返回值列表) - 输出说明
- * [POS]: 位置说明 - 在系统中的位置和作用
+ * [INPUT]: (parameter list) - Input description
+ * [OUTPUT]: (return value list) - Output description
+ * [POS]: Position description - Position and role in the system
  * 
  * [PROTOCOL]:
- * 1. 一旦本文件逻辑变更，必须同步更新此 Header。
- * 2. 更新后必须上浮检查所属文件夹 .folder.md 的描述是否依然准确。
+ * 1. Once this file's logic changes, this Header must be synchronized immediately.
+ * 2. After update, must check upward whether the parent folder's .folder.md description is still accurate.
  */
 ```
 
-### 文件夹 .folder.md 格式
+### Folder .folder.md Format
 
-所有主要文件夹必须包含 `.folder.md` 文件，遵循三行极简原则：
+All major folders must contain a `.folder.md` file, following the three-line minimalism principle:
 
 ```markdown
 # Folder: /path/to/folder
 
-1. **"地位"**：在系统中的地位和作用
-2. **"逻辑"**：核心逻辑流程
-3. **"约束"**：必须遵守的约束条件
+1. **"Status"**: Position and role in the system
+2. **"Logic"**: Core logic flow
+3. **"Constraints"**: Constraints that must be followed
 
-## 🧩 成员清单
+## 🧩 Member List
 
-- `file1.tsx`：文件说明
-- `file2.tsx`：文件说明
+- `file1.tsx`: File description
+- `file2.tsx`: File description
 
-⚠️ **触发器**：一旦本文件夹新增或文件架构逻辑调整，请立即重写此文档。
+⚠️ **Trigger**: Once files are added or architecture logic is adjusted in this folder, immediately rewrite this document.
 ```
 
-### 更新传播规则
+### Update Propagation Rules
 
-当修改代码时，必须遵循以下传播链：
+When modifying code, the following propagation chain must be followed:
 
-1. **修改文件** → 更新文件 Header（如果逻辑变更）
-2. **修改文件** → 检查所属文件夹 `.folder.md` 是否需要更新
-3. **修改文件夹结构** → 更新文件夹 `.folder.md`
-4. **影响全局架构** → 更新根目录 `README.md`
+1. **Modify file** → Update file Header (if logic changes)
+2. **Modify file** → Check if parent folder `.folder.md` needs updating
+3. **Modify folder structure** → Update folder `.folder.md`
+4. **Global architecture impact** → Update root `README.md`
 
-### 代码规范
+### Code Standards
 
-- 使用 TypeScript，严格类型检查
-- 遵循 React Hooks 最佳实践
-- 使用 Compound Component 模式（如 BentoCard）
-- 所有组件必须支持主题切换
-- 严禁硬编码颜色和尺寸，必须使用设计令牌
+- Use TypeScript with strict type checking
+- Follow React Hooks best practices
+- Use Compound Component pattern (e.g., BentoCard)
+- All components must support theme switching
+- Hard-coded colors and sizes are strictly prohibited; must use design tokens
 
-### 项目结构
+### Project Structure
 
-- `/src/bento` - Bento 卡片系统核心
-- `/src/design-system` - 设计系统
-- `/src/app` - Next.js 路由和页面
-- `/src/components` - 通用组件
+- `/src/bento` - Bento card system core
+- `/src/design-system` - Design system
+- `/src/app` - Next.js routes and pages
+- `/src/components` - Generic components
 
-### 注意事项
+### Important Notes
 
-- 所有文档更新必须在代码修改后立即完成
-- 如果发现文档与代码不一致，优先更新文档以反映当前代码状态
-- 在添加新功能时，必须同时更新相关文档
-- 删除功能时，必须同时删除相关文档
+- All documentation updates must be completed immediately after code modifications
+- If documentation is found to be inconsistent with code, prioritize updating documentation to reflect current code state
+- When adding new features, related documentation must be updated simultaneously
+- When removing features, related documentation must be deleted simultaneously
+
+
+
+
 

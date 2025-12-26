@@ -2,21 +2,21 @@
 
 # design-system/foundation
 
-> **设计系统基础设施。提供主题系统。**
-> 为上层组件提供配置基础。
+> **Design system infrastructure. Provides theme system.**
+> Provides configuration foundation for upper-level components.
 
 ## Subfolders
 
 | Folder | Purpose |
 |--------|---------|
-| `theme/` | 主题配置 (ThemeProvider, useTheme) |
+| `theme/` | Theme configuration (ThemeProvider, useTheme) |
 
 ## Files
 
 | File | Role | Purpose |
 |------|------|---------|
-| `index.ts` | Entry | 重新导出公开 API |
+| `index.ts` | Entry | Re-exports public API |
 
 ## Removed (Cleanup)
 
-- ~~`grid/`~~ — 已删除，使用 `bento/grid/BentoGrid.tsx` 替代
+- ~~`grid/`~~ — Removed, use `bento/grid/BentoGrid.tsx` instead

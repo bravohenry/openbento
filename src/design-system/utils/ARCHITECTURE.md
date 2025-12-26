@@ -2,14 +2,14 @@
 
 # design-system/utils
 
-> **工具函数库。提供样式合并、多态组件等通用能力。**
-> 被整个设计系统和业务代码广泛使用。
+> **Utility function library. Provides common capabilities like style merging and polymorphic components.**
+> Widely used throughout the design system and business code.
 
 ## Files
 
 | File | Role | Purpose |
 |------|------|---------|
-| `index.ts` | Entry | 重新导出所有工具 |
-| `cn.ts` | Utility | className 合并 (clsx + tailwind-merge) |
-| `polymorphic.ts` | Utility | 多态组件类型工具 (as prop) |
-| `styleProps.ts` | Utility | Style props 解析和转换 |
+| `index.ts` | Entry | Re-exports all utilities |
+| `cn.ts` | Utility | className merging (clsx + tailwind-merge) |
+| `polymorphic.ts` | Utility | Polymorphic component type utilities (as prop) |
+| `styleProps.ts` | Utility | Style props parsing and transformation |

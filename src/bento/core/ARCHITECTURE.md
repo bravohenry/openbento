@@ -2,18 +2,18 @@
 
 # bento/core
 
-> **Bento 卡片的原子级实现。定义卡片的视觉结构、尺寸系统和组合模式。**
-> 这是整个 Bento 系统的基础层，其他模块都依赖于此。
+> **Atomic-level implementation of Bento cards. Defines the visual structure, size system, and composition patterns of cards.**
+> This is the foundation layer of the entire Bento system, and all other modules depend on it.
 
 ## Files
 
 | File | Role | Purpose |
 |------|------|---------|
-| `index.ts` | Entry | 重新导出公开 API |
-| `BentoCard.tsx` | Core | 卡片主组件，Compound Component 模式 |
-| `BentoCard.types.ts` | Types | 卡片相关类型定义 |
-| `BentoCard.styles.ts` | Styles | 卡片样式常量和 Tailwind 类 |
-| `BentoContext.tsx` | Context | 卡片状态管理 Context |
-| `BentoSizeMap.ts` | Config | 尺寸映射表 (1x1, 2x1, 2x2...) |
-| `BentoSlots.tsx` | Slots | 卡片内容插槽组件 |
-| `useBentoCard.ts` | Hook | 卡片交互逻辑 Hook |
+| `index.ts` | Entry | Re-exports public API |
+| `BentoCard.tsx` | Core | Main card component, Compound Component pattern |
+| `BentoCard.types.ts` | Types | Card-related type definitions |
+| `BentoCard.styles.ts` | Styles | Card style constants and Tailwind classes |
+| `BentoContext.tsx` | Context | Card state management Context |
+| `BentoSizeMap.ts` | Config | Size mapping table (1x1, 2x1, 2x2...) |
+| `BentoSlots.tsx` | Slots | Card content slot components |
+| `useBentoCard.ts` | Hook | Card interaction logic Hook |

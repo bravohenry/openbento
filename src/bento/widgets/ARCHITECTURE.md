@@ -2,26 +2,26 @@
 
 # bento/widgets
 
-> **具体卡片类型实现。每种 Widget 对应一种社交平台或内容类型。**
-> 可扩展的 Widget 注册表模式，添加新平台只需新建子文件夹。
+> **Specific card type implementations. Each Widget corresponds to a social platform or content type.**
+> Extensible Widget registry pattern, adding new platforms only requires creating a new subfolder.
 
 ## Files
 
 | File | Role | Purpose |
 |------|------|---------|
-| `index.tsx` | Entry | WidgetRenderer 动态渲染器 |
-| `types.ts` | Types | Widget 通用类型 (WidgetConfig, WidgetSize) |
-| `registry.ts` | Registry | 平台注册表 (图标、颜色、CTA 检测) |
-| `icons.tsx` | Icons | 通用图标组件 |
+| `index.tsx` | Entry | WidgetRenderer dynamic renderer |
+| `types.ts` | Types | Widget common types (WidgetConfig, WidgetSize) |
+| `registry.ts` | Registry | Platform registry (icons, colors, CTA detection) |
+| `icons.tsx` | Icons | Generic icon components |
 
 ## Widget Subfolders
 
 | Folder | Platform | Key Component |
 |--------|----------|---------------|
-| `link/` | 通用链接 | LinkWidget |
-| `text/` | 文本卡片 | TextWidget |
-| `image/` | 图片卡片 | ImageWidget |
-| `map/` | 地图卡片 | MapWidget |
+| `link/` | Generic link | LinkWidget |
+| `text/` | Text card | TextWidget |
+| `image/` | Image card | ImageWidget |
+| `map/` | Map card | MapWidget |
 | `github/` | GitHub | GitHubWidget |
 | `spotify/` | Spotify | SpotifyWidget |
-| `section/` | 分区标题 | SectionWidget |
+| `section/` | Section title | SectionWidget |

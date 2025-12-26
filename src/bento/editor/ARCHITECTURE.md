@@ -2,16 +2,16 @@
 
 # bento/editor
 
-> **Bento 编辑器 UI。提供编辑模式下的工具栏、覆盖层和用户资料区。**
-> 这是用户与 Bento 页面交互的主要界面层。
+> **Bento editor UI. Provides toolbar, overlay, and user profile section in edit mode.**
+> This is the main interface layer for users to interact with Bento pages.
 
 ## Files
 
 | File | Role | Purpose |
 |------|------|---------|
-| `index.ts` | Entry | 重新导出公开 API |
-| `EditorContext.tsx` | Context | 编辑器状态管理 (isEditing, selectedWidget) |
-| `EditorToolbar.tsx` | Component | 顶部工具栏 (添加卡片、视图切换) |
-| `EditorFooter.tsx` | Component | 底部页脚 (设置、社交链接) |
-| `ProfileSection.tsx` | Component | 左侧用户资料区 |
-| `WidgetEditOverlay.tsx` | Component | 选中卡片的浮动编辑层 (删除、尺寸选择) |
+| `index.ts` | Entry | Re-exports public API |
+| `EditorContext.tsx` | Context | Editor state management (isEditing, selectedWidget) |
+| `EditorToolbar.tsx` | Component | Top toolbar (add card, view toggle) |
+| `EditorFooter.tsx` | Component | Bottom footer (settings, social links) |
+| `ProfileSection.tsx` | Component | Left user profile section |
+| `WidgetEditOverlay.tsx` | Component | Floating edit layer for selected card (delete, size selection) |
