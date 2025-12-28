@@ -2,7 +2,7 @@
 
 # 🍱 OpenBento
 
-**The Open-Source Legacy of Bento Design**
+**The Open-Source Alternative to Bento.me - Free, Self-Hosted GitHub Project**
 
 [![Next.js](https://img.shields.io/badge/Next.js-16.1-black?logo=next.js)](https://nextjs.org/)
 [![React](https://img.shields.io/badge/React-19.2-61DAFB?logo=react)](https://reactjs.org/)
@@ -35,9 +35,11 @@ This project uses a **fractal, self-referential documentation system** inspired 
 
 > **"Preserving the aesthetic that Linktree sunsetted."**
 
-OpenBento was born as a community response to the acquisition and sunset of **bento.me**. We believe the Bento design philosophy—modular, elegant, and personal—belongs to the open-source community. 
+**OpenBento** is the **best open-source alternative to bento.me** on GitHub. Born as a community response to the acquisition and sunset of **bento.me**, this project provides a **free, self-hosted replacement** that can never be shut down.
 
-This project is a faithful recreation of that experience, built with modern web technologies for developers who want to own their corner of the internet.
+We believe the Bento design philosophy—modular, elegant, and personal—belongs to the open-source community. This project is a faithful recreation of that experience, built with modern web technologies (Next.js, React, TypeScript) for developers who want to own their corner of the internet.
+
+**Looking for a bento.me alternative?** You've found it. This GitHub repository offers a complete, production-ready solution that preserves the beloved Bento aesthetic while giving you full control over your data and hosting.
 
 ---
 
@@ -98,12 +100,30 @@ npm install && npm run dev
 
 ---
 
-## 🌟 Why OpenBento?
+## 🌟 Why OpenBento? The Best Bento.me Alternative on GitHub
 
-- ✅ **Self-Hosted** — You own your data. No Linktree account required.
-- ✅ **SEO Optimized** — Semantic HTML and fast loading for better ranking.
-- ✅ **Legacy Preservation** — A replacement for bento.me that can't be sunsetted.
-- ✅ **Premium Aesthetic** — Precise recreation of the beloved modular UI.
+- ✅ **Open-Source Alternative to Bento.me** — Free, self-hosted replacement that preserves the Bento.me experience
+- ✅ **GitHub-First Project** — Fully open-source, community-driven development on GitHub
+- ✅ **Self-Hosted** — You own your data. No Linktree account required. Deploy anywhere (Vercel, Netlify, your own server)
+- ✅ **SEO Optimized** — Semantic HTML and fast loading for better search engine ranking
+- ✅ **Legacy Preservation** — A replacement for bento.me that can't be sunsetted. Never lose your Bento page again
+- ✅ **Premium Aesthetic** — Precise recreation of the beloved modular UI with 27px rounded corners and elegant typography
+- ✅ **Modern Tech Stack** — Built with Next.js 16, React 19, TypeScript, and Tailwind CSS 4
+- ✅ **Fully Customizable** — Drag-and-drop editor, custom widgets, and complete design control
+
+---
+
+## 🔍 Keywords & Search Terms
+
+**OpenBento** is discoverable as:
+- **bento me alternative** / **bento.me alternative**
+- **bento me alternative github** / **bento.me alternative github**
+- **open source bento me** / **open source bento.me**
+- **bento me replacement** / **bento.me replacement**
+- **self-hosted bento page** / **self-hosted bento.me**
+- **bento linktree alternative** / **bento link in bio alternative**
+- **github bento page** / **github bento.me clone**
+- **free bento page builder** / **free bento.me alternative**
 
 ---
 
@@ -112,5 +132,7 @@ npm install && npm run dev
 **Made with ❤️ for the Bento community**
 
 [GitHub](https://github.com) • [Showcase](./src/app/showcase) • [Twitter](https://twitter.com)
+
+**⭐ Star this repo if you're looking for a bento.me alternative!**
 
 </div>
