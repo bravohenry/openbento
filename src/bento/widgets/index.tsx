@@ -1,9 +1,11 @@
 /**
- * 🔄 UPDATE ME: If this file changes, update this header AND /src/bento/widgets/ARCHITECTURE.md
- *
- * @input  - 各 Widget 子模块 (link, text, map, image, section), types
- * @output - WidgetRenderer, 所有 Widget 组件和工厂函数
- * @pos    - Widget 系统的统一入口，动态分发渲染不同类型的卡片
+ * [INPUT]: (Widget submodules, types) - Widget submodules (link, text, map, image, section), types
+ * [OUTPUT]: (WidgetRenderer, all Widget components and factory functions) - WidgetRenderer, all Widget components and factory functions
+ * [POS]: Located at /bento/widgets unified entry point of Widget system, dynamically dispatches and renders different types of cards.
+ * 
+ * [PROTOCOL]:
+ * 1. Once this file's logic changes, this Header must be synchronized immediately.
+ * 2. After update, must check upward whether /src/bento/widgets/.folder.md description is still accurate.
  */
 
 // Types

@@ -1,11 +1,11 @@
 /**
- * [INPUT]: (initialCards, defaultTheme) - 初始卡片状态和主题配置
- * [OUTPUT]: (BentoProvider, useBentoContext, useBentoCard, useSelectedCard, useIsEditing) - 上下文提供者和相关 Hooks
- * [POS]: 位于 /bento/core 的状态管理层，作为整个 Bento 系统的状态中枢，管理编辑模式、卡片状态、网格配置等。
+ * [INPUT]: (initialCards, defaultTheme) - Initial card state and theme configuration
+ * [OUTPUT]: (BentoProvider, useBentoContext, useBentoCard, useSelectedCard, useIsEditing) - Context provider and related Hooks
+ * [POS]: Located at /bento/core state management layer, serves as the state hub of the entire Bento system, managing edit mode, card state, grid configuration, etc.
  * 
  * [PROTOCOL]:
- * 1. 一旦本文件逻辑变更，必须同步更新此 Header。
- * 2. 更新后必须上浮检查 /src/bento/core/.folder.md 的描述是否依然准确。
+ * 1. Once this file's logic changes, this Header must be synchronized immediately.
+ * 2. After update, must check upward whether /src/bento/core/.folder.md description is still accurate.
  */
 
 import React, { createContext, useContext, useReducer, useCallback, ReactNode } from 'react'
@@ -24,21 +24,21 @@ export interface BentoCardState {
 }
 
 export interface BentoState {
-    /** 编辑模式 */
+    /** Edit mode */
     isEditing: boolean
-    /** 当前选中的卡片 ID */
+    /** Currently selected card ID */
     selectedCardId: string | null
-    /** 所有卡片状态 */
+    /** All card states */
     cards: Map<string, BentoCardState>
-    /** 网格列数 */
+    /** Grid column count */
     gridColumns: number
-    /** 是否显示网格辅助线 */
+    /** Whether to show grid guides */
     showGrid: boolean
-    /** 是否启用吸附 */
+    /** Whether to enable snap to grid */
     snapToGrid: boolean
-    /** 缩放级别 */
+    /** Zoom level */
     zoom: number
-    /** 主题模式 */
+    /** Theme mode */
     theme: 'light' | 'dark' | 'system'
 }
 

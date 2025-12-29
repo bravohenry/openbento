@@ -1,13 +1,13 @@
 'use client'
 
 /**
- * [INPUT]: (LinkWidgetConfig, onClick, isEditing) - 链接配置、点击处理、编辑模式标志
- * [OUTPUT]: (LinkWidget, PlatformCardContent, createLinkWidgetConfig) - 链接卡片组件和相关工具函数
- * [POS]: 位于 /bento/widgets/link 的 Widget 实现，基于 BentoCard 构建，提供平台链接展示功能。
+ * [INPUT]: (LinkWidgetConfig, onClick, isEditing) - Link configuration, click handler, edit mode flag
+ * [OUTPUT]: (LinkWidget, PlatformCardContent, createLinkWidgetConfig) - Link card component and related utility functions
+ * [POS]: Located at /bento/widgets/link Widget implementation, built on BentoCard, provides platform link display functionality.
  * 
  * [PROTOCOL]:
- * 1. 一旦本文件逻辑变更，必须同步更新此 Header。
- * 2. 更新后必须上浮检查 /src/bento/widgets/.folder.md 的描述是否依然准确。
+ * 1. Once this file's logic changes, this Header must be synchronized immediately.
+ * 2. After update, must check upward whether /src/bento/widgets/.folder.md description is still accurate.
  */
 
 import React from 'react'
@@ -33,10 +33,10 @@ interface PlatformCardContentProps {
     }
     textColor?: string
     subtitleColor?: string
-    widgetSize: WidgetSize // 新增：响应尺寸
+    widgetSize: WidgetSize // New: responsive size
 }
 
-// 根据尺寸获取布局配置
+// Get layout configuration based on size
 function getSizeLayout(size: WidgetSize) {
     switch (size) {
         case '1x1':
@@ -87,7 +87,7 @@ function getSizeLayout(size: WidgetSize) {
                 isBar: false,
             }
         case 'bar':
-            // 390×68 细横条布局
+            // 390×68 thin horizontal bar layout
             return {
                 iconSize: 28,
                 titleTop: 0,
@@ -96,7 +96,7 @@ function getSizeLayout(size: WidgetSize) {
                 fontSize: 14,
                 lineClamp: 1,
                 horizontal: true,
-                isBar: true, // 特殊紧凑布局
+                isBar: true, // Special compact layout
             }
         default:
             return {
@@ -127,7 +127,7 @@ const PlatformCardContent: React.FC<PlatformCardContentProps> = ({
     const layout = getSizeLayout(widgetSize)
     const iconRadius = layout.iconSize >= 40 ? (layout.iconSize === 56 ? 12 : 10) : 8
 
-    // Bar size: 特殊紧凑水平布局
+    // Bar size: Special compact horizontal layout
     if (layout.isBar) {
         return (
             <div style={{
@@ -197,7 +197,7 @@ const PlatformCardContent: React.FC<PlatformCardContentProps> = ({
         )
     }
 
-    // 标准布局 (1x1, 2x1, 1x2, 2x2)
+    // Standard layout (1x1, 2x1, 1x2, 2x2)
     return (
         <div style={{
             position: 'absolute',
@@ -221,11 +221,11 @@ const PlatformCardContent: React.FC<PlatformCardContentProps> = ({
                 justifyContent: 'center',
                 boxShadow: iconBg === 'transparent' ? 'none' : iconShadow,
                 overflow: 'hidden',
-                // 如果是透明背景（Full-bleed 图标），不需要外边框可见性
+                // If transparent background (Full-bleed icon), no outer border visibility needed
                 border: iconBg === 'transparent' ? 'none' : 'none',
             }}>
                 {icon}
-                {/* 仅在非透明背景时显示内边框高光 */}
+                {/* Only show inner border highlight on non-transparent background */}
                 {iconBg !== 'transparent' && (
                     <div style={{
                         position: 'absolute',
@@ -315,13 +315,13 @@ const PlatformCardContent: React.FC<PlatformCardContentProps> = ({
 
 // ============ Platform Icons (from public/icons/social) ============
 
-// 映射平台名称到 SVG 文件
+// Map platform names to SVG files
 const PLATFORM_ICON_FILES: Record<string, string> = {
     instagram: '/icons/social/instagram.svg',
     twitter: '/icons/social/twitter.svg',
-    tiktok: '/icons/social/unknown.svg', // 暂无 tiktok，使用 unknown
+    tiktok: '/icons/social/unknown.svg', // No tiktok icon yet, using unknown
     youtube: '/icons/social/youtube.svg',
-    spotify: '/icons/social/unknown.svg', // 暂无 spotify
+    spotify: '/icons/social/unknown.svg', // No spotify icon yet
     github: '/icons/social/github.svg',
     linkedin: '/icons/social/linkedin.svg',
     discord: '/icons/social/discord.svg',

@@ -112,11 +112,11 @@ BentoGrid.displayName = 'BentoGrid'
 // ============ Responsive Grid Wrapper ============
 
 interface ResponsiveBentoGridProps extends BentoGridProps {
-    /** 移动端列数 (默认: 2) */
+    /** Mobile column count (default: 2) */
     mobileColumns?: number
-    /** 平板列数 (默认: 3) */
+    /** Tablet column count (default: 3) */
     tabletColumns?: number
-    /** 断点 */
+    /** Breakpoints */
     breakpoints?: {
         mobile: number
         tablet: number

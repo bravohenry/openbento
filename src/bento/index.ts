@@ -1,15 +1,17 @@
 /**
- * 🔄 UPDATE ME: If this file changes, update this header AND /src/bento/ARCHITECTURE.md
- *
- * @input  - core, grid, dnd 子模块
- * @output - Bento 模块所有公开 API
- * @pos    - Bento 系统的统一入口点
+ * [INPUT]: (core, grid, dnd submodules) - core, grid, dnd submodules
+ * [OUTPUT]: (All Bento module public APIs) - All Bento module public APIs
+ * [POS]: Located at /bento unified entry point of Bento system.
+ * 
+ * [PROTOCOL]:
+ * 1. Once this file's logic changes, this Header must be synchronized immediately.
+ * 2. After update, must check upward whether /src/bento/.folder.md description is still accurate.
  */
 
 export * from './core'
 export * from './grid'
 
-// DnD: 排除 GridItem 以避免与 ./grid 的 GridItem 冲突
+// DnD: Exclude GridItem to avoid conflict with ./grid's GridItem
 export {
     GridDndProvider,
     DraggableGridItem,

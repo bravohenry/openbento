@@ -9,24 +9,24 @@ export type AvatarSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'
 export type AvatarShape = 'circle' | 'rounded' | 'square'
 
 export interface AvatarProps extends HTMLAttributes<HTMLDivElement> {
-    /** 图片 URL */
+    /** Image URL */
     src?: string
-    /** 替代文本 */
+    /** Alt text */
     alt?: string
-    /** 尺寸 */
+    /** Size */
     size?: AvatarSize
-    /** 形状 */
+    /** Shape */
     shape?: AvatarShape
-    /** 显示名称的首字母 (当无图片时) */
+    /** Display name's first letter (when no image) */
     name?: string
-    /** 自定义回退内容 */
+    /** Custom fallback content */
     fallback?: ReactNode
-    /** 边框颜色 */
+    /** Border color */
     borderColor?: string
-    /** 是否显示在线状态 */
+    /** Whether to show online status */
     showStatus?: boolean
-    /** 在线状态 */
+    /** Online status */
     status?: 'online' | 'offline' | 'busy' | 'away'
-    /** 图片加载失败回调 */
+    /** Image load error callback */
     onError?: () => void
 }

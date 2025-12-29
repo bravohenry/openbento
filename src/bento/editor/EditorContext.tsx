@@ -1,11 +1,11 @@
 /**
- * [INPUT]: (WidgetConfig[], localStorage) - Widget 配置数组和本地存储接口
- * [OUTPUT]: (EditorProvider, useEditor, useSelectedWidget, useWidgets) - 编辑器上下文提供者和相关 Hooks
- * [POS]: 位于 /bento/editor 的状态管理层，管理编辑模式、选中 Widget、Widgets CRUD 操作。
+ * [INPUT]: (WidgetConfig[], localStorage) - Widget configuration array and local storage interface
+ * [OUTPUT]: (EditorProvider, useEditor, useSelectedWidget, useWidgets) - Editor context provider and related Hooks
+ * [POS]: Located at /bento/editor state management layer, manages edit mode, selected Widget, Widgets CRUD operations.
  * 
  * [PROTOCOL]:
- * 1. 一旦本文件逻辑变更，必须同步更新此 Header。
- * 2. 更新后必须上浮检查 /src/bento/editor/.folder.md 的描述是否依然准确。
+ * 1. Once this file's logic changes, this Header must be synchronized immediately.
+ * 2. After update, must check upward whether /src/bento/editor/.folder.md description is still accurate.
  */
 
 import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react'
@@ -50,7 +50,7 @@ const EditorContext = createContext<EditorContextValue | undefined>(undefined)
 // ============ Provider ============
 
 export const EditorProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-    const [isEditing, setIsEditing] = useState(true) // 默认开启编辑模式方便开发
+    const [isEditing, setIsEditing] = useState(true) // Default to edit mode for development convenience
     const [viewMode, setViewMode] = useState<ViewMode>('desktop')
     const [selectedWidgetId, setSelectedWidgetId] = useState<string | null>(null)
     const [widgets, setWidgets] = useState<WidgetConfig[]>([])

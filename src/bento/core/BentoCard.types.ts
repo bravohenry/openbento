@@ -1,131 +1,131 @@
 /**
  * OpenBento - BentoCard Types
  * 
- * 基于 Figma 设计 (node-id: 25-1023)
- * Bento 风格卡片组件类型定义
+ * Based on Figma design (node-id: 25-1023)
+ * Bento-style card component type definitions
  */
 
 import type { HTMLAttributes, ReactNode, CSSProperties } from 'react'
 
-// ============ 卡片尺寸 ============
+// ============ Card Sizes ============
 
 /**
- * Bento Grid 尺寸
- * 基础单元: 175px, 间距: 40px
+ * Bento Grid sizes
+ * Base unit: 175px, Gap: 40px
  * 
  * 1x1 = 175 x 175
  * 2x1 = 390 x 175 (175*2 + 40)
  * 1x2 = 175 x 390
  * 2x2 = 390 x 390
- * bar = 390 x 68 (细横条)
+ * bar = 390 x 68 (thin horizontal bar)
  */
 export type BentoSize = '1x1' | '2x1' | '1x2' | '2x2' | 'bar' | '2x3' | '3x2' | '4x2'
 
 
-// ============ 卡片变体 ============
+// ============ Card Variants ============
 
 export type BentoVariant =
-    | 'default'     // 白色背景
-    | 'image'       // 全尺寸图片
-    | 'gradient'    // 渐变背景
-    | 'transparent' // 透明
+    | 'default'     // White background
+    | 'image'       // Full-size image
+    | 'gradient'    // Gradient background
+    | 'transparent' // Transparent
 
-// ============ 卡片 Props ============
+// ============ Card Props ============
 
 export interface BentoCardProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title'> {
-    /** 尺寸 */
+    /** Size */
     size?: BentoSize
-    /** 变体 */
+    /** Variant */
     variant?: BentoVariant
-    /** 是否可点击 */
+    /** Whether clickable */
     clickable?: boolean
-    /** 链接地址 */
+    /** Link URL */
     href?: string
-    /** 链接打开方式 */
+    /** Link target */
     target?: '_blank' | '_self'
-    /** 背景图片 */
+    /** Background image */
     backgroundImage?: string
-    /** 背景颜色 */
+    /** Background color */
     backgroundColor?: string
-    /** 背景渐变 */
+    /** Background gradient */
     backgroundGradient?: string
-    /** 是否禁用 hover 效果 */
+    /** Whether to disable hover effect */
     disableHover?: boolean
-    /** 暗色模式 (内部边框使用白色高光) */
+    /** Dark mode (inner border uses white highlight) */
     dark?: boolean
 }
 
-// ============ 图标 Props ============
+// ============ Icon Props ============
 
 export interface BentoCardIconProps extends HTMLAttributes<HTMLDivElement> {
-    /** 图标源 (URL 或 ReactNode) */
+    /** Icon source (URL or ReactNode) */
     src?: string
-    /** 图标组件 */
+    /** Icon component */
     icon?: ReactNode
-    /** 尺寸 */
+    /** Size */
     size?: 'sm' | 'md' | 'lg'
-    /** 背景色 */
+    /** Background color */
     backgroundColor?: string
-    /** 圆角 */
+    /** Rounded */
     rounded?: boolean
 }
 
-// ============ 标题 Props ============
+// ============ Title Props ============
 
 export interface BentoCardTitleProps extends HTMLAttributes<HTMLDivElement> {
-    /** 文本颜色 */
+    /** Text color */
     color?: 'primary' | 'secondary' | 'inverse' | 'muted'
-    /** 字体大小 */
+    /** Font size */
     size?: 'sm' | 'md' | 'lg'
-    /** 是否截断 */
+    /** Whether to truncate */
     truncate?: boolean
-    /** 最大行数 */
+    /** Maximum lines */
     maxLines?: number
 }
 
-// ============ 副标题 Props ============
+// ============ Subtitle Props ============
 
 export interface BentoCardSubtitleProps extends HTMLAttributes<HTMLDivElement> {
-    /** 文本颜色 */
+    /** Text color */
     color?: 'primary' | 'secondary' | 'tertiary' | 'inverse'
 }
 
-// ============ 图片 Props ============
+// ============ Image Props ============
 
 export interface BentoCardImageProps extends HTMLAttributes<HTMLDivElement> {
-    /** 图片 URL */
+    /** Image URL */
     src: string
-    /** Alt 文本 */
+    /** Alt text */
     alt?: string
-    /** 对象适应 */
+    /** Object fit */
     objectFit?: 'cover' | 'contain' | 'fill'
-    /** 图片位置 */
+    /** Image position */
     objectPosition?: string
 }
 
-// ============ 叠加层 Props ============
+// ============ Overlay Props ============
 
 export interface BentoCardOverlayProps extends HTMLAttributes<HTMLDivElement> {
-    /** 渐变方向 */
+    /** Gradient direction */
     gradient?: 'top' | 'bottom' | 'left' | 'right' | 'none'
-    /** 透明度 */
+    /** Opacity */
     opacity?: number
 }
 
-// ============ 操作 Props ============
+// ============ Action Props ============
 
 export interface BentoCardActionProps extends HTMLAttributes<HTMLDivElement> {
-    /** 位置 */
+    /** Position */
     position?: 'bottom-left' | 'bottom-right' | 'top-left' | 'top-right'
 }
 
-// ============ 内容区 Props ============
+// ============ Content Props ============
 
 export interface BentoCardContentProps extends HTMLAttributes<HTMLDivElement> {
-    /** 对齐方式 */
+    /** Alignment */
     align?: 'start' | 'center' | 'end'
-    /** 垂直对齐 */
+    /** Vertical alignment */
     justify?: 'start' | 'center' | 'end' | 'between'
-    /** 内边距 */
+    /** Padding */
     padding?: 'none' | 'sm' | 'md' | 'lg'
 }

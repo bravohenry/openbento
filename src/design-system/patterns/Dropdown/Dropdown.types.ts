@@ -7,39 +7,39 @@ import type { ReactNode, CSSProperties } from 'react'
 export type DropdownPlacement = 'bottom-start' | 'bottom-end' | 'top-start' | 'top-end'
 
 export interface DropdownItem {
-    /** 唯一标识 */
+    /** Unique identifier */
     key: string
-    /** 显示标签 */
+    /** Display label */
     label: ReactNode
-    /** 图标 */
+    /** Icon */
     icon?: ReactNode
-    /** 是否禁用 */
+    /** Whether disabled */
     disabled?: boolean
-    /** 是否危险操作 */
+    /** Whether danger action */
     danger?: boolean
-    /** 分隔线 (在此项前显示分隔线) */
+    /** Divider (show divider before this item) */
     divider?: boolean
-    /** 子菜单 */
+    /** Submenu */
     children?: DropdownItem[]
 }
 
 export interface DropdownProps {
-    /** 触发元素 */
+    /** Trigger element */
     trigger: ReactNode
-    /** 菜单项 */
+    /** Menu items */
     items: DropdownItem[]
-    /** 点击菜单项回调 */
+    /** Menu item click callback */
     onSelect?: (key: string) => void
-    /** 位置 */
+    /** Placement */
     placement?: DropdownPlacement
-    /** 触发方式 */
+    /** Trigger type */
     triggerType?: 'click' | 'hover'
-    /** 是否禁用 */
+    /** Whether disabled */
     disabled?: boolean
-    /** 最小宽度 */
+    /** Minimum width */
     minWidth?: number
-    /** 自定义样式 */
+    /** Custom styles */
     style?: CSSProperties
-    /** 自定义 className */
+    /** Custom className */
     className?: string
 }

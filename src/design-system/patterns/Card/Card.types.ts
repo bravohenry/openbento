@@ -1,52 +1,52 @@
 /**
  * OpenBento Design System - Card Types
  * 
- * 卡片组件类型定义
- * 采用 Compound Component 模式
+ * Card component type definitions
+ * Uses Compound Component pattern
  */
 
 import type { HTMLAttributes, ReactNode } from 'react'
 
-// ============ 卡片变体 ============
+// ============ Card Variants ============
 
 export type CardVariant =
-    | 'default'      // 默认白色背景
-    | 'elevated'     // 带阴影浮起
-    | 'outlined'     // 边框样式
-    | 'filled'       // 填充背景
-    | 'glass'        // 毛玻璃效果
-    | 'gradient'     // 渐变背景
+    | 'default'      // Default white background
+    | 'elevated'     // Elevated with shadow
+    | 'outlined'     // Border style
+    | 'filled'       // Filled background
+    | 'glass'        // Glass morphism effect
+    | 'gradient'     // Gradient background
 
-// ============ 卡片尺寸 (对应 Bento Grid) ============
+// ============ Card Sizes (corresponding to Bento Grid) ============
 
 export type CardSize = '1x1' | '2x1' | '1x2' | '2x2' | '3x1' | '4x1' | '4x2' | 'auto'
 
-// ============ 卡片 Props ============
+// ============ Card Props ============
 
 export interface CardProps extends HTMLAttributes<HTMLDivElement> {
-    /** 变体 */
+    /** Variant */
     variant?: CardVariant
-    /** 尺寸 (Bento Grid) */
+    /** Size (Bento Grid) */
     size?: CardSize
-    /** 是否可点击 */
+    /** Whether clickable */
     clickable?: boolean
-    /** 是否选中 */
+    /** Whether selected */
     selected?: boolean
-    /** 自定义背景色 */
+    /** Custom background color */
     bgColor?: string
-    /** 背景图片 */
+    /** Background image */
     bgImage?: string
-    /** 背景渐变 */
+    /** Background gradient */
     bgGradient?: string
-    /** 边框颜色 */
+    /** Border color */
     borderColor?: string
-    /** 圆角大小 */
+    /** Border radius size */
     rounded?: 'sm' | 'md' | 'lg' | 'xl' | '2xl'
-    /** 内边距 */
+    /** Padding */
     padding?: 'none' | 'sm' | 'md' | 'lg'
-    /** 链接地址 */
+    /** Link URL */
     href?: string
-    /** 链接打开方式 */
+    /** Link target */
     target?: '_blank' | '_self'
     /** 是否禁用 hover 效果 */
     disableHover?: boolean

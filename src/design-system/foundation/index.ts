@@ -1,9 +1,11 @@
 /**
- * 🔄 UPDATE ME: If this file changes, update this header AND /src/design-system/foundation/ARCHITECTURE.md
- *
- * @input  - theme module
- * @output - ThemeProvider, useTheme, theme utilities
- * @pos    - 设计系统基础设施入口
+ * [INPUT]: (theme module) - theme module
+ * [OUTPUT]: (ThemeProvider, useTheme, theme utilities) - ThemeProvider, useTheme, theme utilities
+ * [POS]: Located at /design-system/foundation entry point of design system infrastructure.
+ * 
+ * [PROTOCOL]:
+ * 1. Once this file's logic changes, this Header must be synchronized immediately.
+ * 2. After update, must check upward whether /src/design-system/.folder.md description is still accurate.
  */
 
 // Theme

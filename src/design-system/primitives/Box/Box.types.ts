@@ -6,14 +6,14 @@ import type { HTMLAttributes } from 'react'
 import type { StyleProps } from '../../utils/styleProps'
 
 export interface BoxProps extends StyleProps, HTMLAttributes<HTMLDivElement> {
-    /** 渲染的元素类型 */
+    /** Element type to render */
     as?: React.ElementType
-    /** 应用圆角 */
+    /** Apply border radius */
     rounded?: 'none' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'full'
-    /** 应用阴影 */
+    /** Apply shadow */
     shadow?: 'none' | 'sm' | 'md' | 'lg' | 'xl'
-    /** 边框 */
+    /** Border */
     border?: boolean
-    /** 居中内容 */
+    /** Center content */
     center?: boolean
 }

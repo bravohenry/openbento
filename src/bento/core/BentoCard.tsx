@@ -1,12 +1,14 @@
 /**
- * 🔄 UPDATE ME: If this file changes, update this header AND /src/bento/core/ARCHITECTURE.md
- *
- * @input  - BentoCard.styles (样式常量), BentoCard.types (类型定义), cn (样式工具)
- * @output - BentoCard compound component (Icon, Title, Subtitle, Image, Overlay, Action, Content)
- * @pos    - Bento 系统的原子卡片组件，所有 Widget 都基于此构建
- *
- * 基于 Figma 设计 (node-id: 25-1023)
- * Compound Component 模式实现
+ * [INPUT]: (BentoCard.styles, BentoCard.types, cn) - Style constants, type definitions, style utility
+ * [OUTPUT]: (BentoCard compound component) - Icon, Title, Subtitle, Image, Overlay, Action, Content
+ * [POS]: Located at /bento/core atomic card component, all Widgets are built on this.
+ * 
+ * Based on Figma design (node-id: 25-1023)
+ * Compound Component pattern implementation
+ * 
+ * [PROTOCOL]:
+ * 1. Once this file's logic changes, this Header must be synchronized immediately.
+ * 2. After update, must check upward whether /src/bento/core/.folder.md description is still accurate.
  */
 
 import React, { forwardRef, createContext, useContext, useState } from 'react'
@@ -74,7 +76,7 @@ const BentoCardRoot = forwardRef<HTMLDivElement, BentoCardProps>((props, ref) =>
     const sizeConfig = bentoSizes[size]
     const borderConfig = dark ? bentoBorder.dark : bentoBorder.light
 
-    // 构建样式
+    // Build styles
     const cardStyles: React.CSSProperties = {
         ...bentoCardBase,
         width: sizeConfig.width,
@@ -96,7 +98,7 @@ const BentoCardRoot = forwardRef<HTMLDivElement, BentoCardProps>((props, ref) =>
         ...style,
     }
 
-    // 点击处理
+    // Click handler
     const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
         if (href) {
             window.open(href, target || '_self')
@@ -104,7 +106,7 @@ const BentoCardRoot = forwardRef<HTMLDivElement, BentoCardProps>((props, ref) =>
         onClick?.(e)
     }
 
-    // Grid 样式 (用于 CSS Grid 布局)
+    // Grid styles (for CSS Grid layout)
     const gridStyles = {
         gridColumn: `span ${sizeConfig.columns}`,
         gridRow: `span ${sizeConfig.rows}`,
@@ -123,7 +125,7 @@ const BentoCardRoot = forwardRef<HTMLDivElement, BentoCardProps>((props, ref) =>
                 tabIndex={clickable || href ? 0 : undefined}
                 {...restProps}
             >
-                {/* 悬停叠加层 (Bento.me: 15% 灰色涂层) - Preview mode */}
+                {/* Hover overlay (Bento.me: 15% gray overlay) - Preview mode */}
                 {clickable && !disableHover && (
                     <div
                         className="bento-card-hover-overlay"
@@ -142,7 +144,7 @@ const BentoCardRoot = forwardRef<HTMLDivElement, BentoCardProps>((props, ref) =>
 
                 {children}
 
-                {/* 内边框高光 (Figma Mask Border 效果) */}
+                {/* Inner border highlight (Figma Mask Border effect) */}
                 <div
                     className="bento-card-border"
                     style={{
@@ -153,7 +155,7 @@ const BentoCardRoot = forwardRef<HTMLDivElement, BentoCardProps>((props, ref) =>
                         boxShadow: dark
                             ? 'inset 0 0 0 1px rgba(255, 255, 255, 0.22)'
                             : 'inset 0 0 0 1px rgba(255, 255, 255, 0.22)',
-                        zIndex: 2, // 确保边框在最上层
+                        zIndex: 2, // Ensure border is on top layer
                     }}
                 />
             </div>
@@ -321,18 +323,27 @@ const BentoCardImage = forwardRef<HTMLDivElement, BentoCardImageProps>((props, r
         ...style,
     }
 
+    // Prevent empty string src to avoid browser re-downloading the page
+    const imageSrc = src && src.trim() !== '' ? src : null
+
     return (
         <div ref={ref} className={cn('bento-card-image', className)} style={imageStyles} {...restProps}>
-            <img
-                src={src}
-                alt={alt}
-                style={{
-                    width: '100%',
-                    height: '100%',
-                    objectFit,
-                    objectPosition,
-                }}
-            />
+            {imageSrc ? (
+                <img
+                    src={imageSrc}
+                    alt={alt}
+                    style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit,
+                        objectPosition,
+                    }}
+                />
+            ) : (
+                <div className="flex items-center justify-center w-full h-full bg-gray-100 text-gray-400">
+                    <span className="text-sm font-medium">No image</span>
+                </div>
+            )}
         </div>
     )
 })

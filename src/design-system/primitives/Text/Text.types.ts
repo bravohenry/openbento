@@ -11,26 +11,26 @@ export type TextAlign = 'left' | 'center' | 'right' | 'justify'
 export type TextTransform = 'none' | 'uppercase' | 'lowercase' | 'capitalize'
 
 export interface TextProps extends HTMLAttributes<HTMLSpanElement> {
-    /** 渲染的元素类型 */
+    /** Element type to render */
     as?: React.ElementType
-    /** 预设文本样式 */
+    /** Preset text style */
     variant?: TextStyle
-    /** 字号 */
+    /** Font size */
     size?: TextSize
-    /** 字重 */
+    /** Font weight */
     weight?: TextWeight
-    /** 行高 */
+    /** Line height */
     leading?: LineHeight
-    /** 对齐 */
+    /** Alignment */
     align?: TextAlign
-    /** 转换 */
+    /** Transform */
     transform?: TextTransform
-    /** 颜色 */
+    /** Color */
     color?: 'primary' | 'secondary' | 'tertiary' | 'inverse' | 'inherit' | string
-    /** 截断 */
+    /** Truncate */
     truncate?: boolean | number
-    /** 渐变文本 */
+    /** Gradient text */
     gradient?: string
-    /** 单调字体 */
+    /** Monospace font */
     mono?: boolean
 }

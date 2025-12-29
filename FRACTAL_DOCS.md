@@ -1,149 +1,144 @@
-# 分形文档系统（FractalFlow Documentation System）
+# Fractal Documentation System (FractalFlow Documentation System)
 
-## 📌 核心同步协议（Mandatory）
+## 📌 Core Synchronization Protocol (Mandatory)
 
-**地位：系统的"灵魂"与强制法规**
+**Status: The "soul" and mandatory regulations of the system**
 
-1. **"原子更新规则"**：任何功能、架构、写法更新，必须在代码修改完成后，【立即同步更新】对应目录或子文档。
-2. **"逆向触发链"**：文件变更 → 更新文件 Header → 更新所属文件夹 MD →（若影响全局）更新主 MD。
-3. **"分形自洽"**：确保系统在任何一个子目录下，Claude 都能通过该目录的 MD 重建局部世界观。
+1. **"Atomic Update Rule"**: Any update to functionality, architecture, or implementation patterns MUST be immediately synchronized with the corresponding directory or sub-document after code changes are completed.
+2. **"Reverse Trigger Chain"**: File change → Update file Header → Update parent folder MD → (If global impact) Update main MD.
+3. **"Fractal Self-Consistency"**: Ensure that at any subdirectory level, AI can rebuild its local worldview through that directory's MD file.
 
 > **⚠️ CRITICAL: Any change to functionality, architecture, or implementation patterns MUST be followed by updating the relevant documentation in affected directories.**
 
 ---
 
-## 文档层级结构
+## Documentation Hierarchy Structure
 
-### 层级一：根目录主控文档（/README.md）
+### Level 1: Root Directory Master Document (/README.md)
 
-**地位：系统的"灵魂"与强制法规**
+**Status: The "soul" and mandatory regulations of the system**
 
-根目录的 README.md 定义了整个项目的核心同步协议和顶层架构。它描述了：
-- 核心同步协议（Mandatory）
-- 顶层架构划分
-- 文档层级结构
-- 更新传播规则
+The root README.md defines the core synchronization protocol and top-level architecture of the entire project. It describes:
+- Core synchronization protocol (Mandatory)
+- Top-level architecture division
+- Documentation hierarchy structure
+- Update propagation rules
 
-### 层级二：文件夹级架构说明（.folder.md）
+### Level 2: Folder-Level Architecture Documentation (.folder.md)
 
-**地位：局部地图（三行极简原则）**
+**Status: Local map (Three-line minimalism principle)**
 
-每个主要文件夹都应包含一个 `.folder.md` 文件，遵循三行极简原则：
+Each major folder should contain a `.folder.md` file, following the three-line minimalism principle:
 
-1. **"地位"**：该文件夹在系统中的地位和作用
-2. **"逻辑"**：核心逻辑流程
-3. **"约束"**：必须遵守的约束条件
+1. **"Status"**: The folder's position and role in the system
+2. **"Logic"**: Core logic flow
+3. **"Constraints"**: Constraints that must be followed
 
-**格式示例：**
+**Format Example:**
 
 ```markdown
 # Folder: /src/bento/core
 
-1. **"地位"**：Bento 卡片的原子级实现，定义卡片的视觉结构、尺寸系统和组合模式。
-2. **"逻辑"**：通过 Compound Component 模式提供 BentoCard 及其子组件。
-3. **"约束"**：所有计算必须幂等，严禁直接操作 DOM。
+1. **"Status"**: Atomic-level implementation of Bento cards, defining the visual structure, size system, and composition patterns.
+2. **"Logic"**: Provides BentoCard and its sub-components through Compound Component pattern.
+3. **"Constraints"**: All calculations must be idempotent, direct DOM manipulation is prohibited.
 
-## 🧩 成员清单
+## 🧩 Member List
 
-- `BentoCard.tsx`：卡片主组件
-- `BentoContext.tsx`：状态管理 Context
+- `BentoCard.tsx`: Main card component
+- `BentoContext.tsx`: State management Context
 
-⚠️ **触发器**：一旦本文件夹新增或文件架构逻辑调整，请立即重写此文档。
+⚠️ **Trigger**: Once files are added or architecture logic is adjusted in this folder, immediately rewrite this document.
 ```
 
-### 层级三：文件开头注释（文件 Header）
+### Level 3: File Header Comments (File Header)
 
-**地位：细粒度信息（In/Out/Pos 协议）**
+**Status: Fine-grained information (In/Out/Pos protocol)**
 
-所有关键文件都应在文件开头包含标准化的 Header 注释，说明：
+All critical files should include standardized Header comments at the beginning, describing:
 
-- **[INPUT]**：输入参数和依赖
-- **[OUTPUT]**：输出和返回值
-- **[POS]**：在系统中的位置和作用
-- **[PROTOCOL]**：更新协议
+- **[INPUT]**: Input parameters and dependencies
+- **[OUTPUT]**: Outputs and return values
+- **[POS]**: Position and role in the system
+- **[PROTOCOL]**: Update protocol
 
-**格式示例：**
+**Format Example:**
 
 ```typescript
 /**
- * [INPUT]: (BentoCardProps, BentoCard.styles, cn) - 卡片属性、样式常量、样式工具
- * [OUTPUT]: (BentoCard compound component) - 卡片组件及其子组件
- * [POS]: 位于 /bento/core 的原子组件，所有 Widget 都基于此构建。
+ * [INPUT]: (BentoCardProps, BentoCard.styles, cn) - Card properties, style constants, style utility
+ * [OUTPUT]: (BentoCard compound component) - Card component and its sub-components
+ * [POS]: Located at /bento/core atomic component, all Widgets are built on this.
  * 
  * [PROTOCOL]:
- * 1. 一旦本文件逻辑变更，必须同步更新此 Header。
- * 2. 更新后必须上浮检查 /src/bento/core/.folder.md 的描述是否依然准确。
+ * 1. Once this file's logic changes, this Header must be synchronized immediately.
+ * 2. After update, must check upward whether /src/bento/core/.folder.md description is still accurate.
  */
 ```
 
 ---
 
-## 更新传播规则
+## Update Propagation Rules
 
-### 逆向触发链
+### Reverse Trigger Chain
 
 ```
-文件变更 
+File change 
   ↓
-更新文件 Header（如果逻辑变更）
+Update file Header (if logic changes)
   ↓
-检查所属文件夹 .folder.md 是否需要更新
+Check if parent folder .folder.md needs updating
   ↓
-（若影响全局）更新主 README.md
+(If global impact) Update main README.md
 ```
 
-### 具体操作流程
+### Specific Operation Flow
 
-1. **修改单个文件**：
-   - 如果逻辑变更，更新文件 Header
-   - 检查是否需要更新所属文件夹 `.folder.md`
+1. **Modify a single file**:
+   - If logic changes, update file Header
+   - Check if parent folder `.folder.md` needs updating
 
-2. **修改文件夹结构**：
-   - 更新文件夹 `.folder.md`
-   - 检查是否需要更新父级文档
+2. **Modify folder structure**:
+   - Update folder `.folder.md`
+   - Check if parent-level documentation needs updating
 
-3. **影响全局架构**：
-   - 更新根目录 `README.md`
-   - 更新相关的顶层文档
-
----
-
-## 设计理念
-
-### 1. 解决 AI 的"中段失忆"（Context Mid-loss）
-
-通过将信息密度压缩到**最短路径（三行）**，当 AI 进入任何子目录时，第一眼看到的是**极简的"局部地图"**，注意力权重瞬间精准聚焦。
-
-### 2. 建立"端端循环"（Self-Healing Loop）
-
-通过"一旦……务必……"的触发器（Trigger），文档变成了**代码的"影子变量"**。在代码修改的末尾增加**同步动作**，系统具备了**自愈能力**。
-
-### 3. 分形结构的"全息映射"（Holographic Projection）
-
-- **局部影响整体**：当文件的 Input 改变，AI 会被迫去看文件级 MD
-- **整体约束局部**：当文件夹 MD 写明约束，AI 在修改具体文件时会自动产生逻辑剪枝
-
-### 4. GEB 的美学实践：自指与同构
-
-- 文件在描述自己如何被修改
-- 文件夹在描述文件如何协作
-- 根目录在描述整个系统如何生长
-
-**结果**：AI 不再是一个外来的"修代码工"，它变成了这个**生长系统**的一部分，在修改代码的同时，也在重塑自己的思维导图。
+3. **Global architecture impact**:
+   - Update root `README.md`
+   - Update related top-level documentation
 
 ---
 
-## 操作建议
+## Design Philosophy
 
-1. **立即行动**：将这套规则写入项目的 `.cursorrules`（已完成）
-2. **逐步迁移**：将现有的 `ARCHITECTURE.md` 逐步转换为 `.folder.md` 格式
-3. **持续维护**：每次代码修改后，立即更新相关文档
+### 1. Solving AI's "Context Mid-loss"
+
+By compressing information density to the **shortest path (three lines)**, when AI enters any subdirectory, the first thing it sees is a **minimalist "local map"**, and attention weights instantly focus precisely.
+
+### 2. Establishing "End-to-End Loop" (Self-Healing Loop)
+
+Through "once... must..." triggers, documentation becomes **code's "shadow variable"**. By adding **synchronization actions** at the end of code modifications, the system gains **self-healing capabilities**.
+
+### 3. Fractal Structure's "Holographic Projection"
+
+- **Local affects global**: When a file's Input changes, AI is forced to look at file-level MD
+- **Global constrains local**: When folder MD specifies constraints, AI automatically produces logical pruning when modifying specific files
+
+### 4. GEB's Aesthetic Practice: Self-Reference and Isomorphism
+
+- Files describe how they are modified
+- Folders describe how files collaborate
+- Root directory describes how the entire system grows
+
+**Result**: AI is no longer an external "code repair worker", it becomes part of this **growing system**, reshaping its own mind map while modifying code.
 
 ---
 
-**灵感来自结构思维与《哥德尔、埃舍尔、巴赫：集异璧之大成》**
+## Operation Recommendations
 
+1. **Immediate action**: Write these rules into the project's `.cursorrules` (completed)
+2. **Gradual migration**: Gradually convert existing `ARCHITECTURE.md` to `.folder.md` format
+3. **Continuous maintenance**: Immediately update related documentation after each code modification
 
+---
 
-
-
+**Inspired by structural thinking and "Gödel, Escher, Bach: An Eternal Golden Braid"**

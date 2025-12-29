@@ -1,8 +1,8 @@
 /**
  * OpenBento - useBentoCard Hook
  * 
- * 自定义 Hook 用于管理单个 BentoCard 的状态和交互
- * 包括尺寸、位置、拖拽、选中状态等
+ * Custom Hook for managing a single BentoCard's state and interactions
+ * Includes size, position, drag, selection state, etc.
  */
 
 import { useState, useCallback, useRef, useEffect } from 'react'
@@ -12,19 +12,19 @@ import { getBentoSize } from './BentoSizeMap'
 // ============ Types ============
 
 export interface UseBentoCardOptions {
-    /** 卡片 ID */
+    /** Card ID */
     id: string
-    /** 初始尺寸 */
+    /** Initial size */
     size?: BentoSize
-    /** 初始位置 */
+    /** Initial position */
     initialPosition?: { x: number; y: number }
-    /** 是否可拖拽 */
+    /** Whether draggable */
     draggable?: boolean
-    /** 是否可调整大小 */
+    /** Whether resizable */
     resizable?: boolean
-    /** 是否可选中 */
+    /** Whether selectable */
     selectable?: boolean
-    /** 拖拽回调 */
+    /** Drag callbacks */
     onDragStart?: () => void
     onDragEnd?: (position: { x: number; y: number }) => void
     onDrag?: (position: { x: number; y: number }) => void

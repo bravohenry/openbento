@@ -1,11 +1,11 @@
 /**
  * OpenBento Design System - Typography Tokens
  * 
- * 字体系统设计采用模块化比例 (Modular Scale)
- * 基准字号: 16px, 比例: 1.25 (Major Third)
+ * Typography system uses modular scale
+ * Base font size: 16px, ratio: 1.25 (Major Third)
  */
 
-// ============ 字体族 ============
+// ============ Font Families ============
 
 export const fontFamily = {
     sans: "var(--font-sans, 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif)",
@@ -13,7 +13,7 @@ export const fontFamily = {
     display: "var(--font-display, 'Cal Sans', 'Inter', sans-serif)",
 } as const
 
-// ============ 字号 ============
+// ============ Font Sizes ============
 
 export const fontSize = {
     /** 10px */
@@ -44,7 +44,7 @@ export const fontSize = {
     '8xl': '6rem',
 } as const
 
-// ============ 字重 ============
+// ============ Font Weights ============
 
 export const fontWeight = {
     thin: '100',
@@ -58,24 +58,24 @@ export const fontWeight = {
     black: '900',
 } as const
 
-// ============ 行高 ============
+// ============ Line Heights ============
 
 export const lineHeight = {
-    /** 1 - 用于图标或单行紧凑文本 */
+    /** 1 - For icons or single-line compact text */
     none: '1',
-    /** 1.25 - 紧凑行高，用于标题 */
+    /** 1.25 - Tight line height, for headings */
     tight: '1.25',
-    /** 1.375 - 稍紧凑 */
+    /** 1.375 - Slightly tight */
     snug: '1.375',
-    /** 1.5 - 正常行高，用于正文 */
+    /** 1.5 - Normal line height, for body text */
     normal: '1.5',
-    /** 1.625 - 稍宽松 */
+    /** 1.625 - Slightly relaxed */
     relaxed: '1.625',
-    /** 2 - 宽松行高 */
+    /** 2 - Loose line height */
     loose: '2',
 } as const
 
-// ============ 字间距 ============
+// ============ Letter Spacing ============
 
 export const letterSpacing = {
     tighter: '-0.05em',
@@ -86,7 +86,7 @@ export const letterSpacing = {
     widest: '0.1em',
 } as const
 
-// ============ 文本样式预设 ============
+// ============ Text Style Presets ============
 
 export const textStyles = {
     // 显示标题 (Hero, Banner)

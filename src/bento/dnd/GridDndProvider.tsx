@@ -1,15 +1,15 @@
 'use client'
 
 /**
- * [INPUT]: (@dnd-kit/core, children, onSwap) - DndKit 库、子组件、交换回调
- * [OUTPUT]: (GridDndProvider, DraggableGridItem, swapItems, useGridDnd) - 拖拽提供者、可拖拽项、交换函数、拖拽 Hook
- * [POS]: 位于 /bento/dnd 的拖拽系统核心，基于交换逻辑而非列表排序，提供网格拖拽能力。
+ * [INPUT]: (@dnd-kit/core, children, onSwap) - DndKit library, children components, swap callback
+ * [OUTPUT]: (GridDndProvider, DraggableGridItem, swapItems, useGridDnd) - Drag provider, draggable item, swap function, drag Hook
+ * [POS]: Located at /bento/dnd drag system core, based on swap logic rather than list sorting, provides grid drag capability.
  * 
  * Features: Swap-based drag, Gray placeholder, Blue highlight, Smooth cursor following
  * 
  * [PROTOCOL]:
- * 1. 一旦本文件逻辑变更，必须同步更新此 Header。
- * 2. 更新后必须上浮检查 /src/bento/dnd/.folder.md 的描述是否依然准确。
+ * 1. Once this file's logic changes, this Header must be synchronized immediately.
+ * 2. After update, must check upward whether /src/bento/dnd/.folder.md description is still accurate.
  */
 
 import React, { createContext, useContext, useState, useCallback, useRef } from 'react'

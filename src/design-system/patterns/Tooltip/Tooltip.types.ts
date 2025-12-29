@@ -19,24 +19,24 @@ export type TooltipPlacement =
     | 'right-end'
 
 export interface TooltipProps {
-    /** 提示内容 */
+    /** Tooltip content */
     content: ReactNode
-    /** 触发元素 */
+    /** Trigger element */
     children: ReactNode
-    /** 位置 */
+    /** Placement */
     placement?: TooltipPlacement
-    /** 延迟显示 (ms) */
+    /** Delay before showing (ms) */
     delay?: number
-    /** 延迟隐藏 (ms) */
+    /** Delay before hiding (ms) */
     hideDelay?: number
-    /** 是否禁用 */
+    /** Whether disabled */
     disabled?: boolean
-    /** 是否显示箭头 */
+    /** Whether to show arrow */
     hasArrow?: boolean
-    /** 最大宽度 */
+    /** Maximum width */
     maxWidth?: number | string
-    /** 自定义样式 */
+    /** Custom styles */
     style?: CSSProperties
-    /** 自定义 className */
+    /** Custom className */
     className?: string
 }

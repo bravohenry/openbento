@@ -7,31 +7,31 @@ import type { HTMLAttributes, ReactNode } from 'react'
 export type ModalSize = 'sm' | 'md' | 'lg' | 'xl' | 'full'
 
 export interface ModalProps {
-    /** 是否打开 */
+    /** Whether open */
     isOpen: boolean
-    /** 关闭回调 */
+    /** Close callback */
     onClose: () => void
-    /** 尺寸 */
+    /** Size */
     size?: ModalSize
-    /** 标题 */
+    /** Title */
     title?: ReactNode
-    /** 是否显示关闭按钮 */
+    /** Whether to show close button */
     showCloseButton?: boolean
-    /** 点击遮罩是否关闭 */
+    /** Whether to close on overlay click */
     closeOnOverlayClick?: boolean
-    /** 按 ESC 是否关闭 */
+    /** Whether to close on ESC key */
     closeOnEsc?: boolean
-    /** 是否居中 */
+    /** Whether centered */
     centered?: boolean
-    /** 自定义 className */
+    /** Custom className */
     className?: string
-    /** 自定义样式 */
+    /** Custom styles */
     style?: React.CSSProperties
-    /** 子元素 */
+    /** Children */
     children?: ReactNode
-    /** 页脚 */
+    /** Footer */
     footer?: ReactNode
-    /** 是否无内边距 */
+    /** Whether no padding */
     noPadding?: boolean
 }
 

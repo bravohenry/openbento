@@ -1,14 +1,14 @@
 /**
  * OpenBento Design System - Color Tokens
  * 
- * 采用语义化命名，支持 Light/Dark 主题
- * 颜色值通过 CSS 变量实现主题切换
+ * Uses semantic naming, supports Light/Dark themes
+ * Color values are implemented through CSS variables for theme switching
  */
 
-// ============ 核心颜色语义 ============
+// ============ Core Color Semantics ============
 
 export const colors = {
-    // 背景色
+    // Background colors
     background: {
         primary: 'var(--color-bg-primary)',
         secondary: 'var(--color-bg-secondary)',
@@ -16,7 +16,7 @@ export const colors = {
         overlay: 'var(--color-bg-overlay)',
     },
 
-    // 表面色 (卡片、组件背景)
+    // Surface colors (card, component backgrounds)
     surface: {
         default: 'var(--color-surface)',
         hover: 'var(--color-surface-hover)',
@@ -24,7 +24,7 @@ export const colors = {
         elevated: 'var(--color-surface-elevated, var(--color-surface))',
     },
 
-    // 文本色
+    // Text colors
     text: {
         primary: 'var(--color-text-primary)',
         secondary: 'var(--color-text-secondary)',
@@ -33,7 +33,7 @@ export const colors = {
         disabled: 'var(--color-text-disabled, rgba(0, 0, 0, 0.38))',
     },
 
-    // 边框色
+    // Border colors
     border: {
         default: 'var(--color-border)',
         hover: 'var(--color-border-hover)',
@@ -41,7 +41,7 @@ export const colors = {
         divider: 'var(--color-border-divider, var(--color-border))',
     },
 
-    // 品牌色
+    // Brand colors
     brand: {
         primary: 'var(--color-brand-primary)',
         secondary: 'var(--color-brand-secondary)',

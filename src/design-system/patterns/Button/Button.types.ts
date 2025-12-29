@@ -1,22 +1,22 @@
 /**
  * OpenBento Design System - Button Types
  * 
- * 按钮组件类型定义
- * 灵感来源：Bento.me 的 Follow 按钮设计
+ * Button component type definitions
+ * Inspiration: Bento.me's Follow button design
  */
 
 import type { ButtonHTMLAttributes, ReactNode } from 'react'
 
-// ============ 按钮变体 ============
+// ============ Button Variants ============
 
 export type ButtonVariant =
-    | 'primary'      // 主要操作 - 品牌渐变
-    | 'secondary'    // 次要操作 - 浅色背景
-    | 'outline'      // 边框按钮
-    | 'ghost'        // 幽灵按钮 - 无背景
-    | 'danger'       // 危险操作
-    | 'success'      // 成功操作
-    // 社交媒体品牌按钮
+    | 'primary'      // Primary action - brand gradient
+    | 'secondary'    // Secondary action - light background
+    | 'outline'      // Outline button
+    | 'ghost'        // Ghost button - no background
+    | 'danger'       // Danger action
+    | 'success'      // Success action
+    // Social media brand buttons
     | 'twitter'
     | 'instagram'
     | 'tiktok'
@@ -27,39 +27,39 @@ export type ButtonVariant =
     | 'discord'
     | 'whatsapp'
 
-// ============ 按钮尺寸 ============
+// ============ Button Sizes ============
 
 export type ButtonSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl'
 
-// ============ 按钮形状 ============
+// ============ Button Shapes ============
 
 export type ButtonShape = 'rounded' | 'pill' | 'square'
 
-// ============ 按钮 Props ============
+// ============ Button Props ============
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-    /** 按钮变体 */
+    /** Button variant */
     variant?: ButtonVariant
-    /** 按钮尺寸 */
+    /** Button size */
     size?: ButtonSize
-    /** 按钮形状 */
+    /** Button shape */
     shape?: ButtonShape
-    /** 是否占满宽度 */
+    /** Whether to take full width */
     fullWidth?: boolean
-    /** 左侧图标 */
+    /** Left icon */
     leftIcon?: ReactNode
-    /** 右侧图标 */
+    /** Right icon */
     rightIcon?: ReactNode
-    /** 加载状态 */
+    /** Loading state */
     loading?: boolean
-    /** 徽章内容 (如 TikTok 的粉丝数) */
+    /** Badge content (e.g., TikTok follower count) */
     badge?: ReactNode
-    /** 是否只显示图标 */
+    /** Whether to show icon only */
     iconOnly?: boolean
-    /** 渲染为其他元素 (如 <a>) */
+    /** Render as other element (e.g., <a>) */
     as?: 'button' | 'a' | 'div'
-    /** 链接地址 (当 as="a" 时) */
+    /** Link URL (when as="a") */
     href?: string
-    /** 链接打开方式 */
+    /** Link target */
     target?: '_blank' | '_self' | '_parent' | '_top'
 }

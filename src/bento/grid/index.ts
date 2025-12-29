@@ -1,7 +1,11 @@
 /**
- * OpenBento - Bento Grid Module
+ * [INPUT]: (BentoGrid, BentoCell, useGridLayout) - Grid components and utilities
+ * [OUTPUT]: (All grid-related components and tools) - All grid-related components and tools
+ * [POS]: Located at /bento/grid module entry, exports all grid-related components and utilities.
  * 
- * 导出所有网格相关组件和工具
+ * [PROTOCOL]:
+ * 1. Once this file's logic changes, this Header must be synchronized immediately.
+ * 2. After update, must check upward whether /src/bento/grid/.folder.md description is still accurate.
  */
 
 // Components

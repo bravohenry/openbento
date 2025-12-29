@@ -9,28 +9,28 @@ export type InputSize = 'sm' | 'md' | 'lg'
 export type InputVariant = 'default' | 'filled' | 'flushed' | 'unstyled'
 
 export interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'size'> {
-    /** 变体 */
+    /** Variant */
     variant?: InputVariant
-    /** 尺寸 */
+    /** Size */
     size?: InputSize
-    /** 左侧图标/元素 */
+    /** Left icon/element */
     leftElement?: ReactNode
-    /** 右侧图标/元素 */
+    /** Right icon/element */
     rightElement?: ReactNode
-    /** 左侧插件 */
+    /** Left addon */
     leftAddon?: ReactNode
-    /** 右侧插件 */
+    /** Right addon */
     rightAddon?: ReactNode
-    /** 标签 */
+    /** Label */
     label?: string
-    /** 帮助文本 */
+    /** Helper text */
     helperText?: string
-    /** 错误文本 */
+    /** Error text */
     errorText?: string
-    /** 是否错误状态 */
+    /** Whether in error state */
     isError?: boolean
-    /** 是否成功状态 */
+    /** Whether in success state */
     isSuccess?: boolean
-    /** 是否全宽 */
+    /** Whether full width */
     fullWidth?: boolean
 }

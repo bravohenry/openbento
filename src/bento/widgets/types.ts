@@ -21,11 +21,11 @@ export const SIZE_VARIANTS: WidgetSize[] = ['1x1', '2x1', '1x2', '2x2', 'bar']
 
 
 
-// ============ Widget 分类 ============
+// ============ Widget Categories ============
 
 export type WidgetCategory = 'link' | 'image' | 'text' | 'map' | 'section'
 
-// ============ 平台类型 ============
+// ============ Platform Types ============
 
 export type SocialPlatform =
     | 'instagram'
@@ -44,7 +44,7 @@ export type SocialPlatform =
     | 'dribbble'
     | 'appstore'
     | 'playstore'
-    | 'generic' // 未识别的链接
+    | 'generic' // Unrecognized link
 
 // ============ Base Widget Config ============
 
@@ -64,7 +64,7 @@ export interface LinkWidgetConfig extends BaseWidgetConfig {
     subtitle?: string // handle, description
     ctaLabel?: string // Follow, Get, Listen, etc.
     customIcon?: string // URL or emoji
-    customColor?: string // 自定义背景色
+    customColor?: string // Custom background color
 }
 
 // ============ Image Widget ============
@@ -86,7 +86,7 @@ export interface TextWidgetConfig extends BaseWidgetConfig {
     category: 'text'
     variant: TextWidgetVariant
     content: string
-    attribution?: string // 引用署名
+    attribution?: string // Quote attribution
 }
 
 // ============ Map Widget ============

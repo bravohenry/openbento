@@ -1,7 +1,7 @@
 /**
  * OpenBento - BentoGrid Types
  * 
- * 网格系统类型定义
+ * Grid system type definitions
  */
 
 import type { BentoSize } from '../core/BentoSizeMap'
@@ -10,69 +10,69 @@ import type { ReactNode, CSSProperties } from 'react'
 // ============ Grid Props ============
 
 export interface BentoGridProps {
-    /** 子元素 (BentoCell 或 BentoCard) */
+    /** Children (BentoCell or BentoCard) */
     children: ReactNode
-    /** 网格列数 */
+    /** Grid column count */
     columns?: number
-    /** 网格行数 (可选，自动计算) */
+    /** Grid row count (optional, auto-calculated) */
     rows?: number
-    /** 网格间距 */
+    /** Grid gap */
     gap?: number
-    /** 基础单元尺寸 */
+    /** Base unit size */
     unit?: number
-    /** 容器最大宽度 */
+    /** Container max width */
     maxWidth?: number
-    /** 是否居中 */
+    /** Whether centered */
     centered?: boolean
-    /** 是否显示网格线 (调试用) */
+    /** Whether to show grid lines (for debugging) */
     showGridLines?: boolean
-    /** 是否启用响应式 */
+    /** Whether to enable responsive */
     responsive?: boolean
-    /** 自定义样式 */
+    /** Custom styles */
     style?: CSSProperties
-    /** 自定义类名 */
+    /** Custom class name */
     className?: string
-    /** 容器 padding */
+    /** Container padding */
     padding?: number | string
 }
 
 // ============ Cell Props ============
 
 export interface BentoCellProps {
-    /** 子元素 */
+    /** Children */
     children: ReactNode
-    /** 单元格尺寸 */
+    /** Cell size */
     size?: BentoSize
-    /** 起始列 (1-indexed) */
+    /** Start column (1-indexed) */
     colStart?: number
-    /** 起始行 (1-indexed) */
+    /** Start row (1-indexed) */
     rowStart?: number
-    /** 跨列数 */
+    /** Column span */
     colSpan?: number
-    /** 跨行数 */
+    /** Row span */
     rowSpan?: number
-    /** 自定义 Grid Area */
+    /** Custom Grid Area */
     gridArea?: string
-    /** 自定义样式 */
+    /** Custom styles */
     style?: CSSProperties
-    /** 自定义类名 */
+    /** Custom class name */
     className?: string
 }
 
 // ============ Grid Context ============
 
 export interface GridContextValue {
-    /** 网格列数 */
+    /** Grid column count */
     columns: number
-    /** 网格行数 */
+    /** Grid row count */
     rows: number
-    /** 间距 */
+    /** Gap */
     gap: number
-    /** 基础单元尺寸 */
+    /** Base unit size */
     unit: number
-    /** 是否处于编辑模式 */
+    /** Whether in edit mode */
     isEditing: boolean
-    /** 是否启用吸附 */
+    /** Whether snap is enabled */
     snapEnabled: boolean
 }
 

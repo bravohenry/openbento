@@ -11,20 +11,20 @@ export type JustifyContent = 'start' | 'end' | 'center' | 'between' | 'around' |
 export type AlignItems = 'start' | 'end' | 'center' | 'baseline' | 'stretch'
 
 export interface FlexComponentProps extends StyleProps, HTMLAttributes<HTMLDivElement> {
-    /** 渲染的元素类型 */
+    /** Element type to render */
     as?: React.ElementType
-    /** Flex 方向 */
+    /** Flex direction */
     direction?: FlexDirection
-    /** 换行 */
+    /** Wrap */
     wrap?: FlexWrap
-    /** 主轴对齐 */
+    /** Main axis alignment */
     justify?: JustifyContent
-    /** 交叉轴对齐 */
+    /** Cross axis alignment */
     align?: AlignItems
-    /** 间距 (快捷属性) */
+    /** Gap (shortcut property) */
     gap?: number | string
-    /** 是否内联 */
+    /** Whether inline */
     inline?: boolean
-    /** 应用圆角 */
+    /** Apply border radius */
     rounded?: 'none' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'full'
 }

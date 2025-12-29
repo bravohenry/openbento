@@ -1,98 +1,52 @@
 'use client'
 
-/**
- * OpenBento - Profile Section Component
- * 
- * 左侧个人资料区域，包含头像、名称和描述
- * 基于 Bento.me 原版设计
- */
-
 import React from 'react'
-
-// ============ Types ============
+import { motion } from 'framer-motion'
 
 interface ProfileSectionProps {
-    /** 头像 URL */
     avatarUrl?: string
-    /** 头像背景色 (当无图片时使用) */
     avatarBgColor?: string
-    /** 名称/品牌名 */
     name: string
-    /** 描述文字 */
     description: string | React.ReactNode
-    /** 编辑模式 */
     isEditing?: boolean
 }
 
-// ============ Component ============
-
 export const ProfileSection: React.FC<ProfileSectionProps> = ({
     avatarUrl,
-    avatarBgColor = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+    avatarBgColor,
     name,
     description,
-    isEditing = false,
 }) => {
     return (
-        <div className="flex flex-col items-start gap-6 w-[380px] shrink-0 fixed left-[76px] top-[96px]">
-            {/* Avatar */}
-            <div
-                className="relative w-[120px] h-[120px] rounded-[32px] overflow-hidden shadow-lg"
-                style={{
-                    background: avatarUrl ? undefined : avatarBgColor,
-                }}
-            >
+        <div className="w-full flex flex-col items-start gap-6">
+            {/* Avatar - Circular, no shadow */}
+            <div className="relative w-40 h-40 rounded-full overflow-hidden">
                 {avatarUrl ? (
-                    <img
-                        src={avatarUrl}
-                        alt={name}
-                        className="w-full h-full object-cover"
-                    />
+                    <img src={avatarUrl} alt={name} className="w-full h-full object-cover" />
                 ) : (
-                    /* Default Avatar - Gradient Circle Icon like Bento.me */
-                    <div className="w-full h-full flex items-center justify-center">
-                        <div
-                            className="w-[90px] h-[90px] rounded-full"
-                            style={{
-                                background: 'linear-gradient(180deg, #7DD3FC 0%, #38BDF8 50%, #0EA5E9 100%)',
-                                boxShadow: 'inset 0 -4px 12px rgba(0,0,0,0.1), 0 8px 24px rgba(14,165,233,0.3)',
-                            }}
-                        />
+                    <div className="w-full h-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center relative">
+                        {/* Blue outer ring */}
+                        <div className="absolute inset-0 rounded-full border-4 border-blue-500" />
+                        {/* Light blue crescent shape */}
+                        <div className="absolute inset-0 rounded-full bg-blue-300/30" style={{
+                            clipPath: 'ellipse(60% 40% at 30% 50%)',
+                        }} />
                     </div>
                 )}
-                {/* Subtle inner border */}
-                <div
-                    className="absolute inset-0 rounded-[32px] pointer-events-none"
-                    style={{
-                        boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.2)',
-                    }}
-                />
             </div>
 
-            {/* Name */}
-            <h1
-                className="text-[36px] font-bold leading-[1.1] tracking-[-1px] text-black"
-                style={{ fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif' }}
-            >
-                {name}
-            </h1>
-
-            {/* Description */}
-            <p
-                className="text-[16px] leading-[1.5] text-[#565656] max-w-[320px]"
-                style={{ fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif' }}
-            >
-                {typeof description === 'string' ? (
-                    description
-                ) : (
-                    description
-                )}
-            </p>
+            {/* Content */}
+            <div className="flex flex-col gap-3">
+                <h1 className="text-3xl font-extrabold tracking-tight text-black leading-tight">
+                    {name}
+                </h1>
+                <p className="text-base text-black leading-relaxed">
+                    {description}
+                </p>
+            </div>
         </div>
     )
 }
-
-// ============ Editable Profile Section ============
 
 interface EditableProfileSectionProps extends ProfileSectionProps {
     onNameChange?: (name: string) => void
@@ -111,78 +65,68 @@ export const EditableProfileSection: React.FC<EditableProfileSectionProps> = ({
     onAvatarChange,
 }) => {
     if (!isEditing) {
-        return (
-            <ProfileSection
-                avatarUrl={avatarUrl}
-                avatarBgColor={avatarBgColor}
-                name={name}
-                description={description}
-            />
-        )
+        return <ProfileSection avatarUrl={avatarUrl} avatarBgColor={avatarBgColor} name={name} description={description} />
     }
 
     return (
-        <div className="flex flex-col items-start gap-6 w-[380px] shrink-0 fixed left-[76px] top-[96px]">
-            {/* Avatar with Edit Overlay */}
-            <div className="relative group">
-                <div
-                    className="relative w-[120px] h-[120px] rounded-[32px] overflow-hidden shadow-lg cursor-pointer"
-                    style={{
-                        background: avatarUrl ? undefined : avatarBgColor || 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                    }}
-                    onClick={() => {
-                        // In a real implementation, open file picker
-                        const newUrl = prompt('Enter image URL:', avatarUrl || '')
-                        if (newUrl && onAvatarChange) {
-                            onAvatarChange(newUrl)
-                        }
-                    }}
-                >
+        <div className="w-full flex flex-col items-start gap-6">
+            {/* Editable Avatar - Circular, no shadow */}
+            <motion.div
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="relative group cursor-pointer"
+                onClick={() => {
+                    const newUrl = prompt('Enter image URL:', avatarUrl || '')
+                    if (newUrl && onAvatarChange) onAvatarChange(newUrl)
+                }}
+            >
+                <div className="relative w-40 h-40 rounded-full overflow-hidden">
                     {avatarUrl ? (
-                        <img
-                            src={avatarUrl}
-                            alt={name}
-                            className="w-full h-full object-cover"
-                        />
+                        <img src={avatarUrl} alt={name} className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity" />
                     ) : (
-                        <div className="w-full h-full flex items-center justify-center">
-                            <div
-                                className="w-[90px] h-[90px] rounded-full"
-                                style={{
-                                    background: 'linear-gradient(180deg, #7DD3FC 0%, #38BDF8 50%, #0EA5E9 100%)',
-                                    boxShadow: 'inset 0 -4px 12px rgba(0,0,0,0.1), 0 8px 24px rgba(14,165,233,0.3)',
-                                }}
-                            />
+                        <div className="w-full h-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center relative">
+                            {/* Blue outer ring */}
+                            <div className="absolute inset-0 rounded-full border-4 border-blue-500" />
+                            {/* Light blue crescent shape */}
+                            <div className="absolute inset-0 rounded-full bg-blue-300/30" style={{
+                                clipPath: 'ellipse(60% 40% at 30% 50%)',
+                            }} />
                         </div>
                     )}
-                    {/* Edit overlay on hover */}
-                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                        <span className="text-white text-sm font-medium">Edit</span>
+
+                    {/* Floating Edit Icon */}
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-[2px] rounded-full">
+                        <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-lg transform translate-y-2 group-hover:translate-y-0 transition-transform">
+                            <span className="text-lg">🖊️</span>
+                        </div>
                     </div>
                 </div>
+            </motion.div>
+
+            {/* Editable Inputs */}
+            <div className="w-full space-y-3">
+                <div className="relative group">
+                    <input
+                        type="text"
+                        value={name}
+                        onChange={(e) => onNameChange?.(e.target.value)}
+                        className="w-full text-3xl lg:text-4xl font-extrabold bg-transparent border-2 border-transparent hover:border-gray-200 focus:border-blue-500 rounded-xl px-3 py-1 -ml-3 transition-colors outline-none text-black placeholder:text-gray-300"
+                        placeholder="Your Name"
+                    />
+                    <span className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 text-gray-300 pointer-events-none">✎</span>
+                </div>
+
+                <div className="relative group">
+                    <textarea
+                        value={typeof description === 'string' ? description : ''}
+                        onChange={(e) => onDescriptionChange?.(e.target.value)}
+                        className="w-full text-base lg:text-lg text-gray-500 bg-transparent border-2 border-transparent hover:border-gray-200 focus:border-blue-500 rounded-xl px-3 py-2 -ml-3 transition-colors outline-none resize-none placeholder:text-gray-300 leading-relaxed font-medium"
+                        placeholder="Add a bio..."
+                        rows={3}
+                    />
+                    <span className="absolute right-2 bottom-2 opacity-0 group-hover:opacity-100 text-gray-300 pointer-events-none">✎</span>
+                </div>
             </div>
-
-            {/* Editable Name */}
-            <input
-                type="text"
-                value={name}
-                onChange={(e) => onNameChange?.(e.target.value)}
-                className="text-[36px] font-bold leading-[1.1] tracking-[-1px] text-black bg-transparent border-none outline-none w-full focus:ring-2 focus:ring-black/10 rounded-lg px-2 -mx-2"
-                style={{ fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif' }}
-                placeholder="Your Name"
-            />
-
-            {/* Editable Description */}
-            <textarea
-                value={typeof description === 'string' ? description : ''}
-                onChange={(e) => onDescriptionChange?.(e.target.value)}
-                className="text-[16px] leading-[1.5] text-[#565656] max-w-[320px] bg-transparent border-none outline-none w-full resize-none focus:ring-2 focus:ring-black/10 rounded-lg px-2 -mx-2"
-                style={{ fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif' }}
-                placeholder="Your description..."
-                rows={3}
-            />
         </div>
     )
 }
-
-export default ProfileSection
