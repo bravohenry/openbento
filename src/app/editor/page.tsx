@@ -2,8 +2,8 @@
 
 /**
  * [INPUT]: None - Main editor page component
- * [OUTPUT]: React component - Full-featured editor with drag-and-drop, mobile view, and widget management
- * [POS]: Main editor page at /editor route, provides complete editing experience
+ * [OUTPUT]: React component - Full-featured editor with drag-and-drop, responsive grid (4 columns desktop, 2 columns mobile), and widget management with desktop/mobile layout sync
+ * [POS]: Main editor page at /editor route, provides complete editing experience with responsive grid layout that adapts to view mode (desktop: 4 columns, mobile: 2 columns)
  * 
  * [PROTOCOL]:
  * 1. Once this file's logic changes, this Header must be synchronized immediately.
@@ -15,6 +15,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { motion } from 'framer-motion'
 
 import { EditorProvider, EditorLayout, useEditor } from '@/bento/editor'
+import { MIN_CANVAS_WIDTH } from '@/bento/editor/constants'
 import { WidgetEditOverlay } from '@/bento/editor'
 import { BentoGrid } from '@/bento/grid'
 import { GridDndProvider, DraggableGridItem, swapItems, type GridItem } from '@/bento/dnd'
@@ -56,6 +57,7 @@ interface EditableWidgetProps {
     onSizeChange: (size: WidgetSize) => void
     isEditing: boolean
     onUpdate: (updates: Partial<WidgetConfig>) => void
+    onClose?: () => void
 }
 
 const EditableWidget: React.FC<EditableWidgetProps & { onUpdate: (updates: Partial<WidgetConfig>) => void }> = ({
@@ -66,6 +68,7 @@ const EditableWidget: React.FC<EditableWidgetProps & { onUpdate: (updates: Parti
     onSizeChange,
     isEditing,
     onUpdate,
+    onClose,
 }) => {
     const { cols, rows } = parseWidgetSize(widget.size)
 
@@ -86,6 +89,7 @@ const EditableWidget: React.FC<EditableWidgetProps & { onUpdate: (updates: Parti
                     onDelete={onDelete}
                     onSizeChange={onSizeChange}
                     onUpdate={onUpdate}
+                    onClose={onClose}
                 />
             )}
         </div>
@@ -139,19 +143,9 @@ const EditorContent: React.FC = () => {
         reorderWidgets,
         desktopWidgets,
         mobileWidgets,
-        syncDesktopToMobile,
     } = useEditor()
     const containerRef = useRef<HTMLDivElement>(null)
     const hasInitialized = useRef(false)
-    const hasSyncedToMobile = useRef(false)
-
-    // Sync desktop to mobile on first switch to mobile
-    useEffect(() => {
-        if (currentViewMode === 'mobile' && !hasSyncedToMobile.current && desktopWidgets.length > 0 && mobileWidgets.length === 0) {
-            syncDesktopToMobile()
-            hasSyncedToMobile.current = true
-        }
-    }, [currentViewMode, desktopWidgets.length, mobileWidgets.length, syncDesktopToMobile])
 
     // Initialize with example data if empty
     useEffect(() => {
@@ -159,14 +153,14 @@ const EditorContent: React.FC = () => {
             hasInitialized.current = true
 
             const exampleWidgets: WidgetConfig[] = [
-                { ...createLinkWidgetConfig('https://instagram.com/biuty.ai', '1x1'), id: uuidv4() },
-                { ...createLinkWidgetConfig('https://tiktok.com/@biuty.ai', '1x1'), id: uuidv4() },
-                { ...createLinkWidgetConfig('https://biuty.ai', '1x1'), id: uuidv4() },
-                { ...createLinkWidgetConfig('https://linkedin.com/company/biutyai', '1x1'), id: uuidv4() },
-                { ...createTextWidgetConfig('', 'note', '1x1'), id: uuidv4() },
-                { ...createImageWidgetConfig('https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop', '1x1'), id: uuidv4() },
-                { ...createLinkWidgetConfig('https://twitter.com/biutyai', '2x2'), id: uuidv4() },
-                { ...createMapWidgetConfig('Berlin, Germany', '2x2', { lat: 52.52, lng: 13.405, label: 'Berlin, Germany' }), id: uuidv4() },
+                { ...createLinkWidgetConfig('https://linkcard.ai', '1x1'), id: uuidv4() },
+                { ...createLinkWidgetConfig('https://twitter.com/linkcardai', '1x1'), id: uuidv4() },
+                { ...createLinkWidgetConfig('https://instagram.com/linkcardai', '1x1'), id: uuidv4() },
+                { ...createLinkWidgetConfig('https://linkedin.com/company/linkcard', '1x1'), id: uuidv4() },
+                { ...createTextWidgetConfig('Designed for the moment you meet.', 'note', '1x1'), id: uuidv4() },
+                { ...createImageWidgetConfig('https://images.unsplash.com/photo-1551650975-87deedd944c3?w=400&h=400&fit=crop', '1x1'), id: uuidv4() },
+                { ...createLinkWidgetConfig('https://linkcard.ai/features', '2x2'), id: uuidv4() },
+                { ...createMapWidgetConfig('San Francisco, CA', '2x2', { lat: 37.7749, lng: -122.4194, label: 'San Francisco, CA' }), id: uuidv4() },
             ]
 
             exampleWidgets.forEach((widget) => addWidget(widget))
@@ -244,6 +238,7 @@ const EditorContent: React.FC = () => {
                             onSizeChange={(size) => handleSizeChange(widget.id, size)}
                             isEditing={isEditing}
                             onUpdate={(updates) => updateWidget(widget.id, updates)}
+                            onClose={() => setSelectedWidgetId(null)}
                         />
             ))}
         </BentoGrid>
@@ -251,34 +246,36 @@ const EditorContent: React.FC = () => {
 
     return (
         <EditorLayout>
-            {/* Desktop: Container with max-width and padding */}
+            {/* Desktop: Full width container, no max-width constraint */}
             {/* Mobile: Container is handled by EditorLayout, no extra wrapper needed */}
             {currentViewMode === 'desktop' ? (
-                <div className="w-full max-w-[1200px] mx-auto px-8 py-12" ref={containerRef}>
-                    {isEditing ? (
-                        <GridDndProvider
-                            items={gridItems}
-                            onSwap={handleSwap}
-                            renderOverlay={(item) => {
-                                const widget = item.data as WidgetConfig
-                                const dims = WIDGET_DIMENSIONS[widget.size] || WIDGET_DIMENSIONS['1x1']
-                                return (
-                                    <div style={{
-                                        width: dims.width,
-                                        height: dims.height,
-                                        borderRadius: '27px',
-                                        overflow: 'hidden',
-                                    }}>
-                                        <WidgetRenderer config={widget} isEditing={false} />
-                                    </div>
-                                )
-                            }}
-                        >
-                            {gridContent}
-                        </GridDndProvider>
-                    ) : (
-                        gridContent
-                    )}
+                <div className="w-full h-full flex items-start justify-center py-12" ref={containerRef} style={{ overflowX: 'hidden' }}>
+                    <div style={{ width: `${MIN_CANVAS_WIDTH}px`, minWidth: `${MIN_CANVAS_WIDTH}px` }}>
+                        {isEditing ? (
+                            <GridDndProvider
+                                items={gridItems}
+                                onSwap={handleSwap}
+                                renderOverlay={(item) => {
+                                    const widget = item.data as WidgetConfig
+                                    const dims = WIDGET_DIMENSIONS[widget.size] || WIDGET_DIMENSIONS['1x1']
+                                    return (
+                                        <div style={{
+                                            width: dims.width,
+                                            height: dims.height,
+                                            borderRadius: '27px',
+                                            overflow: 'hidden',
+                                        }}>
+                                            <WidgetRenderer config={widget} isEditing={false} />
+                                        </div>
+                                    )
+                                }}
+                            >
+                                {gridContent}
+                            </GridDndProvider>
+                        ) : (
+                            gridContent
+                        )}
+                    </div>
                 </div>
             ) : (
                 // Mobile: Content is already wrapped by EditorLayout's container

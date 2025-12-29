@@ -1,7 +1,7 @@
 /**
- * [INPUT]: None - Layout constants
- * [OUTPUT]: (MIN_CANVAS_WIDTH, MIN_PROFILE_WIDTH, MOBILE_BREAKPOINT) - Layout dimension constants
- * [POS]: Located at /bento/editor - Defines responsive layout breakpoints and minimum widths
+ * [INPUT]: (BENTO_UNIT, BENTO_GAP) - Base unit and gap from BentoSizeMap
+ * [OUTPUT]: (MIN_CANVAS_WIDTH, MIN_PROFILE_WIDTH, MOBILE_BREAKPOINT, MOBILE_CONTAINER_MAX_WIDTH) - Layout dimension constants for responsive editor layout
+ * [POS]: Located at /bento/editor - Defines responsive layout breakpoints, minimum widths for desktop layout, and mobile container constraints
  * 
  * [PROTOCOL]:
  * 1. Once this file's logic changes, this Header must be synchronized immediately.

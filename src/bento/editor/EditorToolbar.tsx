@@ -1,9 +1,9 @@
 'use client'
 
 /**
- * [INPUT]: (EditorContext) - Editor context providing viewMode, setViewMode, addWidget functions
- * [OUTPUT]: React component - Fixed bottom toolbar with widget creation buttons, view mode toggle, and link input modal
- * [POS]: Located at /bento/editor, provides primary editing interface with widget creation, sharing, and view mode switching
+ * [INPUT]: (EditorContext, useDeviceDetection) - Editor context providing viewMode, setViewMode, addWidget functions, and device detection hook
+ * [OUTPUT]: React component - Fixed bottom toolbar with widget creation buttons, view mode toggle, link input modal, and conditional share button (desktop only)
+ * [POS]: Located at /bento/editor, provides primary editing interface with widget creation, sharing (desktop only), and view mode switching, adapts UI based on device detection
  * 
  * [PROTOCOL]:
  * 1. Once this file's logic changes, this Header must be synchronized immediately.

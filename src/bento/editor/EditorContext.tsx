@@ -9,7 +9,7 @@
  */
 
 import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react'
-import type { WidgetConfig } from '../widgets/types'
+import type { WidgetConfig, WidgetSize } from '../widgets/types'
 
 export type ViewMode = 'desktop' | 'mobile'
 
@@ -17,7 +17,7 @@ export type ViewMode = 'desktop' | 'mobile'
 
 const STORAGE_KEY = 'openbento-widgets'
 const PROFILE_STORAGE_KEY = 'openbento-profile'
-const STORAGE_VERSION = '1.0'
+const STORAGE_VERSION = '1.1'
 
 // ============ Storage Types ============
 
@@ -25,6 +25,10 @@ interface StoredLayout {
     widgets?: WidgetConfig[] // Legacy support
     desktopWidgets: WidgetConfig[]
     mobileWidgets: WidgetConfig[]
+    layoutIndependent?: {
+        desktop: boolean
+        mobile: boolean
+    }
     version: string
 }
 
@@ -70,11 +74,42 @@ interface EditorContextValue {
     clearLayout: () => void
     // Layout sync
     syncDesktopToMobile: () => void
+    // Layout independence
+    layoutIndependent: { desktop: boolean; mobile: boolean }
+    markLayoutIndependent: (viewMode: ViewMode) => void
 }
 
 const EditorContext = createContext<EditorContextValue | undefined>(undefined)
 
 // ============ Provider ============
+
+// ============ Property Type Helpers ============
+
+// Content properties that should sync across views
+const CONTENT_PROPERTIES = [
+    'category', 'type', 'content', 'url', 'title', 'description',
+    'imageUrl', 'platform', 'subtitle', 'ctaLabel', 'customIcon', 'customColor',
+    'address', 'lat', 'lng', 'style', 'variant', 'attribution'
+] as const
+
+// Layout properties that can be independent
+const LAYOUT_PROPERTIES = ['size'] as const
+
+// Check if a property is a content property
+const isContentProperty = (key: string): boolean => {
+    return CONTENT_PROPERTIES.includes(key as any)
+}
+
+// Check if a property is a layout property
+const isLayoutProperty = (key: string): boolean => {
+    return LAYOUT_PROPERTIES.includes(key as any)
+}
+
+// Extract content properties from widget (excluding layout properties)
+const extractContentProperties = (widget: WidgetConfig): Omit<WidgetConfig, 'size'> & { size?: WidgetSize } => {
+    const { size, ...rest } = widget
+    return rest as Omit<WidgetConfig, 'size'> & { size?: WidgetSize }
+}
 
 export const EditorProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [isEditing, setIsEditing] = useState(true) // Default to edit mode for development convenience
@@ -82,9 +117,13 @@ export const EditorProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     const [selectedWidgetId, setSelectedWidgetId] = useState<string | null>(null)
     const [desktopWidgets, setDesktopWidgets] = useState<WidgetConfig[]>([])
     const [mobileWidgets, setMobileWidgets] = useState<WidgetConfig[]>([])
+    const [layoutIndependent, setLayoutIndependent] = useState<{ desktop: boolean; mobile: boolean }>({
+        desktop: false,
+        mobile: false,
+    })
     const [profile, setProfile] = useState<ProfileData>({
-        name: 'Biuty AI',
-        description: "Don't waste another dollar on products that don't work. Let AI analyze your skin.",
+        name: 'LinkCard',
+        description: "The first context-aware identity OS. Create a dynamic Link Card that lives natively in Apple Wallet. Features AI agents, offline sync, and zero-app sharing.",
         avatarUrl: undefined,
     })
 
@@ -98,11 +137,13 @@ export const EditorProvider: React.FC<{ children: ReactNode }> = ({ children }) 
         if (stored) {
             try {
                 const data: StoredLayout = JSON.parse(stored)
-                if (data.version === STORAGE_VERSION) {
+                // Support both old and new versions
+                if (data.version === STORAGE_VERSION || data.version === '1.0') {
                     // Support legacy format (single widgets array)
                     if (data.widgets && !data.desktopWidgets) {
                         setDesktopWidgets(data.widgets)
                         setMobileWidgets([]) // Mobile layout will be synced on first switch
+                        setLayoutIndependent({ desktop: false, mobile: false })
                     } else {
                         // New format with separate desktop and mobile layouts
                         if (Array.isArray(data.desktopWidgets)) {
@@ -110,6 +151,12 @@ export const EditorProvider: React.FC<{ children: ReactNode }> = ({ children }) 
                         }
                         if (Array.isArray(data.mobileWidgets)) {
                             setMobileWidgets(data.mobileWidgets)
+                        }
+                        // Load layout independence state
+                        if (data.layoutIndependent) {
+                            setLayoutIndependent(data.layoutIndependent)
+                        } else {
+                            setLayoutIndependent({ desktop: false, mobile: false })
                         }
                     }
                 }
@@ -137,11 +184,12 @@ export const EditorProvider: React.FC<{ children: ReactNode }> = ({ children }) 
             const data: StoredLayout = {
                 desktopWidgets,
                 mobileWidgets,
+                layoutIndependent,
                 version: STORAGE_VERSION,
             }
             localStorage.setItem(STORAGE_KEY, JSON.stringify(data))
         }
-    }, [desktopWidgets, mobileWidgets])
+    }, [desktopWidgets, mobileWidgets, layoutIndependent])
 
     // Auto-save profile data
     useEffect(() => {
@@ -200,39 +248,114 @@ export const EditorProvider: React.FC<{ children: ReactNode }> = ({ children }) 
         setMobileWidgets(newOrder)
     }, [])
 
+    // ============ Mark Layout Independent ============
+
+    const markLayoutIndependent = useCallback((mode: ViewMode) => {
+        setLayoutIndependent((prev) => ({
+            ...prev,
+            [mode]: true,
+        }))
+    }, [])
+
     // ============ Unified Widget Operations (operate on current view mode) ============
 
     const addWidget = useCallback((widget: WidgetConfig) => {
         if (viewMode === 'desktop') {
             addDesktopWidget(widget)
+            // Sync to mobile if mobile layout is not independent
+            if (!layoutIndependent.mobile) {
+                // Add same widget to mobile with same content and layout
+                addMobileWidget(widget)
+            } else {
+                // Add same widget to mobile with same content but default size
+                const contentProps = extractContentProperties(widget)
+                const mobileWidget: WidgetConfig = {
+                    ...contentProps,
+                    size: '1x1', // Default size for independent mobile layout
+                } as WidgetConfig
+                addMobileWidget(mobileWidget)
+            }
         } else {
             addMobileWidget(widget)
+            // Sync to desktop if desktop layout is not independent
+            if (!layoutIndependent.desktop) {
+                // Add same widget to desktop with same content and layout
+                addDesktopWidget(widget)
+            } else {
+                // Add same widget to desktop with same content but default size
+                const contentProps = extractContentProperties(widget)
+                const desktopWidget: WidgetConfig = {
+                    ...contentProps,
+                    size: '1x1', // Default size for independent desktop layout
+                } as WidgetConfig
+                addDesktopWidget(desktopWidget)
+            }
         }
-    }, [viewMode, addDesktopWidget, addMobileWidget])
+    }, [viewMode, addDesktopWidget, addMobileWidget, layoutIndependent])
 
     const removeWidget = useCallback((id: string) => {
-        if (viewMode === 'desktop') {
-            removeDesktopWidget(id)
-        } else {
-            removeMobileWidget(id)
-        }
-    }, [viewMode, removeDesktopWidget, removeMobileWidget])
+        // Always sync removal across both views
+        removeDesktopWidget(id)
+        removeMobileWidget(id)
+    }, [removeDesktopWidget, removeMobileWidget])
 
     const updateWidget = useCallback((id: string, updates: Partial<WidgetConfig>) => {
+        // Separate content and layout updates
+        const contentUpdates: Partial<WidgetConfig> = {}
+        const layoutUpdates: Partial<WidgetConfig> = {}
+        let hasLayoutUpdates = false
+
+        Object.keys(updates).forEach((key) => {
+            const value = (updates as any)[key]
+            if (isLayoutProperty(key)) {
+                ;(layoutUpdates as any)[key] = value
+                hasLayoutUpdates = true
+            } else if (isContentProperty(key) || key === 'id' || key === 'category') {
+                ;(contentUpdates as any)[key] = value
+            }
+        })
+
+        // Update current view
         if (viewMode === 'desktop') {
+            // Apply all updates to desktop
             updateDesktopWidget(id, updates)
+            // If layout was updated, mark desktop as independent
+            if (hasLayoutUpdates) {
+                markLayoutIndependent('desktop')
+            }
+            // Sync content updates to mobile (if mobile has this widget)
+            if (Object.keys(contentUpdates).length > 0) {
+                const mobileWidget = mobileWidgets.find((w) => w.id === id)
+                if (mobileWidget) {
+                    updateMobileWidget(id, contentUpdates)
+                }
+            }
         } else {
+            // Apply all updates to mobile
             updateMobileWidget(id, updates)
+            // If layout was updated, mark mobile as independent
+            if (hasLayoutUpdates) {
+                markLayoutIndependent('mobile')
+            }
+            // Sync content updates to desktop (if desktop has this widget)
+            if (Object.keys(contentUpdates).length > 0) {
+                const desktopWidget = desktopWidgets.find((w) => w.id === id)
+                if (desktopWidget) {
+                    updateDesktopWidget(id, contentUpdates)
+                }
+            }
         }
-    }, [viewMode, updateDesktopWidget, updateMobileWidget])
+    }, [viewMode, updateDesktopWidget, updateMobileWidget, desktopWidgets, mobileWidgets, markLayoutIndependent])
 
     const reorderWidgets = useCallback((newOrder: WidgetConfig[]) => {
+        // Reordering changes layout, so mark current view as independent
+        markLayoutIndependent(viewMode)
         if (viewMode === 'desktop') {
             reorderDesktopWidgets(newOrder)
         } else {
             reorderMobileWidgets(newOrder)
         }
-    }, [viewMode, reorderDesktopWidgets, reorderMobileWidgets])
+    }, [viewMode, reorderDesktopWidgets, reorderMobileWidgets, markLayoutIndependent])
 
     // ============ Layout Sync ============
 
@@ -310,6 +433,8 @@ export const EditorProvider: React.FC<{ children: ReactNode }> = ({ children }) 
                 loadLayout,
                 clearLayout,
                 syncDesktopToMobile,
+                layoutIndependent,
+                markLayoutIndependent,
             }}
         >
             {children}

@@ -2,8 +2,8 @@
 
 /**
  * [INPUT]: children, profileName, profileDescription, profileAvatarUrl - React children and optional profile props
- * [OUTPUT]: React component - Editor layout with left sidebar (profile section) and right content area (widget grid)
- * [POS]: Main layout component for editor, provides two-column layout structure and connects profile data to EditorContext
+ * [OUTPUT]: React component - Responsive editor layout with desktop (two-column) and mobile (single-column) modes, auto-switches based on device detection and window size
+ * [POS]: Main layout component for editor, provides responsive two-column layout (desktop: profile left, canvas right) or single-column mobile layout, auto-adapts to screen size using device detection and breakpoints
  * 
  * [PROTOCOL]:
  * 1. Once this file's logic changes, this Header must be synchronized immediately.
@@ -50,8 +50,10 @@ export const EditorLayout: React.FC<EditorLayoutProps> = ({
 
         const handleResize = () => {
             const windowWidth = window.innerWidth
-            if (windowWidth < MOBILE_BREAKPOINT && viewMode === 'desktop') {
-                // Auto-switch to mobile when window is too small
+            // Calculate minimum required width: left profile (min 280px) + right canvas (820px) = 1100px
+            const minRequiredWidth = 280 + MIN_CANVAS_WIDTH // 1100px
+            if (windowWidth < minRequiredWidth && viewMode === 'desktop') {
+                // Auto-switch to mobile when window is too small to fit both columns
                 setViewMode('mobile')
             }
         }
@@ -89,18 +91,20 @@ export const EditorLayout: React.FC<EditorLayoutProps> = ({
     // Desktop layout: two columns (Profile left, Canvas right)
     if (viewMode === 'desktop') {
         return (
-            <div className="fixed inset-0 w-full h-full flex overflow-hidden bg-white">
-                {/* Left Column: Profile Section (Adaptive width) */}
+            <div className="fixed inset-0 w-full h-full flex overflow-hidden bg-white" style={{ overflowX: 'hidden' }}>
+                {/* Left Column: Profile Section (Can shrink, min width) */}
                 <div 
-                    className="h-screen flex flex-col bg-white shrink"
+                    className="h-screen flex flex-col bg-white"
                     style={{
-                        minWidth: `${MIN_PROFILE_WIDTH}px`,
+                        minWidth: '280px',
                         width: 'auto',
-                        flex: '0 0 auto',
+                        flex: '0 1 auto',
+                        flexShrink: 1,
+                        maxWidth: `${MIN_PROFILE_WIDTH}px`,
                     }}
                 >
                     {/* Top Section: Profile Content */}
-                    <div className="flex-1 overflow-y-auto px-6 pt-6 min-h-0">
+                    <div className="flex-1 overflow-y-auto px-6 pt-12 min-h-0" style={{ overflowX: 'hidden' }}>
                         <ProfileSection
                             name={displayName}
                             description={displayDescription}
@@ -157,11 +161,13 @@ export const EditorLayout: React.FC<EditorLayoutProps> = ({
                     </div>
                 </div>
 
-                {/* Right Column: Widget Grid (Scrollable, with min width) */}
+                {/* Right Column: Widget Grid (Fixed min width, cannot shrink) */}
                 <div 
-                    className="flex-1 h-screen overflow-y-auto bg-white"
+                    className="h-screen overflow-y-auto bg-white"
                     style={{
                         minWidth: `${MIN_CANVAS_WIDTH}px`,
+                        flexShrink: 0,
+                        overflowX: 'visible',
                     }}
                 >
                     {children}
