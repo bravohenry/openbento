@@ -101,9 +101,33 @@ export const Input = forwardRef<HTMLInputElement, InputProps>((props, ref) => {
         return undefined
     }
 
+    // 处理边框样式：将简写 border 拆分为独立属性，避免与 borderColor 冲突
+    const borderColor = getBorderColor()
+    const { border, ...variantStylesWithoutBorder } = variantStyles
+    
+    // 如果 variantStyles 使用了 border 简写，拆分为独立属性
+    let borderWidth = '1px'
+    let borderStyle = 'solid'
+    let defaultBorderColor = 'var(--color-border)'
+    
+    if (border && typeof border === 'string') {
+        const borderParts = border.split(' ')
+        borderWidth = borderParts[0] || '1px'
+        borderStyle = borderParts[1] || 'solid'
+        defaultBorderColor = borderParts[2] || 'var(--color-border)'
+    } else {
+        // 如果 variantStyles 已经使用了独立属性
+        borderWidth = (variantStyles.borderWidth as string) || '1px'
+        borderStyle = (variantStyles.borderStyle as string) || 'solid'
+        defaultBorderColor = (variantStyles.borderColor as string) || 'var(--color-border)'
+    }
+
     // 输入框样式
     const inputStyles: React.CSSProperties = {
-        ...variantStyles,
+        ...variantStylesWithoutBorder,
+        borderWidth,
+        borderStyle,
+        borderColor: borderColor || defaultBorderColor,
         height: sizeConfig.height,
         padding: sizeConfig.padding,
         fontSize: sizeConfig.fontSize,
@@ -111,7 +135,6 @@ export const Input = forwardRef<HTMLInputElement, InputProps>((props, ref) => {
         color: 'var(--color-text-primary)',
         outline: 'none',
         transition: transitions.fast,
-        ...(getBorderColor() && { borderColor: getBorderColor() }),
         ...(leftElement && { paddingLeft: `calc(${sizeConfig.height} - 4px)` }),
         ...(rightElement && { paddingRight: `calc(${sizeConfig.height} - 4px)` }),
         ...(disabled && { opacity: 0.5, cursor: 'not-allowed' }),

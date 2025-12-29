@@ -1,7 +1,21 @@
 'use client'
 
-import React from 'react'
-import { motion } from 'framer-motion'
+/**
+ * [INPUT]: (avatarUrl, name, description, isEditing, callbacks) - Profile data and editing callbacks
+ * [OUTPUT]: React component - Profile section with seamless inline editing using contentEditable
+ * [POS]: Profile display and editing component in EditorLayout, provides seamless editing experience without visible input boxes
+ * 
+ * [PROTOCOL]:
+ * 1. Once this file's logic changes, this Header must be synchronized immediately.
+ * 2. After update, must check upward whether the parent folder's .folder.md description is still accurate.
+ */
+
+import React, { useRef, useState, useEffect } from 'react'
+import ReactDOM from 'react-dom'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Upload, Trash } from 'phosphor-react'
+import { useClickOutside } from './hooks/useClickOutside'
+import { cn } from '@/design-system/utils/cn'
 
 interface ProfileSectionProps {
     avatarUrl?: string
@@ -9,6 +23,11 @@ interface ProfileSectionProps {
     name: string
     description: string | React.ReactNode
     isEditing?: boolean
+    onNameChange?: (name: string) => void
+    onDescriptionChange?: (description: string) => void
+    onAvatarChange?: (url: string) => void
+    onShare?: () => void
+    showShareButton?: boolean
 }
 
 export const ProfileSection: React.FC<ProfileSectionProps> = ({
@@ -16,7 +35,30 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
     avatarBgColor,
     name,
     description,
+    isEditing = false,
+    onNameChange,
+    onDescriptionChange,
+    onAvatarChange,
+    onShare,
+    showShareButton = false,
 }) => {
+    // If editing, use EditableProfileSection
+    if (isEditing) {
+        return (
+            <EditableProfileSection
+                avatarUrl={avatarUrl}
+                avatarBgColor={avatarBgColor}
+                name={name}
+                description={description}
+                isEditing={true}
+                onNameChange={onNameChange}
+                onDescriptionChange={onDescriptionChange}
+                onAvatarChange={onAvatarChange}
+                onShare={onShare}
+                showShareButton={showShareButton}
+            />
+        )
+    }
     return (
         <div className="w-full flex flex-col items-start gap-6">
             {/* Avatar - Circular, no shadow */}
@@ -52,6 +94,8 @@ interface EditableProfileSectionProps extends ProfileSectionProps {
     onNameChange?: (name: string) => void
     onDescriptionChange?: (description: string) => void
     onAvatarChange?: (url: string) => void
+    onShare?: () => void
+    showShareButton?: boolean
 }
 
 export const EditableProfileSection: React.FC<EditableProfileSectionProps> = ({
@@ -63,70 +107,357 @@ export const EditableProfileSection: React.FC<EditableProfileSectionProps> = ({
     onNameChange,
     onDescriptionChange,
     onAvatarChange,
+    onShare,
+    showShareButton = false,
 }) => {
+    const [isSelected, setIsSelected] = useState(false)
+    const [rect, setRect] = useState<DOMRect | null>(null)
+    const avatarRef = useRef<HTMLDivElement>(null)
+    const fileInputRef = useRef<HTMLInputElement>(null)
+
+    // Update position when selected
+    useEffect(() => {
+        if (!isSelected || !avatarRef.current) return
+
+        const updatePosition = () => {
+            if (avatarRef.current) {
+                setRect(avatarRef.current.getBoundingClientRect())
+            }
+        }
+
+        updatePosition()
+        window.addEventListener('scroll', updatePosition, { passive: true })
+        window.addEventListener('resize', updatePosition, { passive: true })
+
+        return () => {
+            window.removeEventListener('scroll', updatePosition)
+            window.removeEventListener('resize', updatePosition)
+        }
+    }, [isSelected])
+
+    // Click outside to deselect
+    useClickOutside(avatarRef, () => {
+        if (isSelected) {
+            setIsSelected(false)
+        }
+    }, isSelected)
+
+    const handleAvatarClick = () => {
+        if (!isEditing) return
+        
+        if (!avatarUrl) {
+            // If no avatar, trigger file upload
+            fileInputRef.current?.click()
+        } else {
+            // If has avatar, toggle selection to show edit buttons
+            setIsSelected(!isSelected)
+        }
+    }
+
+    const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0]
+        if (file && file.type.startsWith('image/') && onAvatarChange) {
+            const reader = new FileReader()
+            reader.onload = (event) => {
+                const dataUrl = event.target?.result as string
+                if (dataUrl) {
+                    onAvatarChange(dataUrl)
+                }
+            }
+            reader.readAsDataURL(file)
+        }
+        if (fileInputRef.current) {
+            fileInputRef.current.value = ''
+        }
+    }
+
+    const handleReplace = () => {
+        fileInputRef.current?.click()
+        setIsSelected(false)
+    }
+
+    const handleDelete = () => {
+        if (onAvatarChange) {
+            onAvatarChange('')
+        }
+        setIsSelected(false)
+    }
+
+    // Handle paste from clipboard
+    useEffect(() => {
+        if (!isEditing) return
+
+        const handlePaste = (e: ClipboardEvent) => {
+            const items = e.clipboardData?.items
+            if (!items || !onAvatarChange) return
+
+            for (let i = 0; i < items.length; i++) {
+                const item = items[i]
+                if (item.type.startsWith('image/')) {
+                    e.preventDefault()
+                    const file = item.getAsFile()
+                    if (file) {
+                        const reader = new FileReader()
+                        reader.onload = (event) => {
+                            const dataUrl = event.target?.result as string
+                            if (dataUrl) {
+                                onAvatarChange(dataUrl)
+                            }
+                        }
+                        reader.readAsDataURL(file)
+                    }
+                    break
+                }
+            }
+        }
+
+        document.addEventListener('paste', handlePaste)
+        return () => {
+            document.removeEventListener('paste', handlePaste)
+        }
+    }, [isEditing, onAvatarChange])
+
     if (!isEditing) {
         return <ProfileSection avatarUrl={avatarUrl} avatarBgColor={avatarBgColor} name={name} description={description} />
     }
 
     return (
-        <div className="w-full flex flex-col items-start gap-6">
-            {/* Editable Avatar - Circular, no shadow */}
-            <motion.div
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                className="relative group cursor-pointer"
-                onClick={() => {
-                    const newUrl = prompt('Enter image URL:', avatarUrl || '')
-                    if (newUrl && onAvatarChange) onAvatarChange(newUrl)
-                }}
-            >
-                <div className="relative w-40 h-40 rounded-full overflow-hidden">
-                    {avatarUrl ? (
-                        <img src={avatarUrl} alt={name} className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity" />
-                    ) : (
-                        <div className="w-full h-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center relative">
-                            {/* Blue outer ring */}
-                            <div className="absolute inset-0 rounded-full border-4 border-blue-500" />
-                            {/* Light blue crescent shape */}
-                            <div className="absolute inset-0 rounded-full bg-blue-300/30" style={{
-                                clipPath: 'ellipse(60% 40% at 30% 50%)',
-                            }} />
-                        </div>
-                    )}
+        <>
+            {/* Hidden file input */}
+            <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleFileSelect}
+                className="hidden"
+                aria-label="Upload avatar"
+            />
 
-                    {/* Floating Edit Icon */}
-                    <div className="absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-[2px] rounded-full">
-                        <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-lg transform translate-y-2 group-hover:translate-y-0 transition-transform">
-                            <span className="text-lg">🖊️</span>
-                        </div>
+            <div className="w-full flex flex-col items-start gap-6 relative">
+                {/* Share Button - Top Right (only on mobile) */}
+                {showShareButton && onShare && (
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation()
+                            e.preventDefault()
+                            onShare()
+                        }}
+                        className={cn(
+                            "absolute top-0 right-0",
+                            "flex items-center justify-center px-[20px] py-[6.5px]",
+                            "bg-[#ffe8ae] rounded-[6px]",
+                            "shadow-[0px_2px_3px_0px_rgba(0,0,0,0.06)]",
+                            "hover:opacity-90 active:scale-95",
+                            "transition-all duration-200",
+                            "z-[100]",
+                            "w-fit min-w-[127px]"
+                        )}
+                    >
+                        <span className="text-[12px] font-semibold text-[#333] leading-[20px] whitespace-nowrap">
+                            Share my LinkCard
+                        </span>
+                    </button>
+                )}
+
+                {/* Editable Avatar - Circular, no shadow */}
+                <div
+                    ref={avatarRef}
+                    className="relative cursor-pointer"
+                    onClick={handleAvatarClick}
+                >
+                    <div className="relative w-40 h-40 rounded-full overflow-hidden">
+                        {avatarUrl ? (
+                            <img src={avatarUrl} alt={name} className="w-full h-full object-cover" />
+                        ) : (
+                            <div 
+                                className="w-full h-full border-2 border-dashed rounded-full flex flex-col items-center justify-center"
+                                style={{
+                                    borderColor: 'var(--color-border)',
+                                    backgroundColor: 'var(--color-bg-primary)',
+                                }}
+                            >
+                                <Upload size={20} weight="regular" className="text-gray-400 mb-2" />
+                                <span className="text-sm font-medium text-gray-600">Add Avatar</span>
+                            </div>
+                        )}
                     </div>
                 </div>
-            </motion.div>
 
-            {/* Editable Inputs */}
+                {/* Avatar Edit Overlay */}
+                {isSelected && rect && avatarUrl && (
+                    <AvatarEditOverlay
+                        rect={rect}
+                        onReplace={handleReplace}
+                        onDelete={handleDelete}
+                    />
+                )}
+
+            {/* Editable Content - Seamless editing without visible input boxes */}
             <div className="w-full space-y-3">
                 <div className="relative group">
-                    <input
-                        type="text"
-                        value={name}
-                        onChange={(e) => onNameChange?.(e.target.value)}
-                        className="w-full text-3xl lg:text-4xl font-extrabold bg-transparent border-2 border-transparent hover:border-gray-200 focus:border-blue-500 rounded-xl px-3 py-1 -ml-3 transition-colors outline-none text-black placeholder:text-gray-300"
-                        placeholder="Your Name"
-                    />
-                    <span className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 text-gray-300 pointer-events-none">✎</span>
+                    <h1
+                        contentEditable={isEditing}
+                        suppressContentEditableWarning={true}
+                        onBlur={(e) => {
+                            const newName = e.currentTarget.textContent || ''
+                            if (newName !== name && onNameChange) {
+                                onNameChange(newName)
+                            }
+                        }}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                                e.preventDefault()
+                                e.currentTarget.blur()
+                            }
+                        }}
+                        className="w-full text-3xl lg:text-4xl font-extrabold tracking-tight text-black leading-tight outline-none cursor-text"
+                        style={{
+                            minHeight: '1.5em',
+                            wordBreak: 'break-word',
+                        }}
+                        data-placeholder="Your Name"
+                    >
+                        {name || ''}
+                    </h1>
+                    {isEditing && (
+                        <style jsx>{`
+                            h1[contenteditable="true"]:empty:before {
+                                content: attr(data-placeholder);
+                                color: #d1d5db;
+                                pointer-events: none;
+                            }
+                            h1[contenteditable="true"]:focus {
+                                outline: none;
+                            }
+                            h1[contenteditable="true"]:hover {
+                                background: rgba(0, 0, 0, 0.02);
+                                border-radius: 8px;
+                                padding: 4px 8px;
+                                margin: -4px -8px;
+                            }
+                        `}</style>
+                    )}
                 </div>
 
                 <div className="relative group">
-                    <textarea
-                        value={typeof description === 'string' ? description : ''}
-                        onChange={(e) => onDescriptionChange?.(e.target.value)}
-                        className="w-full text-base lg:text-lg text-gray-500 bg-transparent border-2 border-transparent hover:border-gray-200 focus:border-blue-500 rounded-xl px-3 py-2 -ml-3 transition-colors outline-none resize-none placeholder:text-gray-300 leading-relaxed font-medium"
-                        placeholder="Add a bio..."
-                        rows={3}
-                    />
-                    <span className="absolute right-2 bottom-2 opacity-0 group-hover:opacity-100 text-gray-300 pointer-events-none">✎</span>
+                    <p
+                        contentEditable={isEditing}
+                        suppressContentEditableWarning={true}
+                        onBlur={(e) => {
+                            const newDescription = e.currentTarget.textContent || ''
+                            const currentDescription = typeof description === 'string' ? description : ''
+                            if (newDescription !== currentDescription && onDescriptionChange) {
+                                onDescriptionChange(newDescription)
+                            }
+                        }}
+                        className="w-full text-base lg:text-lg text-black leading-relaxed outline-none cursor-text"
+                        style={{
+                            minHeight: '1.5em',
+                            wordBreak: 'break-word',
+                        }}
+                        data-placeholder="Add a bio..."
+                    >
+                        {typeof description === 'string' ? description : ''}
+                    </p>
+                    {isEditing && (
+                        <style jsx>{`
+                            p[contenteditable="true"]:empty:before {
+                                content: attr(data-placeholder);
+                                color: #d1d5db;
+                                pointer-events: none;
+                            }
+                            p[contenteditable="true"]:focus {
+                                outline: none;
+                            }
+                            p[contenteditable="true"]:hover {
+                                background: rgba(0, 0, 0, 0.02);
+                                border-radius: 8px;
+                                padding: 4px 8px;
+                                margin: -4px -8px;
+                            }
+                        `}</style>
+                    )}
                 </div>
             </div>
         </div>
+        </>
     )
+}
+
+// ============ Avatar Edit Overlay ============
+
+interface AvatarEditOverlayProps {
+    rect: DOMRect
+    onReplace: () => void
+    onDelete: () => void
+}
+
+const AvatarEditOverlay: React.FC<AvatarEditOverlayProps> = ({ rect, onReplace, onDelete }) => {
+    const overlayContent = (
+        <div
+            data-avatar-overlay
+            onPointerDown={(e) => e.stopPropagation()}
+            onClick={(e) => e.stopPropagation()}
+            onMouseDown={(e) => e.stopPropagation()}
+        >
+            {/* Replace Button - Bottom Left */}
+            <motion.button
+                onClick={(e) => {
+                    e.stopPropagation()
+                    e.preventDefault()
+                    onReplace()
+                }}
+                onPointerDown={(e) => e.stopPropagation()}
+                className="fixed rounded-full shadow-lg size-[34px] flex items-center justify-center z-[9999] bg-white"
+                style={{
+                    left: rect.left - 12,
+                    top: rect.bottom - 12,
+                    cursor: 'pointer',
+                }}
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0, opacity: 0 }}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+                transition={{
+                    type: 'spring',
+                    stiffness: 500,
+                    damping: 30,
+                }}
+            >
+                <Upload size={16} weight="regular" className="text-black" />
+            </motion.button>
+
+            {/* Delete Button - Bottom Right */}
+            <motion.button
+                onClick={(e) => {
+                    e.stopPropagation()
+                    e.preventDefault()
+                    onDelete()
+                }}
+                onPointerDown={(e) => e.stopPropagation()}
+                className="fixed rounded-full shadow-lg size-[34px] flex items-center justify-center z-[9999] bg-white"
+                style={{
+                    left: rect.right - 12,
+                    top: rect.bottom - 12,
+                    cursor: 'pointer',
+                }}
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0, opacity: 0 }}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+                transition={{
+                    type: 'spring',
+                    stiffness: 500,
+                    damping: 30,
+                }}
+            >
+                <Trash size={16} weight="regular" className="text-black" />
+            </motion.button>
+        </div>
+    )
+
+    if (typeof document === 'undefined') return null
+    return ReactDOM.createPortal(overlayContent, document.body)
 }

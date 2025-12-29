@@ -1,6 +1,16 @@
 'use client'
 
-import React from 'react'
+/**
+ * [INPUT]: (EditorContext) - Editor context providing viewMode, setViewMode, addWidget functions
+ * [OUTPUT]: React component - Fixed bottom toolbar with widget creation buttons, view mode toggle, and link input modal
+ * [POS]: Located at /bento/editor, provides primary editing interface with widget creation, sharing, and view mode switching
+ * 
+ * [PROTOCOL]:
+ * 1. Once this file's logic changes, this Header must be synchronized immediately.
+ * 2. After update, must check upward whether the parent folder's .folder.md description is still accurate.
+ */
+
+import React, { useState, useRef, useEffect } from 'react'
 import { 
     LinkSimple, 
     Image, 
@@ -19,6 +29,8 @@ import {
     createMapWidgetConfig,
 } from '@/bento/widgets'
 import { cn } from '@/design-system/utils/cn'
+import { useClickOutside } from './hooks/useClickOutside'
+import { useDeviceDetection } from './hooks/useDeviceDetection'
 
 // ============ Icons (Phosphor Icons) ============
 
@@ -58,6 +70,18 @@ const MobileIcon = ({ active }: { active: boolean }) => (
 
 export const EditorToolbar: React.FC = () => {
     const { viewMode, setViewMode, addWidget } = useEditor()
+    const isMobileDevice = useDeviceDetection()
+    const [showLinkModal, setShowLinkModal] = useState(false)
+    const [linkUrl, setLinkUrl] = useState('')
+    const linkInputRef = useRef<HTMLInputElement>(null)
+    const linkModalRef = useRef<HTMLFormElement>(null)
+
+    // Focus input when modal opens
+    useEffect(() => {
+        if (showLinkModal && linkInputRef.current) {
+            linkInputRef.current.focus()
+        }
+    }, [showLinkModal])
 
     const handleShare = () => {
         const url = window.location.href
@@ -68,12 +92,144 @@ export const EditorToolbar: React.FC = () => {
     }
 
     const handleAddLink = () => {
-        addWidget(createLinkWidgetConfig('', '1x1'))
+        setShowLinkModal(true)
+        setLinkUrl('')
     }
 
-    const handleAddImage = () => {
-        addWidget(createImageWidgetConfig('', '1x1'))
+    const handleLinkSubmit = (e: React.FormEvent) => {
+        e.preventDefault()
+        if (linkUrl.trim()) {
+            // Create widget with detected platform
+            addWidget(createLinkWidgetConfig(linkUrl.trim(), '1x1'))
+            setShowLinkModal(false)
+            setLinkUrl('')
+        }
     }
+
+    const handleLinkModalClose = () => {
+        setShowLinkModal(false)
+        setLinkUrl('')
+    }
+
+    // Auto-detect and add link when valid URL is detected
+    useEffect(() => {
+        if (!showLinkModal || !linkUrl.trim()) return
+
+        const trimmedUrl = linkUrl.trim()
+        
+        // Check if it looks like a URL (contains domain-like structure)
+        // Pattern: has a dot and looks like a domain (e.g., github.com, instagram.com/user)
+        const urlPattern = /^(https?:\/\/)?([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}(\/.*)?$/
+        const looksLikeUrl = urlPattern.test(trimmedUrl) || 
+                            trimmedUrl.includes('http://') || 
+                            trimmedUrl.includes('https://') ||
+                            trimmedUrl.includes('www.')
+
+        if (looksLikeUrl) {
+            // Normalize URL (add https:// if missing)
+            let normalizedUrl = trimmedUrl
+            if (!trimmedUrl.startsWith('http://') && !trimmedUrl.startsWith('https://')) {
+                normalizedUrl = `https://${trimmedUrl}`
+            }
+
+            // Validate URL using URL constructor
+            try {
+                new URL(normalizedUrl)
+                
+                // Small delay to ensure user finished typing/pasting
+                const timer = setTimeout(() => {
+                    // Double-check the URL hasn't changed
+                    if (linkUrl.trim() === trimmedUrl && showLinkModal) {
+                        addWidget(createLinkWidgetConfig(normalizedUrl, '1x1'))
+                        setShowLinkModal(false)
+                        setLinkUrl('')
+                    }
+                }, 300) // 300ms debounce - enough time for paste to complete
+
+                return () => clearTimeout(timer)
+            } catch (_) {
+                // Invalid URL, do nothing
+            }
+        }
+    }, [linkUrl, showLinkModal, addWidget])
+
+    // Close modal on Escape key
+    useEffect(() => {
+        if (!showLinkModal) return
+        
+        const handleEscape = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') {
+                handleLinkModalClose()
+            }
+        }
+        window.addEventListener('keydown', handleEscape)
+        return () => window.removeEventListener('keydown', handleEscape)
+    }, [showLinkModal])
+
+    // Close modal when clicking outside
+    useClickOutside(linkModalRef, () => {
+        if (showLinkModal) {
+            handleLinkModalClose()
+        }
+    }, showLinkModal)
+
+    const fileInputRef = useRef<HTMLInputElement>(null)
+
+    const handleAddImage = () => {
+        // Trigger file input click
+        fileInputRef.current?.click()
+    }
+
+    const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0]
+        if (file && file.type.startsWith('image/')) {
+            // Convert file to data URL
+            const reader = new FileReader()
+            reader.onload = (event) => {
+                const dataUrl = event.target?.result as string
+                if (dataUrl) {
+                    addWidget(createImageWidgetConfig(dataUrl, '1x1'))
+                }
+            }
+            reader.readAsDataURL(file)
+        }
+        // Reset input so same file can be selected again
+        if (fileInputRef.current) {
+            fileInputRef.current.value = ''
+        }
+    }
+
+    // Handle paste from clipboard
+    useEffect(() => {
+        const handlePaste = (e: ClipboardEvent) => {
+            const items = e.clipboardData?.items
+            if (!items) return
+
+            for (let i = 0; i < items.length; i++) {
+                const item = items[i]
+                if (item.type.startsWith('image/')) {
+                    e.preventDefault()
+                    const file = item.getAsFile()
+                    if (file) {
+                        const reader = new FileReader()
+                        reader.onload = (event) => {
+                            const dataUrl = event.target?.result as string
+                            if (dataUrl) {
+                                addWidget(createImageWidgetConfig(dataUrl, '1x1'))
+                            }
+                        }
+                        reader.readAsDataURL(file)
+                    }
+                    break
+                }
+            }
+        }
+
+        document.addEventListener('paste', handlePaste)
+        return () => {
+            document.removeEventListener('paste', handlePaste)
+        }
+    }, [addWidget])
 
     const handleAddText = () => {
         addWidget(createTextWidgetConfig('', 'note', '1x1'))
@@ -84,94 +240,161 @@ export const EditorToolbar: React.FC = () => {
     }
 
     return (
-        <div className="fixed bottom-10 left-1/2 -translate-x-1/2 z-[1000]">
-            <div className={cn(
-                "flex items-center gap-2 p-2",
-                "backdrop-blur-md bg-white/88 rounded-[16px]",
-                "shadow-[0px_0px_0px_1px_rgba(0,0,0,0.04),0px_27px_54px_0px_rgba(0,0,0,0.04),0px_17.5px_31.625px_0px_rgba(0,0,0,0.03),0px_10.4px_17.2px_0px_rgba(0,0,0,0.02),0px_5.4px_8.775px_0px_rgba(0,0,0,0.02),0px_2.2px_4.4px_0px_rgba(0,0,0,0.02),0px_0.5px_2.125px_0px_rgba(0,0,0,0.01)]",
-                "border border-white/40",
-                "transition-all duration-300 transform hover:scale-[1.05]"
-            )}>
-                {/* Left: Share */}
-                <button
-                    onClick={handleShare}
-                    className={cn(
-                        "flex items-center justify-center h-[33px] px-[20px]",
-                        "bg-[#4edd76] rounded-[6px]",
-                        "shadow-[0px_2px_3px_0px_rgba(0,0,0,0.06)]",
-                        "hover:opacity-90 active:scale-95",
-                        "transition-all duration-200"
-                    )}
-                >
-                    <span className="text-[14px] font-semibold text-white leading-[20px]">
-                        Share my Bento
-                    </span>
-                </button>
+        <>
+            {/* Hidden file input for image upload */}
+            <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleFileSelect}
+                className="hidden"
+                aria-label="Upload image"
+            />
 
-                <div className="w-[2px] h-4 bg-black/12 rounded-full mx-1" />
-
-                {/* Center: Add Widgets */}
-                <div className="flex items-center gap-1">
-                    <ToolbarButton
-                        icon={<LinkIcon />}
-                        tooltip="Add Link"
-                        onClick={handleAddLink}
-                    />
-                    <ToolbarButton
-                        icon={<ImageIcon />}
-                        tooltip="Add Image"
-                        onClick={handleAddImage}
-                    />
-                    <ToolbarButton
-                        icon={<TextIcon />}
-                        tooltip="Add Text"
-                        onClick={handleAddText}
-                    />
-                    <ToolbarButton
-                        icon={<MapIcon />}
-                        tooltip="Add Map"
-                        onClick={handleAddMap}
-                    />
-                    <ToolbarButton
-                        icon={<WidgetsIcon />}
-                        tooltip="More Widgets"
-                    />
+            {/* Link Input Modal - Positioned above toolbar */}
+            {showLinkModal && (
+                <div className="fixed bottom-[120px] left-1/2 -translate-x-1/2 z-[2000]">
+                    <form 
+                        ref={linkModalRef}
+                        onSubmit={handleLinkSubmit}
+                        className="bg-white rounded-[12px] shadow-[0px_2px_8px_0px_rgba(0,0,0,0.08)] border border-black/8 flex items-center overflow-hidden min-w-[400px]"
+                    >
+                        <input
+                            ref={linkInputRef}
+                            type="url"
+                            value={linkUrl}
+                            onChange={(e) => setLinkUrl(e.target.value)}
+                            placeholder="Enter Link"
+                            className={cn(
+                                "flex-1 px-4 py-3",
+                                "text-[14px] text-black placeholder:text-black/40",
+                                "focus:outline-none",
+                                "bg-transparent"
+                            )}
+                            autoComplete="off"
+                        />
+                        <button
+                            type="button"
+                            onClick={async () => {
+                                try {
+                                    const text = await navigator.clipboard.readText()
+                                    setLinkUrl(text)
+                                } catch (err) {
+                                    console.error('Failed to read clipboard:', err)
+                                }
+                            }}
+                            className={cn(
+                                "px-4 py-3",
+                                "text-[14px] font-medium text-black",
+                                "hover:bg-black/5 active:bg-black/10",
+                                "transition-colors duration-150",
+                                "border-l border-black/8"
+                            )}
+                        >
+                            Paste
+                        </button>
+                    </form>
                 </div>
+            )}
 
-                <div className="w-[2px] h-4 bg-black/12 rounded-full mx-1" />
+            <div className="fixed bottom-10 left-1/2 -translate-x-1/2 z-[1000]">
+                <div className={cn(
+                    "flex items-center gap-2 p-2",
+                    "backdrop-blur-md bg-white/88 rounded-[16px]",
+                    "shadow-[0px_0px_0px_1px_rgba(0,0,0,0.04),0px_27px_54px_0px_rgba(0,0,0,0.04),0px_17.5px_31.625px_0px_rgba(0,0,0,0.03),0px_10.4px_17.2px_0px_rgba(0,0,0,0.02),0px_5.4px_8.775px_0px_rgba(0,0,0,0.02),0px_2.2px_4.4px_0px_rgba(0,0,0,0.02),0px_0.5px_2.125px_0px_rgba(0,0,0,0.01)]",
+                    "border border-white/40",
+                    "transition-all duration-300 transform hover:scale-[1.05]"
+                )}>
+                    {/* Desktop: Full toolbar with Share and View Toggle */}
+                    {!isMobileDevice && (
+                        <>
+                            {/* Left: Share */}
+                            <button
+                                onClick={handleShare}
+                                className={cn(
+                                    "flex items-center justify-center px-[20px] py-[6.5px]",
+                                    "bg-[#ffe8ae] rounded-[6px]",
+                                    "shadow-[0px_2px_3px_0px_rgba(0,0,0,0.06)]",
+                                    "hover:opacity-90 active:scale-95",
+                                    "transition-all duration-200",
+                                    "w-[127px]"
+                                )}
+                            >
+                                <span className="text-[12px] font-semibold text-[#333] leading-[20px] whitespace-nowrap">
+                                    Share my LinkCard
+                                </span>
+                            </button>
 
-                {/* Right: View Mode Toggle */}
-                <div className="flex items-center gap-1">
-                    <button
-                        onClick={() => setViewMode('desktop')}
-                        className={cn(
-                            "flex items-center justify-center",
-                            "h-[33px] w-[50px] rounded-[6px]",
-                            "transition-all duration-200",
-                            viewMode === 'desktop'
-                                ? "bg-black shadow-[0px_3px_2px_0px_rgba(0,0,0,0.06)]"
-                                : "hover:bg-black/5"
-                        )}
-                    >
-                        <DesktopIcon active={viewMode === 'desktop'} />
-                    </button>
-                    <div className="w-[4px]" />
-                    <button
-                        onClick={() => setViewMode('mobile')}
-                        className={cn(
-                            "flex items-center justify-center",
-                            "h-[33px] w-[50px] rounded-[6px]",
-                            "transition-all duration-200",
-                            viewMode === 'mobile'
-                                ? "bg-black shadow-[0px_3px_2px_0px_rgba(0,0,0,0.06)]"
-                                : "hover:bg-black/5"
-                        )}
-                    >
-                        <MobileIcon active={viewMode === 'mobile'} />
-                    </button>
+                            <div className="w-[2px] h-4 bg-black/12 rounded-full mx-1" />
+                        </>
+                    )}
+
+                    {/* Center: Add Widgets (always visible) */}
+                    <div className="flex items-center gap-1">
+                        <ToolbarButton
+                            icon={<LinkIcon />}
+                            tooltip="Add Link"
+                            onClick={handleAddLink}
+                        />
+                        <ToolbarButton
+                            icon={<ImageIcon />}
+                            tooltip="Add Image"
+                            onClick={handleAddImage}
+                        />
+                        <ToolbarButton
+                            icon={<TextIcon />}
+                            tooltip="Add Text"
+                            onClick={handleAddText}
+                        />
+                        <ToolbarButton
+                            icon={<MapIcon />}
+                            tooltip="Add Map"
+                            onClick={handleAddMap}
+                        />
+                        <ToolbarButton
+                            icon={<WidgetsIcon />}
+                            tooltip="More Widgets"
+                        />
+                    </div>
+
+                    {/* Desktop: View Mode Toggle */}
+                    {!isMobileDevice && (
+                        <>
+                            <div className="w-[2px] h-4 bg-black/12 rounded-full mx-1" />
+                            <div className="flex items-center gap-1">
+                                <button
+                                    onClick={() => setViewMode('desktop')}
+                                    className={cn(
+                                        "flex items-center justify-center",
+                                        "h-[33px] w-[50px] rounded-[6px]",
+                                        "transition-all duration-200",
+                                        viewMode === 'desktop'
+                                            ? "bg-black shadow-[0px_3px_2px_0px_rgba(0,0,0,0.06)]"
+                                            : "hover:bg-black/5"
+                                    )}
+                                >
+                                    <DesktopIcon active={viewMode === 'desktop'} />
+                                </button>
+                                <div className="w-[4px]" />
+                                <button
+                                    onClick={() => setViewMode('mobile')}
+                                    className={cn(
+                                        "flex items-center justify-center",
+                                        "h-[33px] w-[50px] rounded-[6px]",
+                                        "transition-all duration-200",
+                                        viewMode === 'mobile'
+                                            ? "bg-black shadow-[0px_3px_2px_0px_rgba(0,0,0,0.06)]"
+                                            : "hover:bg-black/5"
+                                    )}
+                                >
+                                    <MobileIcon active={viewMode === 'mobile'} />
+                                </button>
+                            </div>
+                        </>
+                    )}
                 </div>
             </div>
-        </div>
+        </>
     )
 }
 
@@ -199,7 +422,13 @@ const ToolbarButton: React.FC<{
             {icon}
         </div>
         {/* Tooltip */}
-        <div className="absolute -top-10 left-1/2 -translate-x-1/2 px-2 py-1 bg-black text-white text-[11px] rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
+        <div 
+            className="absolute -top-10 left-1/2 -translate-x-1/2 px-2 py-1 text-black text-[10px] font-normal rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50"
+            style={{
+                background: '#fafafa', // 1% gray background
+                boxShadow: 'none' // no shadow
+            }}
+        >
             {tooltip}
         </div>
     </button>

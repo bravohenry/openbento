@@ -1,8 +1,11 @@
 /**
- * OpenBento - Platform Registry
+ * [INPUT]: (url: string) - URL string to detect platform and extract information
+ * [OUTPUT]: (PlatformConfig, detectPlatform, extractPlatformInfo) - Platform registry, detection function, and info extraction function
+ * [POS]: Located at /bento/widgets, provides platform detection and configuration for link widgets based on URL patterns
  * 
- * 平台识别与配置注册表
- * 根据 URL 自动识别社交媒体平台
+ * [PROTOCOL]:
+ * 1. Once this file's logic changes, this Header must be synchronized immediately.
+ * 2. After update, must check upward whether the parent folder's .folder.md description is still accurate.
  */
 
 import type { SocialPlatform } from './types'
@@ -132,6 +135,115 @@ export const PLATFORM_REGISTRY: Record<SocialPlatform, PlatformConfig> = {
         color: '#5865F2',
         ctaLabel: 'Join',
         urlPatterns: [/discord\.gg\/([^/?]+)/i, /discord\.com\/invite\/([^/?]+)/i],
+    },
+    telegram: {
+        name: 'Telegram',
+        icon: 'telegram',
+        color: '#0088cc',
+        ctaLabel: 'Join',
+        urlPatterns: [
+            /t\.me\/([^/?]+)/i,
+            /telegram\.me\/([^/?]+)/i,
+            /telegram\.org\/([^/?]+)/i,
+        ],
+        extractInfo: (url) => {
+            const match = url.match(/(?:t\.me|telegram\.me|telegram\.org)\/([^/?]+)/i)
+            return { subtitle: match ? `@${match[1]}` : undefined }
+        },
+    },
+    medium: {
+        name: 'Medium',
+        icon: 'medium',
+        color: '#000000',
+        ctaLabel: 'Read',
+        urlPatterns: [
+            /medium\.com\/@?([^/?]+)/i,
+            /medium\.com\/([^/?]+)/i,
+        ],
+        extractInfo: (url) => {
+            const match = url.match(/medium\.com\/@?([^/?]+)/i)
+            return { subtitle: match ? `@${match[1]}` : undefined }
+        },
+    },
+    whatsapp: {
+        name: 'WhatsApp',
+        icon: 'whatsapp',
+        color: '#25D366',
+        ctaLabel: 'Message',
+        urlPatterns: [
+            /wa\.me\/([^/?]+)/i,
+            /whatsapp\.com\/([^/?]+)/i,
+            /api\.whatsapp\.com\/send\?phone=([^&]+)/i,
+        ],
+        extractInfo: (url) => {
+            const match = url.match(/(?:wa\.me|whatsapp\.com)\/([^/?]+)/i) || url.match(/phone=([^&]+)/i)
+            return { subtitle: match ? match[1] : undefined }
+        },
+    },
+    reddit: {
+        name: 'Reddit',
+        icon: 'reddit',
+        color: '#FF4500',
+        ctaLabel: 'Join',
+        urlPatterns: [
+            /reddit\.com\/r\/([^/?]+)/i,
+            /reddit\.com\/user\/([^/?]+)/i,
+            /redd\.it\/([^/?]+)/i,
+        ],
+        extractInfo: (url) => {
+            const match = url.match(/reddit\.com\/(?:r|user)\/([^/?]+)/i)
+            return { subtitle: match ? `r/${match[1]}` : undefined }
+        },
+    },
+    patreon: {
+        name: 'Patreon',
+        icon: 'patreon',
+        color: '#DA552F',
+        ctaLabel: 'Support',
+        urlPatterns: [
+            /patreon\.com\/([^/?]+)/i,
+        ],
+        extractInfo: (url) => {
+            const match = url.match(/patreon\.com\/([^/?]+)/i)
+            return { subtitle: match ? match[1] : undefined }
+        },
+    },
+    buymeacoffee: {
+        name: 'Buy Me a Coffee',
+        icon: 'buymeacoffee',
+        color: '#FFDD00',
+        ctaLabel: 'Support',
+        urlPatterns: [
+            /buymeacoffee\.com\/([^/?]+)/i,
+            /buymeacoffee\.com\/s\/([^/?]+)/i,
+        ],
+        extractInfo: (url) => {
+            const match = url.match(/buymeacoffee\.com\/(?:s\/)?([^/?]+)/i)
+            return { subtitle: match ? match[1] : undefined }
+        },
+    },
+    dev: {
+        name: 'Dev.to',
+        icon: 'dev',
+        color: '#000000',
+        ctaLabel: 'Follow',
+        urlPatterns: [
+            /dev\.to\/([^/?]+)/i,
+        ],
+        extractInfo: (url) => {
+            const match = url.match(/dev\.to\/([^/?]+)/i)
+            return { subtitle: match ? `@${match[1]}` : undefined }
+        },
+    },
+    google: {
+        name: 'Google',
+        icon: 'google',
+        color: '#4285F4',
+        ctaLabel: 'Visit',
+        urlPatterns: [
+            /google\.com\/([^/?]+)/i,
+            /goo\.gl\/([^/?]+)/i,
+        ],
     },
     twitch: {
         name: 'Twitch',

@@ -325,6 +325,7 @@ const PLATFORM_ICON_FILES: Record<string, string> = {
     github: '/icons/social/github.svg',
     linkedin: '/icons/social/linkedin.svg',
     discord: '/icons/social/discord.svg',
+    telegram: '/icons/social/unknown.svg', // No telegram icon yet, using unknown
     twitch: '/icons/social/twitch.svg',
     behance: '/icons/social/behance.svg',
     dribbble: '/icons/social/dribbble.svg',
@@ -334,6 +335,8 @@ const PLATFORM_ICON_FILES: Record<string, string> = {
     medium: '/icons/social/medium.svg',
     patreon: '/icons/social/patreon.svg',
     buymeacoffee: '/icons/social/buymeacoffee.svg',
+    dev: '/icons/social/dev.svg',
+    google: '/icons/social/google.svg',
     generic: '/icons/social/unknown.svg',
 }
 

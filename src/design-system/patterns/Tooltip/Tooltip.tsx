@@ -178,12 +178,12 @@ export function Tooltip(props: TooltipProps) {
         top: position.top,
         left: position.left,
         padding: '8px 12px',
-        fontSize: '13px',
-        fontWeight: 500,
-        color: '#ffffff',
-        background: '#1f2937',
+        fontSize: '10px',
+        fontWeight: 400, // regular
+        color: '#000000', // black text
+        background: '#fafafa', // 1% gray background
         borderRadius: radii.lg,
-        boxShadow: shadows.lg,
+        boxShadow: 'none', // no shadow
         maxWidth: typeof maxWidth === 'number' ? `${maxWidth}px` : maxWidth,
         zIndex: 9999,
         pointerEvents: 'none',
@@ -196,7 +196,7 @@ export function Tooltip(props: TooltipProps) {
         position: 'absolute',
         width: 8,
         height: 8,
-        background: '#1f2937',
+        background: '#ffffff', // white background
         transform: 'rotate(45deg)',
         ...(placement.startsWith('top') && { bottom: -4, left: '50%', marginLeft: -4 }),
         ...(placement.startsWith('bottom') && { top: -4, left: '50%', marginLeft: -4 }),

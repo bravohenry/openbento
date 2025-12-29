@@ -87,6 +87,14 @@ export const AppStoreIcon: React.FC<IconProps> = ({ size = 24, color = '#007AFF'
     </svg>
 )
 
+// ============ Telegram ============
+export const TelegramIcon: React.FC<IconProps> = ({ size = 24, color = '#0088cc' }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+        <rect width="24" height="24" rx="6" fill={color} />
+        <path d="M9.5 15.5L8.5 19.5C8.5 19.5 8.2 20.2 9 20.5C9.8 20.8 10.5 20.2 10.5 20.2L15.5 15.5L19.5 17.5C19.5 17.5 20.5 18 20.5 17.5C20.5 17 19.5 16.5 19.5 16.5L6.5 9.5C6.5 9.5 5.5 9 5.5 9.5C5.5 10 6.5 10.5 6.5 10.5L9.5 15.5Z" fill="white" />
+    </svg>
+)
+
 // ============ Generic Link ============
 export const LinkIcon: React.FC<IconProps> = ({ size = 24, color = '#6B7280' }) => (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
@@ -104,6 +112,7 @@ export const PLATFORM_ICONS: Record<string, React.FC<IconProps>> = {
     spotify: SpotifyIcon,
     github: GitHubIcon,
     linkedin: LinkedInIcon,
+    telegram: TelegramIcon,
     appstore: AppStoreIcon,
     generic: LinkIcon,
     link: LinkIcon,

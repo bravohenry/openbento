@@ -55,15 +55,17 @@ interface EditableWidgetProps {
     onDelete: () => void
     onSizeChange: (size: WidgetSize) => void
     isEditing: boolean
+    onUpdate: (updates: Partial<WidgetConfig>) => void
 }
 
-const EditableWidget: React.FC<EditableWidgetProps> = ({
+const EditableWidget: React.FC<EditableWidgetProps & { onUpdate: (updates: Partial<WidgetConfig>) => void }> = ({
     widget,
     isSelected,
     onSelect,
     onDelete,
     onSizeChange,
     isEditing,
+    onUpdate,
 }) => {
     const { cols, rows } = parseWidgetSize(widget.size)
 
@@ -83,6 +85,7 @@ const EditableWidget: React.FC<EditableWidgetProps> = ({
                     widget={widget}
                     onDelete={onDelete}
                     onSizeChange={onSizeChange}
+                    onUpdate={onUpdate}
                 />
             )}
         </div>
@@ -126,6 +129,7 @@ const EditableWidget: React.FC<EditableWidgetProps> = ({
 const EditorContent: React.FC = () => {
     const {
         widgets,
+        viewMode: currentViewMode,
         selectedWidgetId,
         setSelectedWidgetId,
         isEditing,
@@ -133,9 +137,21 @@ const EditorContent: React.FC = () => {
         updateWidget,
         addWidget,
         reorderWidgets,
+        desktopWidgets,
+        mobileWidgets,
+        syncDesktopToMobile,
     } = useEditor()
     const containerRef = useRef<HTMLDivElement>(null)
     const hasInitialized = useRef(false)
+    const hasSyncedToMobile = useRef(false)
+
+    // Sync desktop to mobile on first switch to mobile
+    useEffect(() => {
+        if (currentViewMode === 'mobile' && !hasSyncedToMobile.current && desktopWidgets.length > 0 && mobileWidgets.length === 0) {
+            syncDesktopToMobile()
+            hasSyncedToMobile.current = true
+        }
+    }, [currentViewMode, desktopWidgets.length, mobileWidgets.length, syncDesktopToMobile])
 
     // Initialize with example data if empty
     useEffect(() => {
@@ -157,14 +173,37 @@ const EditorContent: React.FC = () => {
         }
     }, [widgets.length, addWidget])
 
-    // Click outside to deselect
+    // Click outside to deselect (but not when clicking on overlay elements or widgets)
     useEffect(() => {
         if (!isEditing) return
 
         const handleClickOutside = (e: MouseEvent) => {
-            if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
-                setSelectedWidgetId(null)
+            const target = e.target as Element | null
+            if (!target) return
+
+            // Don't deselect if clicking on overlay elements (portal elements)
+            if (target.closest('[data-widget-overlay]')) {
+                return
             }
+
+            // Check if clicking on any widget element
+            // Widgets have id="widget-{id}" on the motion.div wrapper
+            let currentElement: Element | null = target
+            while (currentElement) {
+                // Check if this element or any parent has widget id
+                if (currentElement.id && currentElement.id.startsWith('widget-')) {
+                    return // Clicked on a widget, don't deselect
+                }
+                // Check if inside a widget container (bento-card or widget wrapper)
+                if (currentElement.classList.contains('bento-card') || 
+                    currentElement.closest('[id^="widget-"]')) {
+                    return // Clicked inside a widget, don't deselect
+                }
+                currentElement = currentElement.parentElement
+            }
+
+            // If we get here, clicked on empty space - deselect
+            setSelectedWidgetId(null)
         }
 
         document.addEventListener('mousedown', handleClickOutside)
@@ -190,50 +229,86 @@ const EditorContent: React.FC = () => {
         reorderWidgets(newWidgets)
     }, [widgets, reorderWidgets])
 
+    // Determine grid columns based on view mode
+    const gridColumns = currentViewMode === 'mobile' ? 2 : 4
+
     const gridContent = (
-        <BentoGrid columns={4} centered>
+        <BentoGrid columns={gridColumns} centered>
             {widgets.map((widget) => (
-                <EditableWidget
-                    key={widget.id}
-                    widget={widget}
-                    isSelected={selectedWidgetId === widget.id}
-                    onSelect={() => setSelectedWidgetId(widget.id)}
-                    onDelete={() => removeWidget(widget.id)}
-                    onSizeChange={(size) => handleSizeChange(widget.id, size)}
-                    isEditing={isEditing}
-                />
+                        <EditableWidget
+                            key={widget.id}
+                            widget={widget}
+                            isSelected={selectedWidgetId === widget.id}
+                            onSelect={() => setSelectedWidgetId(widget.id)}
+                            onDelete={() => removeWidget(widget.id)}
+                            onSizeChange={(size) => handleSizeChange(widget.id, size)}
+                            isEditing={isEditing}
+                            onUpdate={(updates) => updateWidget(widget.id, updates)}
+                        />
             ))}
         </BentoGrid>
     )
 
     return (
         <EditorLayout>
-            <div className="w-full max-w-[1200px] mx-auto px-8 py-12" ref={containerRef}>
-                {isEditing ? (
-                    <GridDndProvider
-                        items={gridItems}
-                        onSwap={handleSwap}
-                        renderOverlay={(item) => {
-                            const widget = item.data as WidgetConfig
-                            const dims = WIDGET_DIMENSIONS[widget.size] || WIDGET_DIMENSIONS['1x1']
-                            return (
-                                <div style={{
-                                    width: dims.width,
-                                    height: dims.height,
-                                    borderRadius: '27px',
-                                    overflow: 'hidden',
-                                }}>
-                                    <WidgetRenderer config={widget} isEditing={false} />
-                                </div>
-                            )
-                        }}
-                    >
-                        {gridContent}
-                    </GridDndProvider>
-                ) : (
-                    gridContent
-                )}
-            </div>
+            {/* Desktop: Container with max-width and padding */}
+            {/* Mobile: Container is handled by EditorLayout, no extra wrapper needed */}
+            {currentViewMode === 'desktop' ? (
+                <div className="w-full max-w-[1200px] mx-auto px-8 py-12" ref={containerRef}>
+                    {isEditing ? (
+                        <GridDndProvider
+                            items={gridItems}
+                            onSwap={handleSwap}
+                            renderOverlay={(item) => {
+                                const widget = item.data as WidgetConfig
+                                const dims = WIDGET_DIMENSIONS[widget.size] || WIDGET_DIMENSIONS['1x1']
+                                return (
+                                    <div style={{
+                                        width: dims.width,
+                                        height: dims.height,
+                                        borderRadius: '27px',
+                                        overflow: 'hidden',
+                                    }}>
+                                        <WidgetRenderer config={widget} isEditing={false} />
+                                    </div>
+                                )
+                            }}
+                        >
+                            {gridContent}
+                        </GridDndProvider>
+                    ) : (
+                        gridContent
+                    )}
+                </div>
+            ) : (
+                // Mobile: Content is already wrapped by EditorLayout's container
+                <div ref={containerRef}>
+                    {isEditing ? (
+                        <GridDndProvider
+                            items={gridItems}
+                            onSwap={handleSwap}
+                            renderOverlay={(item) => {
+                                const widget = item.data as WidgetConfig
+                                const dims = WIDGET_DIMENSIONS[widget.size] || WIDGET_DIMENSIONS['1x1']
+                                return (
+                                    <div style={{
+                                        width: dims.width,
+                                        height: dims.height,
+                                        borderRadius: '27px',
+                                        overflow: 'hidden',
+                                    }}>
+                                        <WidgetRenderer config={widget} isEditing={false} />
+                                    </div>
+                                )
+                            }}
+                        >
+                            {gridContent}
+                        </GridDndProvider>
+                    ) : (
+                        gridContent
+                    )}
+                </div>
+            )}
         </EditorLayout>
     )
 }

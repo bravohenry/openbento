@@ -5,7 +5,6 @@
 **You are the guardian of this fractal system. Whenever you feel logic is unclear, first calibrate your understanding by updating the relevant MD files at all levels.**
 
 ### Core Synchronization Protocol (Mandatory)
-
 1. **"Atomic Update Rule"**: Any update to functionality, architecture, or implementation patterns MUST be immediately synchronized with the corresponding directory or sub-document after code changes are completed.
 2. **"Reverse Trigger Chain"**: File change → Update file Header → Update parent folder `.folder.md` → (If global impact) Update main `README.md`.
 3. **"Fractal Self-Consistency"**: Ensure that at any subdirectory level, the system can rebuild its local worldview through that directory's MD file.
