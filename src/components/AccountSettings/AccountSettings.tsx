@@ -194,17 +194,22 @@ export const AccountSettings: React.FC<AccountSettingsProps> = ({ triggerRef, is
         }
 
         const validation = validateUsername(username)
-        if (!validation.isValid) {
+        if (!validation.valid) {
             setErrors({ username: validation.error || 'Invalid username' })
             return
         }
 
         setIsSaving(true)
-        await new Promise(resolve => setTimeout(resolve, 300))
+        setErrors({})
         
-        updateProfile({ username: username })
-        setIsSaving(false)
-        closeEdit()
+        try {
+            await updateProfile({ username: username })
+            setIsSaving(false)
+            closeEdit()
+        } catch (error) {
+            setIsSaving(false)
+            setErrors({ username: error instanceof Error ? error.message : 'Failed to update username' })
+        }
     }
 
     const handleEmailSave = async () => {
@@ -214,17 +219,22 @@ export const AccountSettings: React.FC<AccountSettingsProps> = ({ triggerRef, is
         }
 
         const validation = validateEmail(email)
-        if (!validation.isValid) {
+        if (!validation.valid) {
             setErrors({ email: validation.error || 'Invalid email' })
             return
         }
 
         setIsSaving(true)
-        await new Promise(resolve => setTimeout(resolve, 300))
+        setErrors({})
         
-        updateProfile({ email: email })
-        setIsSaving(false)
-        closeEdit()
+        try {
+            await updateProfile({ email: email })
+            setIsSaving(false)
+            closeEdit()
+        } catch (error) {
+            setIsSaving(false)
+            setErrors({ email: error instanceof Error ? error.message : 'Failed to update email' })
+        }
     }
 
     const handlePasswordSave = async () => {
@@ -234,7 +244,7 @@ export const AccountSettings: React.FC<AccountSettingsProps> = ({ triggerRef, is
         }
 
         const validation = validatePassword(password)
-        if (!validation.isValid) {
+        if (!validation.valid) {
             setErrors({ password: validation.error || 'Invalid password' })
             return
         }

@@ -15,19 +15,22 @@ export default function EditorLayout({
 }: {
     children: React.ReactNode
 }) {
-    const { user, refreshUser } = useUserStore()
+    const { refreshUser } = useUserStore()
     const { loadLayout } = useBentoStore()
 
     // Refresh user session and load layout on mount
     useEffect(() => {
-        refreshUser()
-    }, [refreshUser])
-
-    useEffect(() => {
-        if (user) {
-            loadLayout()
+        async function initialize() {
+            await refreshUser()
+            // After refreshUser completes, get the latest user state from store
+            // and load layout if user exists
+            const currentUser = useUserStore.getState().user
+            if (currentUser) {
+                loadLayout()
+            }
         }
-    }, [user, loadLayout])
+        initialize()
+    }, [refreshUser, loadLayout])
 
     return (
         <AuthGuard>

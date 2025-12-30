@@ -31,7 +31,7 @@ interface UserState {
     login: (email: string, password: string) => Promise<boolean>
     register: (username: string, email: string, password: string, displayName?: string) => Promise<boolean>
     logout: () => Promise<void>
-    updateProfile: (updates: Partial<Pick<User, 'displayName' | 'avatar' | 'bio'>>) => Promise<void>
+    updateProfile: (updates: Partial<Pick<User, 'displayName' | 'avatar' | 'bio' | 'username' | 'email'>>) => Promise<void>
     clearError: () => void
     refreshUser: () => Promise<void>
 }
@@ -144,24 +144,36 @@ export const useUserStore = create<UserState>((set, get) => ({
 
     updateProfile: async (updates) => {
         const { user } = get()
-        if (!user) return
+        if (!user) {
+            throw new Error('User not authenticated')
+        }
 
         try {
             const response = await fetch('/api/users/me', {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
+                credentials: 'include', // Important: include cookies for auth
                 body: JSON.stringify({
                     display_name: updates.displayName,
                     avatar_url: updates.avatar,
                     bio: updates.bio,
+                    username: updates.username,
+                    email: updates.email,
                 }),
             })
 
             const data = await response.json()
 
             if (!response.ok) {
-                set({ error: data.error || '更新失败' })
-                return
+                const errorMessage = data.error || '更新失败'
+                console.error('Update profile API error:', {
+                    status: response.status,
+                    statusText: response.statusText,
+                    error: data.error,
+                    updates,
+                })
+                set({ error: errorMessage })
+                throw new Error(errorMessage)
             }
 
             const updatedUser: User = {
@@ -169,11 +181,15 @@ export const useUserStore = create<UserState>((set, get) => ({
                 displayName: data.user.display_name || user.displayName,
                 avatar: data.user.avatar_url || user.avatar,
                 bio: data.user.bio || user.bio,
+                username: data.user.username || user.username,
+                email: data.user.email || user.email,
             }
 
             set({ user: updatedUser, error: null })
         } catch (error) {
-            set({ error: '网络错误，请稍后重试' })
+            const errorMessage = error instanceof Error ? error.message : '网络错误，请稍后重试'
+            set({ error: errorMessage })
+            throw error
         }
     },
 

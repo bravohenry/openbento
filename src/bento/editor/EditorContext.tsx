@@ -10,6 +10,7 @@
 
 import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react'
 import type { WidgetConfig, WidgetSize } from '../widgets/types'
+import { useUserStore } from '@/stores'
 
 export type ViewMode = 'desktop' | 'mobile'
 
@@ -112,6 +113,7 @@ const extractContentProperties = (widget: WidgetConfig): Omit<WidgetConfig, 'siz
 }
 
 export const EditorProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+    const { user, updateProfile: updateUserProfile } = useUserStore()
     const [isEditing, setIsEditing] = useState(true) // Default to edit mode for development convenience
     const [viewMode, setViewMode] = useState<ViewMode>('desktop')
     const [selectedWidgetId, setSelectedWidgetId] = useState<string | null>(null)
@@ -177,7 +179,7 @@ export const EditorProvider: React.FC<{ children: ReactNode }> = ({ children }) 
         }
     }, [])
 
-    // ============ Auto-save to localStorage ============
+    // ============ Auto-save to localStorage and Supabase ============
 
     useEffect(() => {
         if (desktopWidgets.length > 0 || mobileWidgets.length > 0 || localStorage.getItem(STORAGE_KEY)) {
@@ -188,13 +190,86 @@ export const EditorProvider: React.FC<{ children: ReactNode }> = ({ children }) 
                 version: STORAGE_VERSION,
             }
             localStorage.setItem(STORAGE_KEY, JSON.stringify(data))
+            
+            // Auto-save to Supabase if user is authenticated
+            if (user) {
+                const saveLayout = async () => {
+                    try {
+                        const currentWidgets = viewMode === 'desktop' ? desktopWidgets : mobileWidgets
+                        const payload: {
+                            widgets: WidgetConfig[]
+                            desktop_layout?: unknown
+                            mobile_layout?: unknown
+                        } = {
+                            widgets: currentWidgets,
+                        }
+                        
+                        if (viewMode === 'desktop') {
+                            payload.desktop_layout = desktopWidgets
+                        } else {
+                            payload.mobile_layout = mobileWidgets
+                        }
+                        
+                        const response = await fetch('/api/bento/layout', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            credentials: 'include',
+                            body: JSON.stringify(payload),
+                        })
+                        
+                        if (!response.ok) {
+                            const data = await response.json()
+                            console.error('Auto-save layout error:', data.error)
+                        }
+                    } catch (error) {
+                        console.error('Auto-save layout error:', error)
+                    }
+                }
+                
+                // Debounce auto-save to avoid too many API calls
+                const timer = setTimeout(saveLayout, 2000)
+                return () => clearTimeout(timer)
+            }
         }
-    }, [desktopWidgets, mobileWidgets, layoutIndependent])
+    }, [desktopWidgets, mobileWidgets, layoutIndependent, viewMode, user])
 
-    // Auto-save profile data
+    // Auto-save profile data to localStorage and Supabase
     useEffect(() => {
         localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(profile))
-    }, [profile])
+        
+        // Auto-save to Supabase if user is authenticated
+        if (user && (profile.name || profile.description || profile.avatarUrl)) {
+            const saveProfile = async () => {
+                try {
+                    const profileUpdates: {
+                        displayName?: string
+                        bio?: string
+                        avatar?: string
+                    } = {}
+                    
+                    if (profile.name) {
+                        profileUpdates.displayName = profile.name
+                    }
+                    if (profile.description) {
+                        profileUpdates.bio = profile.description
+                    }
+                    if (profile.avatarUrl) {
+                        profileUpdates.avatar = profile.avatarUrl
+                    }
+                    
+                    if (Object.keys(profileUpdates).length > 0) {
+                        await updateUserProfile(profileUpdates)
+                    }
+                } catch (error) {
+                    console.error('Auto-save profile error:', error)
+                }
+            }
+            
+            // Debounce auto-save to avoid too many API calls
+            const timer = setTimeout(saveProfile, 1000)
+            return () => clearTimeout(timer)
+        }
+    }, [profile, user, updateUserProfile])
 
     // ============ Desktop Widget CRUD Operations ============
 
@@ -366,9 +441,40 @@ export const EditorProvider: React.FC<{ children: ReactNode }> = ({ children }) 
 
     // ============ Profile Management ============
 
-    const updateProfile = useCallback((updates: Partial<ProfileData>) => {
+    const updateProfile = useCallback(async (updates: Partial<ProfileData>) => {
+        // Update local state immediately for UI responsiveness
         setProfile((prev) => ({ ...prev, ...updates }))
-    }, [])
+        
+        // Save to Supabase if user is authenticated
+        if (user) {
+            try {
+                // Map ProfileData to userStore format
+                const profileUpdates: {
+                    displayName?: string
+                    bio?: string
+                    avatar?: string
+                } = {}
+                
+                if (updates.name !== undefined) {
+                    profileUpdates.displayName = updates.name
+                }
+                if (updates.description !== undefined) {
+                    profileUpdates.bio = updates.description
+                }
+                if (updates.avatarUrl !== undefined) {
+                    profileUpdates.avatar = updates.avatarUrl
+                }
+                
+                // Only call API if there are actual updates
+                if (Object.keys(profileUpdates).length > 0) {
+                    await updateUserProfile(profileUpdates)
+                }
+            } catch (error) {
+                console.error('Failed to save profile to Supabase:', error)
+                // Don't revert local state - keep UI responsive
+            }
+        }
+    }, [user, updateUserProfile])
 
     // ============ Persistence Helpers ============
 

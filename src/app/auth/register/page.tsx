@@ -33,14 +33,17 @@ export default function RegisterPage() {
 
     // Validation
     const newErrors: Record<string, string> = {}
-    if (!validateUsername(formData.username)) {
-      newErrors.username = 'Username must be 3-20 characters, alphanumeric'
+    const usernameValidation = validateUsername(formData.username)
+    if (!usernameValidation.valid) {
+      newErrors.username = usernameValidation.error || 'Username must be 3-20 characters, alphanumeric'
     }
-    if (!validateEmail(formData.email)) {
-      newErrors.email = 'Please enter a valid email address'
+    const emailValidation = validateEmail(formData.email)
+    if (!emailValidation.valid) {
+      newErrors.email = emailValidation.error || 'Please enter a valid email address'
     }
-    if (!validatePassword(formData.password)) {
-      newErrors.password = 'Password must be at least 8 chars with 1 number'
+    const passwordValidation = validatePassword(formData.password)
+    if (!passwordValidation.valid) {
+      newErrors.password = passwordValidation.error || 'Password must be at least 8 chars with 1 number'
     }
 
     if (Object.keys(newErrors).length > 0) {

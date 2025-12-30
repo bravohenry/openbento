@@ -41,8 +41,9 @@ export default function LoginPage() {
 
     // Validation
     const newErrors: Record<string, string> = {}
-    if (!validateEmail(formData.email)) {
-      newErrors.email = 'Please enter a valid email address'
+    const emailValidation = validateEmail(formData.email)
+    if (!emailValidation.valid) {
+      newErrors.email = emailValidation.error || 'Please enter a valid email address'
     }
     if (!formData.password) {
       newErrors.password = 'Password is required'

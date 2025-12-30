@@ -96,7 +96,9 @@ export const useBentoStore = create<BentoState>((set, get) => ({
 
     loadLayout: async () => {
         try {
-            const response = await fetch('/api/bento/layout')
+            const response = await fetch('/api/bento/layout', {
+                credentials: 'include', // Important: include cookies for auth
+            })
             const data = await response.json()
 
             if (response.ok && data.layout) {
@@ -133,6 +135,7 @@ export const useBentoStore = create<BentoState>((set, get) => ({
             const response = await fetch('/api/bento/layout', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
+                credentials: 'include', // Important: include cookies for auth
                 body: JSON.stringify(payload),
             })
 
