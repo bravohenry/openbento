@@ -1,21 +1,13 @@
 /**
  * OpenBento Design System - Social Media Icons
  * 
- * Phosphor Icons wrapper components - 社交媒体品牌图标
+ * SVG icons from public/icons/social/ directory - 社交媒体品牌图标
  * 设计灵感：Bento.me 卡片中的社交媒体图标
  */
 
 import React from 'react'
+import Image from 'next/image'
 import { 
-    TwitterLogo,
-    InstagramLogo,
-    TiktokLogo,
-    LinkedinLogo,
-    YoutubeLogo,
-    SpotifyLogo,
-    GithubLogo,
-    WhatsappLogo,
-    DiscordLogo,
     LinkSimple, 
     MapPin, 
     ArrowSquareOut, 
@@ -25,45 +17,67 @@ import {
     type IconProps as PhosphorIconProps,
 } from 'phosphor-react'
 
-interface IconProps extends Omit<PhosphorIconProps, 'size'> {
+interface IconProps {
     size?: number | string
     color?: string
+    className?: string
     weight?: 'thin' | 'light' | 'regular' | 'bold' | 'fill' | 'duotone'
 }
 
-// Wrapper component to handle size conversion
-const createIconWrapper = (IconComponent: React.ComponentType<PhosphorIconProps>) => {
-    const WrappedIcon: React.FC<IconProps> = ({ size = 24, color = 'currentColor', weight = 'regular', ...props }) => {
+// Map platform names to SVG file names in public/icons/social/
+const PLATFORM_ICON_MAP: Record<string, string> = {
+    twitter: 'twitter',
+    instagram: 'instagram',
+    tiktok: 'unknown', // No SVG available, fallback to unknown
+    linkedin: 'linkedin',
+    youtube: 'youtube',
+    spotify: 'unknown', // No SVG available, fallback to unknown
+    github: 'github',
+    whatsapp: 'whatsapp',
+    discord: 'discord',
+}
+
+// Create SVG icon component
+const createSvgIcon = (iconName: string, displayName: string) => {
+    const IconComponent: React.FC<IconProps> = ({ size = 24, className, ...props }) => {
         const sizeNum = typeof size === 'string' ? parseInt(size, 10) : size
+        const iconPath = `/icons/social/${iconName}.svg`
         return (
-            <IconComponent
-                size={sizeNum}
-                color={color}
-                weight={weight}
-                {...(props as PhosphorIconProps)}
+            <Image
+                src={iconPath}
+                alt={iconName}
+                width={sizeNum}
+                height={sizeNum}
+                className={className}
+                style={{
+                    width: sizeNum,
+                    height: sizeNum,
+                    objectFit: 'contain',
+                }}
+                {...props}
             />
         )
     }
-    return WrappedIcon
+    IconComponent.displayName = displayName
+    return IconComponent
 }
 
-// ============ 社交媒体图标 (Phosphor Icons) ============
+// ============ 社交媒体图标 (SVG Files) ============
 
-export const TwitterIcon = createIconWrapper(TwitterLogo)
-TwitterIcon.displayName = 'TwitterIcon'
+export const TwitterIcon = createSvgIcon('twitter', 'TwitterIcon')
 
-export const InstagramIcon = createIconWrapper(InstagramLogo)
-InstagramIcon.displayName = 'InstagramIcon'
+export const InstagramIcon = createSvgIcon('instagram', 'InstagramIcon')
 
 // InstagramGradientIcon: 使用 SVG linearGradient 直接在图标内填充渐变色
-export const InstagramGradientIcon: React.FC<Omit<IconProps, 'color'>> = ({ size = 24, weight = 'regular', ...props }) => {
+export const InstagramGradientIcon: React.FC<Omit<IconProps, 'color'>> = ({ size = 24, className, ...props }) => {
     const sizeNum = typeof size === 'string' ? parseInt(size, 10) : size
     return (
         <svg
             width={sizeNum}
             height={sizeNum}
-            viewBox="0 0 24 24"
+            viewBox="0 0 40 40"
             fill="none"
+            className={className}
             {...(props as React.SVGProps<SVGSVGElement>)}
         >
             <defs>
@@ -75,36 +89,25 @@ export const InstagramGradientIcon: React.FC<Omit<IconProps, 'color'>> = ({ size
                     <stop offset="100%" stopColor="#bc1888" />
                 </linearGradient>
             </defs>
-            <InstagramLogo
-                size={sizeNum}
-                weight={weight}
-                fill="url(#instagram-gradient)"
-            />
+            <path d="M30 0H10C4.47715 0 0 4.47715 0 10V30C0 35.5228 4.47715 40 10 40H30C35.5228 40 40 35.5228 40 30V10C40 4.47715 35.5228 0 30 0Z" fill="url(#instagram-gradient)"/>
         </svg>
     )
 }
 InstagramGradientIcon.displayName = 'InstagramGradientIcon'
 
-export const TikTokIcon = createIconWrapper(TiktokLogo)
-TikTokIcon.displayName = 'TikTokIcon'
+export const TikTokIcon = createSvgIcon('unknown', 'TikTokIcon') // Fallback
 
-export const LinkedInIcon = createIconWrapper(LinkedinLogo)
-LinkedInIcon.displayName = 'LinkedInIcon'
+export const LinkedInIcon = createSvgIcon('linkedin', 'LinkedInIcon')
 
-export const YouTubeIcon = createIconWrapper(YoutubeLogo)
-YouTubeIcon.displayName = 'YouTubeIcon'
+export const YouTubeIcon = createSvgIcon('youtube', 'YouTubeIcon')
 
-export const SpotifyIcon = createIconWrapper(SpotifyLogo)
-SpotifyIcon.displayName = 'SpotifyIcon'
+export const SpotifyIcon = createSvgIcon('unknown', 'SpotifyIcon') // Fallback
 
-export const GitHubIcon = createIconWrapper(GithubLogo)
-GitHubIcon.displayName = 'GitHubIcon'
+export const GitHubIcon = createSvgIcon('github', 'GitHubIcon')
 
-export const WhatsAppIcon = createIconWrapper(WhatsappLogo)
-WhatsAppIcon.displayName = 'WhatsAppIcon'
+export const WhatsAppIcon = createSvgIcon('whatsapp', 'WhatsAppIcon')
 
-export const DiscordIcon = createIconWrapper(DiscordLogo)
-DiscordIcon.displayName = 'DiscordIcon'
+export const DiscordIcon = createSvgIcon('discord', 'DiscordIcon')
 
 // ============ 通用图标 (Phosphor Icons) ============
 

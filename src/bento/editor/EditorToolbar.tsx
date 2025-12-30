@@ -15,6 +15,7 @@ import {
     LinkSimple, 
     Image, 
     TextT, 
+    TextH,
     MapPin, 
     GridFour,
     Share,
@@ -117,9 +118,9 @@ const WidgetsIcon = () => (
     />
 )
 
-// Section Title Icon - using TextT with different color scheme
+// Section Title Icon - using TextH to represent heading/title
 const SectionTitleIcon = () => (
-    <TextT 
+    <TextH 
         size={16} 
         weight="duotone" 
         color={DOPAMINE_COLORS.widgetsPrimary}
@@ -325,7 +326,7 @@ export const EditorToolbar: React.FC = () => {
     }
 
     const handleAddSectionTitle = () => {
-        addWidget(createSectionTitleConfig('', '2x1'))
+        addWidget(createSectionTitleConfig('', 'bar'))
     }
 
     return (

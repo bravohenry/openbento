@@ -9,9 +9,17 @@
 import React from 'react'
 import type { SectionTitleConfig, WidgetProps } from '../types'
 import { BENTO_UNIT, BENTO_GAP } from '@/bento/core'
+import { useEditor } from '@/bento/editor'
 
 // 计算尺寸
 function getWidgetDimensions(size: string) {
+    // Handle 'bar' size specially - thin horizontal bar (390×68)
+    if (size === 'bar') {
+        return {
+            width: 390,
+            height: 68,
+        }
+    }
     const [cols, rows] = size.split('x').map(Number)
     return {
         width: cols * BENTO_UNIT + (cols - 1) * BENTO_GAP,
@@ -29,9 +37,12 @@ export const SectionTitleWidget: React.FC<WidgetProps<SectionTitleConfig>> = ({
 }) => {
     if (!config) return null
 
-    const { title, size = '2x1' } = config
+    const { title, size = 'bar' } = config
     const { width, height } = getWidgetDimensions(size)
     const [isFocused, setIsFocused] = React.useState(false)
+    const [isHovered, setIsHovered] = React.useState(false)
+    const { selectedWidgetId } = useEditor()
+    const isSelected = selectedWidgetId === config.id
 
     const handleBlur = (e: React.FocusEvent<HTMLHeadingElement>) => {
         setIsFocused(false)
@@ -66,9 +77,12 @@ export const SectionTitleWidget: React.FC<WidgetProps<SectionTitleConfig>> = ({
 
     const showPlaceholder = isEditing && !title && !isFocused
 
-    // Show gray background only when there's no title
+    // Show gray background when:
+    // 1. There's no title (empty state)
+    // 2. Hovered (when there's a title)
+    // 3. Selected (when there's a title)
     const hasTitle = title && title.trim().length > 0
-    const showBackground = !hasTitle
+    const showBackground = !hasTitle || (hasTitle && (isHovered || isSelected))
 
     return (
         <div
@@ -79,6 +93,8 @@ export const SectionTitleWidget: React.FC<WidgetProps<SectionTitleConfig>> = ({
                     onClick?.()
                 }
             } : undefined}
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
             style={{
                 width,
                 height,
@@ -89,7 +105,7 @@ export const SectionTitleWidget: React.FC<WidgetProps<SectionTitleConfig>> = ({
                 padding: '0 16px',
                 backgroundColor: showBackground ? '#F5F5F5' : 'transparent',
                 borderRadius: '12px',
-                minHeight: '48px', // Minimum height for the bar
+                transition: 'background-color 0.2s ease',
             }}
         >
             <div style={{ position: 'relative', flex: 1, width: '100%' }}>
@@ -159,7 +175,7 @@ export const SectionTitleWidget: React.FC<WidgetProps<SectionTitleConfig>> = ({
 
 export function createSectionTitleConfig(
     title: string,
-    size: SectionTitleConfig['size'] = '2x1'
+    size: SectionTitleConfig['size'] = 'bar'
 ): SectionTitleConfig {
     return {
         id: `section-${Date.now()}`,

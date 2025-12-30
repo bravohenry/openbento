@@ -1,25 +1,11 @@
 /**
  * OpenBento - Social Platform Icons
  * 
- * Phosphor Icons wrapper for social platform icons
+ * SVG icons from public/icons/social/ directory
  */
 
 import React from 'react'
-import {
-    TwitterLogo,
-    InstagramLogo,
-    TiktokLogo,
-    LinkedinLogo,
-    YoutubeLogo,
-    SpotifyLogo,
-    GithubLogo,
-    WhatsappLogo,
-    DiscordLogo,
-    TelegramLogo,
-    AppStoreLogo,
-    LinkSimple,
-    type IconProps as PhosphorIconProps,
-} from 'phosphor-react'
+import Image from 'next/image'
 
 interface IconProps {
     size?: number
@@ -28,46 +14,80 @@ interface IconProps {
     weight?: 'thin' | 'light' | 'regular' | 'bold' | 'fill' | 'duotone'
 }
 
-// Wrapper component to handle size conversion
-const createIconWrapper = (IconComponent: React.ComponentType<PhosphorIconProps>) => {
-    const WrappedIcon: React.FC<IconProps> = ({ size = 24, color = 'currentColor', weight = 'regular', className }) => {
+// Map platform names to SVG file names in public/icons/social/
+const PLATFORM_ICON_MAP: Record<string, string> = {
+    instagram: 'instagram',
+    twitter: 'twitter',
+    tiktok: 'unknown', // No SVG available, fallback to unknown
+    youtube: 'youtube',
+    spotify: 'unknown', // No SVG available, fallback to unknown
+    github: 'github',
+    linkedin: 'linkedin',
+    discord: 'discord',
+    telegram: 'unknown', // No SVG available, fallback to unknown
+    twitch: 'twitch',
+    behance: 'behance',
+    dribbble: 'dribbble',
+    pinterest: 'pinterest',
+    reddit: 'reddit',
+    whatsapp: 'whatsapp',
+    medium: 'medium',
+    patreon: 'patreon',
+    buymeacoffee: 'buymeacoffee',
+    dev: 'dev',
+    google: 'google',
+    appstore: 'unknown', // No SVG available, fallback to unknown
+    generic: 'unknown',
+    link: 'unknown',
+}
+
+// Create icon component from SVG file
+const createSvgIcon = (iconName: string) => {
+    const IconComponent: React.FC<IconProps> = ({ size = 24, className }) => {
+        const iconPath = `/icons/social/${iconName}.svg`
         return (
-            <IconComponent
-                size={size}
-                color={color}
-                weight={weight}
+            <Image
+                src={iconPath}
+                alt={iconName}
+                width={size}
+                height={size}
                 className={className}
+                style={{
+                    width: size,
+                    height: size,
+                    objectFit: 'contain',
+                }}
             />
         )
     }
-    return WrappedIcon
+    return IconComponent
 }
 
 // ============ Social Media Icons ============
 
-export const InstagramIcon = createIconWrapper(InstagramLogo)
+export const InstagramIcon = createSvgIcon('instagram')
 
-export const TwitterIcon = createIconWrapper(TwitterLogo)
+export const TwitterIcon = createSvgIcon('twitter')
 
-export const TikTokIcon = createIconWrapper(TiktokLogo)
+export const TikTokIcon = createSvgIcon('unknown') // Fallback
 
-export const YouTubeIcon = createIconWrapper(YoutubeLogo)
+export const YouTubeIcon = createSvgIcon('youtube')
 
-export const SpotifyIcon = createIconWrapper(SpotifyLogo)
+export const SpotifyIcon = createSvgIcon('unknown') // Fallback
 
-export const GitHubIcon = createIconWrapper(GithubLogo)
+export const GitHubIcon = createSvgIcon('github')
 
-export const LinkedInIcon = createIconWrapper(LinkedinLogo)
+export const LinkedInIcon = createSvgIcon('linkedin')
 
-export const TelegramIcon = createIconWrapper(TelegramLogo)
+export const TelegramIcon = createSvgIcon('unknown') // Fallback
 
-export const AppStoreIcon = createIconWrapper(AppStoreLogo)
+export const AppStoreIcon = createSvgIcon('unknown') // Fallback
 
 // ============ Generic Link ============
 
-export const LinkIcon: React.FC<IconProps> = ({ size = 24, color = '#6B7280', className }) => (
-    <LinkSimple size={size} color={color} weight="regular" className={className} />
-)
+export const LinkIcon: React.FC<IconProps> = ({ size = 24, className }) => {
+    return createSvgIcon('unknown')({ size, className })
+}
 
 // ============ Icon Map ============
 export const PLATFORM_ICONS: Record<string, React.FC<IconProps>> = {
@@ -85,7 +105,8 @@ export const PLATFORM_ICONS: Record<string, React.FC<IconProps>> = {
 }
 
 export function getPlatformIcon(platform: string): React.FC<IconProps> {
-    return PLATFORM_ICONS[platform] || LinkIcon
+    const iconName = PLATFORM_ICON_MAP[platform] || PLATFORM_ICON_MAP.generic
+    return createSvgIcon(iconName)
 }
 
 export default PLATFORM_ICONS

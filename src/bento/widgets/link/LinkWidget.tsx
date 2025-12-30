@@ -14,28 +14,7 @@ import React from 'react'
 import { BentoCard } from '@/bento/core'
 import type { LinkWidgetConfig, WidgetProps, WidgetSize } from '../types'
 import { PLATFORM_REGISTRY, extractPlatformInfo } from '../registry'
-import {
-    TwitterLogo,
-    InstagramLogo,
-    TiktokLogo,
-    LinkedinLogo,
-    YoutubeLogo,
-    SpotifyLogo,
-    GithubLogo,
-    WhatsappLogo,
-    DiscordLogo,
-    TelegramLogo,
-    TwitchLogo,
-    BehanceLogo,
-    DribbbleLogo,
-    PinterestLogo,
-    RedditLogo,
-    MediumLogo,
-    Coffee,
-    GoogleLogo,
-    LinkSimple,
-    type IconProps as PhosphorIconProps,
-} from 'phosphor-react'
+import Image from 'next/image'
 
 // ============ Size-Responsive Platform Card Content ============
 
@@ -68,6 +47,8 @@ function getSizeLayout(size: WidgetSize) {
                 subtitleTop: 69,
                 actionTop: 97,
                 fontSize: 14,
+                subtitleFontSize: 12,
+                actionFontSize: 12,
                 lineClamp: 3,
                 horizontal: false,
                 isBar: false,
@@ -79,6 +60,8 @@ function getSizeLayout(size: WidgetSize) {
                 subtitleTop: 69,
                 actionTop: 97,
                 fontSize: 14,
+                subtitleFontSize: 12,
+                actionFontSize: 12,
                 lineClamp: 2,
                 horizontal: true,
                 rightContentWidth: '50%',
@@ -91,6 +74,8 @@ function getSizeLayout(size: WidgetSize) {
                 subtitleTop: 69,
                 actionTop: 97,
                 fontSize: 14,
+                subtitleFontSize: 12,
+                actionFontSize: 12,
                 lineClamp: 6,
                 horizontal: false,
                 hasExtraContent: true,
@@ -103,6 +88,8 @@ function getSizeLayout(size: WidgetSize) {
                 subtitleTop: 94,
                 actionTop: 120,
                 fontSize: 18,
+                subtitleFontSize: 14,
+                actionFontSize: 14,
                 lineClamp: 4,
                 horizontal: false,
                 hasExtraContent: true,
@@ -116,6 +103,8 @@ function getSizeLayout(size: WidgetSize) {
                 subtitleTop: 0,
                 actionTop: 0,
                 fontSize: 14,
+                subtitleFontSize: 12,
+                actionFontSize: 11,
                 lineClamp: 1,
                 horizontal: true,
                 isBar: true, // Special compact layout
@@ -127,6 +116,8 @@ function getSizeLayout(size: WidgetSize) {
                 subtitleTop: 69,
                 actionTop: 97,
                 fontSize: 14,
+                subtitleFontSize: 12,
+                actionFontSize: 12,
                 lineClamp: 3,
                 horizontal: false,
                 isBar: false,
@@ -289,9 +280,9 @@ const PlatformCardContent: React.FC<PlatformCardContentProps> = ({
                     left: 0,
                     right: layout.horizontal ? layout.rightContentWidth : 0,
                     fontFamily: 'Inter, sans-serif',
-                    fontSize: 12,
+                    fontSize: layout.subtitleFontSize || 12,
                     fontWeight: 400,
-                    lineHeight: '16px',
+                    lineHeight: layout.subtitleFontSize === 14 ? '18px' : '16px',
                     color: subtitleColor,
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
@@ -308,13 +299,13 @@ const PlatformCardContent: React.FC<PlatformCardContentProps> = ({
                     top: layout.actionTop,
                     left: 0,
                     minWidth: action.shape === 'pill' ? 70 : 66,
-                    height: 30,
+                    height: layout.actionFontSize === 14 ? 34 : 30,
                     borderRadius: action.borderRadius || (action.shape === 'pill' ? 23 : 8),
                     backgroundColor: action.color || '#4093ef',
                     border: 'none',
                     cursor: 'pointer',
                     fontFamily: 'Inter, sans-serif',
-                    fontSize: 12,
+                    fontSize: layout.actionFontSize || 12,
                     fontWeight: 600,
                     color: action.textColor || '#ffffff',
                     display: 'flex',
@@ -335,42 +326,49 @@ const PlatformCardContent: React.FC<PlatformCardContentProps> = ({
 }
 
 
-// ============ Platform Icons (Phosphor Icons) ============
+// ============ Platform Icons (SVG Files) ============
 
-// Map platform names to Phosphor icon components
-const PLATFORM_ICON_COMPONENTS: Record<string, React.ComponentType<PhosphorIconProps>> = {
-    instagram: InstagramLogo,
-    twitter: TwitterLogo,
-    tiktok: TiktokLogo,
-    youtube: YoutubeLogo,
-    spotify: SpotifyLogo,
-    github: GithubLogo,
-    linkedin: LinkedinLogo,
-    discord: DiscordLogo,
-    telegram: TelegramLogo,
-    twitch: TwitchLogo,
-    behance: BehanceLogo,
-    dribbble: DribbbleLogo,
-    pinterest: PinterestLogo,
-    reddit: RedditLogo,
-    whatsapp: WhatsappLogo,
-    medium: MediumLogo,
-    patreon: LinkSimple, // PatreonLogo not available, using LinkSimple as fallback
-    buymeacoffee: Coffee,
-    dev: GithubLogo, // DevToLogo not available, using GithubLogo as fallback
-    google: GoogleLogo,
-    generic: LinkSimple,
+// Map platform names to SVG file names in public/icons/social/
+const PLATFORM_ICON_MAP: Record<string, string> = {
+    instagram: 'instagram',
+    twitter: 'twitter',
+    tiktok: 'unknown', // No SVG available, fallback to unknown
+    youtube: 'youtube',
+    spotify: 'unknown', // No SVG available, fallback to unknown
+    github: 'github',
+    linkedin: 'linkedin',
+    discord: 'discord',
+    telegram: 'unknown', // No SVG available, fallback to unknown
+    twitch: 'twitch',
+    behance: 'behance',
+    dribbble: 'dribbble',
+    pinterest: 'pinterest',
+    reddit: 'reddit',
+    whatsapp: 'whatsapp',
+    medium: 'medium',
+    patreon: 'patreon',
+    buymeacoffee: 'buymeacoffee',
+    dev: 'dev',
+    google: 'google',
+    generic: 'unknown',
 }
 
 function getPlatformIconComponent(platform: string, iconSize: number = 40) {
-    const IconComponent = PLATFORM_ICON_COMPONENTS[platform] || PLATFORM_ICON_COMPONENTS.generic
+    const iconName = PLATFORM_ICON_MAP[platform] || PLATFORM_ICON_MAP.generic
+    const iconPath = `/icons/social/${iconName}.svg`
 
     return (
         <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <IconComponent
-                size={iconSize}
-                weight="fill"
-                color="currentColor"
+            <Image
+                src={iconPath}
+                alt={platform}
+                width={iconSize}
+                height={iconSize}
+                style={{
+                    width: iconSize,
+                    height: iconSize,
+                    objectFit: 'contain',
+                }}
             />
         </div>
     )

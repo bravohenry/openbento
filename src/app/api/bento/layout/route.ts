@@ -95,21 +95,58 @@ export async function POST(request: Request) {
       )
     }
 
-    // Upsert layout
-    const { data: layout, error } = await supabase
+    // Upsert layout (do an explicit update/insert to avoid duplicate user_id errors)
+    const { data: existingLayout, error: existingError } = await supabase
       .from('bento_layouts')
-      .upsert({
-        user_id: user.id,
-        widgets: widgets || [],
-        desktop_layout: desktop_layout || null,
-        mobile_layout: mobile_layout || null,
-      })
-      .select()
-      .single()
+      .select('id')
+      .eq('user_id', user.id)
+      .maybeSingle()
+
+    if (existingError) {
+      console.error('Fetch existing layout error:', existingError)
+      return NextResponse.json(
+        { error: existingError.message || 'Failed to save layout', code: existingError.code },
+        { status: 500 }
+      )
+    }
+
+    let layout = null
+    let error = null
+
+    if (existingLayout) {
+      // Update existing row
+      const { data, error: updateError } = await supabase
+        .from('bento_layouts')
+        .update({
+          widgets: widgets || [],
+          desktop_layout: desktop_layout || null,
+          mobile_layout: mobile_layout || null,
+        })
+        .eq('user_id', user.id)
+        .select()
+        .single()
+      layout = data
+      error = updateError
+    } else {
+      // Insert new row
+      const { data, error: insertError } = await supabase
+        .from('bento_layouts')
+        .insert({
+          user_id: user.id,
+          widgets: widgets || [],
+          desktop_layout: desktop_layout || null,
+          mobile_layout: mobile_layout || null,
+        })
+        .select()
+        .single()
+      layout = data
+      error = insertError
+    }
 
     if (error) {
+      console.error('Save layout supabase error:', error)
       return NextResponse.json(
-        { error: 'Failed to save layout' },
+        { error: error.message || 'Failed to save layout', code: error.code, details: error.details },
         { status: 500 }
       )
     }
