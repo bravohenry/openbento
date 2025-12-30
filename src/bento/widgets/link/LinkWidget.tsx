@@ -14,6 +14,28 @@ import React from 'react'
 import { BentoCard } from '@/bento/core'
 import type { LinkWidgetConfig, WidgetProps, WidgetSize } from '../types'
 import { PLATFORM_REGISTRY, extractPlatformInfo } from '../registry'
+import {
+    TwitterLogo,
+    InstagramLogo,
+    TiktokLogo,
+    LinkedinLogo,
+    YoutubeLogo,
+    SpotifyLogo,
+    GithubLogo,
+    WhatsappLogo,
+    DiscordLogo,
+    TelegramLogo,
+    TwitchLogo,
+    BehanceLogo,
+    DribbbleLogo,
+    PinterestLogo,
+    RedditLogo,
+    MediumLogo,
+    Coffee,
+    GoogleLogo,
+    LinkSimple,
+    type IconProps as PhosphorIconProps,
+} from 'phosphor-react'
 
 // ============ Size-Responsive Platform Card Content ============
 
@@ -313,47 +335,44 @@ const PlatformCardContent: React.FC<PlatformCardContentProps> = ({
 }
 
 
-// ============ Platform Icons (from public/icons/social) ============
+// ============ Platform Icons (Phosphor Icons) ============
 
-// Map platform names to SVG files
-const PLATFORM_ICON_FILES: Record<string, string> = {
-    instagram: '/icons/social/instagram.svg',
-    twitter: '/icons/social/twitter.svg',
-    tiktok: '/icons/social/unknown.svg', // No tiktok icon yet, using unknown
-    youtube: '/icons/social/youtube.svg',
-    spotify: '/icons/social/unknown.svg', // No spotify icon yet
-    github: '/icons/social/github.svg',
-    linkedin: '/icons/social/linkedin.svg',
-    discord: '/icons/social/discord.svg',
-    telegram: '/icons/social/unknown.svg', // No telegram icon yet, using unknown
-    twitch: '/icons/social/twitch.svg',
-    behance: '/icons/social/behance.svg',
-    dribbble: '/icons/social/dribbble.svg',
-    pinterest: '/icons/social/pinterest.svg',
-    reddit: '/icons/social/reddit.svg',
-    whatsapp: '/icons/social/whatsapp.svg',
-    medium: '/icons/social/medium.svg',
-    patreon: '/icons/social/patreon.svg',
-    buymeacoffee: '/icons/social/buymeacoffee.svg',
-    dev: '/icons/social/dev.svg',
-    google: '/icons/social/google.svg',
-    generic: '/icons/social/unknown.svg',
+// Map platform names to Phosphor icon components
+const PLATFORM_ICON_COMPONENTS: Record<string, React.ComponentType<PhosphorIconProps>> = {
+    instagram: InstagramLogo,
+    twitter: TwitterLogo,
+    tiktok: TiktokLogo,
+    youtube: YoutubeLogo,
+    spotify: SpotifyLogo,
+    github: GithubLogo,
+    linkedin: LinkedinLogo,
+    discord: DiscordLogo,
+    telegram: TelegramLogo,
+    twitch: TwitchLogo,
+    behance: BehanceLogo,
+    dribbble: DribbbleLogo,
+    pinterest: PinterestLogo,
+    reddit: RedditLogo,
+    whatsapp: WhatsappLogo,
+    medium: MediumLogo,
+    patreon: LinkSimple, // PatreonLogo not available, using LinkSimple as fallback
+    buymeacoffee: Coffee,
+    dev: GithubLogo, // DevToLogo not available, using GithubLogo as fallback
+    google: GoogleLogo,
+    generic: LinkSimple,
 }
 
 function getPlatformIconComponent(platform: string, iconSize: number = 40) {
-    const iconFile = PLATFORM_ICON_FILES[platform] || PLATFORM_ICON_FILES.generic
+    const IconComponent = PLATFORM_ICON_COMPONENTS[platform] || PLATFORM_ICON_COMPONENTS.generic
 
     return (
-        <img
-            src={iconFile}
-            alt={platform}
-            style={{
-                width: '100%',
-                height: '100%',
-                objectFit: 'contain',
-                display: 'block',
-            }}
-        />
+        <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <IconComponent
+                size={iconSize}
+                weight="fill"
+                color="currentColor"
+            />
+        </div>
     )
 }
 

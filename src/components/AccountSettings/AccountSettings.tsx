@@ -202,7 +202,7 @@ export const AccountSettings: React.FC<AccountSettingsProps> = ({ triggerRef, is
         setIsSaving(true)
         await new Promise(resolve => setTimeout(resolve, 300))
         
-        updateProfile({ displayName: username })
+        updateProfile({ username: username })
         setIsSaving(false)
         closeEdit()
     }
@@ -222,7 +222,7 @@ export const AccountSettings: React.FC<AccountSettingsProps> = ({ triggerRef, is
         setIsSaving(true)
         await new Promise(resolve => setTimeout(resolve, 300))
         
-        // Note: In a real app, you'd update email via backend API
+        updateProfile({ email: email })
         setIsSaving(false)
         closeEdit()
     }
@@ -287,7 +287,7 @@ export const AccountSettings: React.FC<AccountSettingsProps> = ({ triggerRef, is
                     padding: '12px',
                     cursor: 'pointer',
                     borderRadius: '10px',
-                    backgroundColor: isHovered || activeEdit === editType ? 'var(--color-surface-hover)' : 'transparent',
+                    backgroundColor: isHovered || activeEdit === editType ? '#F7F7F7' : 'transparent',
                     transition: 'background-color 0.2s',
                     width: '100%',
                     display: 'flex',
@@ -354,12 +354,12 @@ export const AccountSettings: React.FC<AccountSettingsProps> = ({ triggerRef, is
                     padding: '12px',
                     cursor: 'pointer',
                     borderRadius: '10px',
-                    backgroundColor: isHovered ? 'var(--color-surface-hover)' : 'transparent',
+                    backgroundColor: isHovered ? '#F7F7F7' : 'transparent',
                     transition: 'background-color 0.2s',
                     width: '100%',
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'center',
+                    justifyContent: 'flex-start',
                     overflow: 'hidden',
                 }}
             >
@@ -369,7 +369,7 @@ export const AccountSettings: React.FC<AccountSettingsProps> = ({ triggerRef, is
                         fontWeight: 400,
                         fontFamily: 'Inter, sans-serif',
                         lineHeight: '16px',
-                        color: isDanger ? 'var(--color-accent-red)' : '#000000',
+                        color: '#000000',
                     }}
                 >
                     {text}
@@ -404,10 +404,9 @@ export const AccountSettings: React.FC<AccountSettingsProps> = ({ triggerRef, is
         top: editPosition.top,
         left: editPosition.left,
         width: '320px',
-        background: 'var(--color-surface)',
+        background: '#FFFFFF',
         borderRadius: radii.xl,
-        boxShadow: shadows.xl,
-        border: '1px solid var(--color-border)',
+        boxShadow: '0px 0px 0px 1px rgba(0,0,0,0.06), 0px 40px 54px 0px rgba(0,0,0,0.04), 0px 25.926px 31.625px 0px rgba(0,0,0,0.03), 0px 15.407px 17.2px 0px rgba(0,0,0,0.02), 0px 8px 8.775px 0px rgba(0,0,0,0.02), 0px 3.259px 4.4px 0px rgba(0,0,0,0.02), 0px 0.741px 2.125px 0px rgba(0,0,0,0.01)',
         zIndex: 1001,
         padding: '16px',
         animation: 'dropdownFadeIn 0.15s ease-out',
@@ -453,7 +452,7 @@ export const AccountSettings: React.FC<AccountSettingsProps> = ({ triggerRef, is
                 <Separator />
 
                 {/* Log Out */}
-                <ActionItem text="Log Out" onClick={handleLogout} isDanger />
+                <ActionItem text="Log Out" onClick={handleLogout} />
             </div>,
             document.body
         )
@@ -471,7 +470,7 @@ export const AccountSettings: React.FC<AccountSettingsProps> = ({ triggerRef, is
                     style={{
                         fontSize: '14px',
                         fontWeight: 500,
-                        color: 'var(--color-text-primary)',
+                        color: '#000000',
                         marginBottom: '8px',
                     }}
                 >
@@ -513,7 +512,7 @@ export const AccountSettings: React.FC<AccountSettingsProps> = ({ triggerRef, is
                     style={{
                         fontSize: '14px',
                         fontWeight: 500,
-                        color: 'var(--color-text-primary)',
+                        color: '#000000',
                         marginBottom: '8px',
                     }}
                 >
@@ -555,7 +554,7 @@ export const AccountSettings: React.FC<AccountSettingsProps> = ({ triggerRef, is
                     style={{
                         fontSize: '14px',
                         fontWeight: 500,
-                        color: 'var(--color-text-primary)',
+                        color: '#000000',
                         marginBottom: '8px',
                     }}
                 >

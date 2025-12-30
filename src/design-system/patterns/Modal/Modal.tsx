@@ -1,5 +1,6 @@
 import React, { forwardRef, useEffect, useCallback } from 'react'
 import { createPortal } from 'react-dom'
+import { X } from 'phosphor-react'
 import { cn } from '../../utils/cn'
 import { radii } from '../../tokens/radii'
 import { shadows } from '../../tokens/shadows'
@@ -140,9 +141,7 @@ const ModalRoot = forwardRef<HTMLDivElement, ModalProps>((props, ref) => {
             }}
             aria-label="Close"
         >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M18 6L6 18M6 6l12 12" />
-            </svg>
+            <X size={20} weight="regular" />
         </button>
     )
 

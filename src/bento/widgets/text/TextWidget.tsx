@@ -106,12 +106,12 @@ const NoteWidget: React.FC<WidgetProps<TextWidgetConfig>> = ({
                         width: 40,
                         height: 40,
                         borderRadius: 10,
-                        backgroundColor: '#FFFFFF',
+                        backgroundColor: 'unset',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        fontSize: 18,
-                        boxShadow: '0px 1px 2px rgba(0, 0, 0, 0.1)',
+                        fontSize: 32,
+                        boxShadow: 'none',
                         marginBottom: 12,
                     }}
                 >

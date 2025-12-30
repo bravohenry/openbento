@@ -64,3 +64,30 @@ export function validateDisplayName(name: string): ValidationResult {
     }
     return { valid: true }
 }
+
+export function validateHandle(handle: string): ValidationResult {
+    if (!handle) {
+        return { valid: false, error: 'Please enter a handle' }
+    }
+    if (handle.length < 3) {
+        return { valid: false, error: 'Handle must be at least 3 characters' }
+    }
+    if (handle.length > 50) {
+        return { valid: false, error: 'Handle must be at most 50 characters' }
+    }
+    // Only lowercase letters, numbers, and hyphens
+    const handleRegex = /^[a-z0-9-]+$/
+    if (!handleRegex.test(handle)) {
+        return { valid: false, error: 'Handle can only contain lowercase letters, numbers, and hyphens' }
+    }
+    // Cannot start or end with hyphen
+    if (handle.startsWith('-') || handle.endsWith('-')) {
+        return { valid: false, error: 'Handle cannot start or end with a hyphen' }
+    }
+    // Reserved handles
+    const reserved = ['www', 'api', 'admin', 'app', 'mail', 'ftp', 'auth', 'login', 'register', 'editor', 'settings', 'bento', 'showcase']
+    if (reserved.includes(handle.toLowerCase())) {
+        return { valid: false, error: 'This handle is reserved' }
+    }
+    return { valid: true }
+}

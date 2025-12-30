@@ -53,6 +53,8 @@
   --color-border: rgba(0, 0, 0, 0.08);
   --color-border-hover: rgba(0, 0, 0, 0.12);
   --color-border-focus: var(--color-brand-primary);
+  --color-gray-100: #f9fafb;
+  --color-gray-200: #f3f4f6;
 
   /* ============ Typography ============ */
 
@@ -665,4 +667,21 @@ input:focus-visible {
 .card-clickable:hover {
   transform: translateY(-4px);
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* ============ Phosphor Icons Duotone Support ============ */
+/* Support for duotone icons with dopamine colors */
+svg[data-phosphor-icon] {
+  --duotone-primary: currentColor;
+  --duotone-secondary: var(--duotone-secondary, currentColor);
+}
+
+/* Duotone icon color layers - Phosphor Icons duotone uses two path elements */
+svg[data-phosphor-icon] path:nth-of-type(1) {
+  fill: currentColor;
+}
+
+svg[data-phosphor-icon] path:nth-of-type(2) {
+  fill: var(--duotone-secondary, currentColor);
+  opacity: 0.6;
 }

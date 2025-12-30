@@ -55,14 +55,17 @@ export default function LoginPage() {
 
     setIsLoading(true)
 
-    // Simulate API delay for better UX
-    setTimeout(() => {
-      const success = login(formData.email, formData.password)
+    try {
+      const success = await login(formData.email, formData.password)
       setIsLoading(false)
       if (success) {
-        router.push('/editor')
+        // Refresh page to ensure cookies are loaded
+        window.location.href = '/editor'
       }
-    }, 800)
+    } catch (error) {
+      setIsLoading(false)
+      console.error('Login error:', error)
+    }
   }
 
   if (!domLoaded) return null
@@ -126,7 +129,7 @@ export default function LoginPage() {
         )}
 
         <div className="flex justify-start">
-          <Link href="#" className="text-sm font-semibold text-[#4A9DFF] hover:text-blue-600 underline decoration-2 underline-offset-2">
+          <Link href="/auth/forgot-password" className="text-sm font-semibold text-[#4A9DFF] hover:text-blue-600 underline decoration-2 underline-offset-2">
             Reset Password
           </Link>
         </div>

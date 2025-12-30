@@ -15,17 +15,17 @@ export default function EditorLayout({
 }: {
     children: React.ReactNode
 }) {
-    const { hydrate, user } = useUserStore()
+    const { user, refreshUser } = useUserStore()
     const { loadLayout } = useBentoStore()
 
-    // Hydrate and load layout on mount
+    // Refresh user session and load layout on mount
     useEffect(() => {
-        hydrate()
-    }, [hydrate])
+        refreshUser()
+    }, [refreshUser])
 
     useEffect(() => {
         if (user) {
-            loadLayout(user.id)
+            loadLayout()
         }
     }, [user, loadLayout])
 

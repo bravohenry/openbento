@@ -51,8 +51,8 @@ export default function RegisterPage() {
     setIsLoading(true)
 
     // Simulate API delay
-    setTimeout(() => {
-      const success = register(formData.email, formData.password, formData.username)
+    setTimeout(async () => {
+      const success = await register(formData.username, formData.email, formData.password)
       setIsLoading(false)
       if (success) {
         router.push('/editor')

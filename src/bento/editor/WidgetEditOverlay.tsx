@@ -262,6 +262,8 @@ export const WidgetEditOverlay: React.FC<WidgetEditOverlayProps> = ({
 
     // Map widget check
     const isMapWidget = widget.category === 'map'
+    // Section title widget - no size picker needed (fixed size)
+    const isSectionWidget = widget.category === 'section'
 
     // Render via Portal
     const overlayContent = (
@@ -306,7 +308,8 @@ export const WidgetEditOverlay: React.FC<WidgetEditOverlayProps> = ({
                 <DeleteIcon className="text-black" />
             </motion.button>
 
-            {/* Size Picker - Bottom Center relative to widget */}
+            {/* Size Picker - Bottom Center relative to widget (hidden for section widgets) */}
+            {!isSectionWidget && (
             <motion.div
                 className={cn(
                     'fixed backdrop-blur-xl bg-black/90 rounded-[12px]',
@@ -420,6 +423,7 @@ export const WidgetEditOverlay: React.FC<WidgetEditOverlayProps> = ({
                     </>
                 )}
             </motion.div>
+            )}
 
             {/* Location Search Dropdown */}
             {isMapWidget && showLocationSearch && onUpdate && (

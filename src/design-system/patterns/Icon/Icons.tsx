@@ -1,56 +1,70 @@
 /**
  * OpenBento Design System - Social Media Icons
  * 
- * SVG 图标组件 - 社交媒体品牌图标
+ * Phosphor Icons wrapper components - 社交媒体品牌图标
  * 设计灵感：Bento.me 卡片中的社交媒体图标
  */
 
 import React from 'react'
+import { 
+    TwitterLogo,
+    InstagramLogo,
+    TiktokLogo,
+    LinkedinLogo,
+    YoutubeLogo,
+    SpotifyLogo,
+    GithubLogo,
+    WhatsappLogo,
+    DiscordLogo,
+    LinkSimple, 
+    MapPin, 
+    ArrowSquareOut, 
+    Play, 
+    Pause, 
+    MusicNote,
+    type IconProps as PhosphorIconProps,
+} from 'phosphor-react'
 
-interface IconProps extends React.SVGProps<SVGSVGElement> {
+interface IconProps extends Omit<PhosphorIconProps, 'size'> {
     size?: number | string
     color?: string
+    weight?: 'thin' | 'light' | 'regular' | 'bold' | 'fill' | 'duotone'
 }
 
-const createIcon = (path: React.ReactNode, viewBox = '0 0 24 24') => {
-    const Icon = React.forwardRef<SVGSVGElement, IconProps>(
-        ({ size = 24, color = 'currentColor', ...props }, ref) => (
-            <svg
-                ref={ref}
-                width={size}
-                height={size}
-                viewBox={viewBox}
-                fill={color}
-                {...props}
-            >
-                {path}
-            </svg>
+// Wrapper component to handle size conversion
+const createIconWrapper = (IconComponent: React.ComponentType<PhosphorIconProps>) => {
+    const WrappedIcon: React.FC<IconProps> = ({ size = 24, color = 'currentColor', weight = 'regular', ...props }) => {
+        const sizeNum = typeof size === 'string' ? parseInt(size, 10) : size
+        return (
+            <IconComponent
+                size={sizeNum}
+                color={color}
+                weight={weight}
+                {...(props as PhosphorIconProps)}
+            />
         )
-    )
-    return Icon
+    }
+    return WrappedIcon
 }
 
-// ============ 社交媒体图标 ============
+// ============ 社交媒体图标 (Phosphor Icons) ============
 
-export const TwitterIcon = createIcon(
-    <path d="M23.643 4.937c-.835.37-1.732.62-2.675.733.962-.576 1.7-1.49 2.048-2.578-.9.534-1.897.922-2.958 1.13-.85-.904-2.06-1.47-3.4-1.47-2.572 0-4.658 2.086-4.658 4.66 0 .364.042.718.12 1.06-3.873-.195-7.304-2.05-9.602-4.868-.4.69-.63 1.49-.63 2.342 0 1.616.823 3.043 2.072 3.878-.764-.025-1.482-.234-2.11-.583v.06c0 2.257 1.605 4.14 3.737 4.568-.392.106-.803.162-1.227.162-.3 0-.593-.028-.877-.082.593 1.85 2.313 3.198 4.352 3.234-1.595 1.25-3.604 1.995-5.786 1.995-.376 0-.747-.022-1.112-.065 2.062 1.323 4.51 2.093 7.14 2.093 8.57 0 13.255-7.098 13.255-13.254 0-.2-.005-.402-.014-.602.91-.658 1.7-1.477 2.323-2.41z" />
-)
+export const TwitterIcon = createIconWrapper(TwitterLogo)
 TwitterIcon.displayName = 'TwitterIcon'
 
-export const InstagramIcon = createIcon(
-    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
-)
+export const InstagramIcon = createIconWrapper(InstagramLogo)
 InstagramIcon.displayName = 'InstagramIcon'
 
 // InstagramGradientIcon: 使用 SVG linearGradient 直接在图标内填充渐变色
-export const InstagramGradientIcon = React.forwardRef<SVGSVGElement, Omit<IconProps, 'color'>>(
-    ({ size = 24, ...props }, ref) => (
+export const InstagramGradientIcon: React.FC<Omit<IconProps, 'color'>> = ({ size = 24, weight = 'regular', ...props }) => {
+    const sizeNum = typeof size === 'string' ? parseInt(size, 10) : size
+    return (
         <svg
-            ref={ref}
-            width={size}
-            height={size}
+            width={sizeNum}
+            height={sizeNum}
             viewBox="0 0 24 24"
-            {...props}
+            fill="none"
+            {...(props as React.SVGProps<SVGSVGElement>)}
         >
             <defs>
                 <linearGradient id="instagram-gradient" x1="0%" y1="100%" x2="100%" y2="0%">
@@ -61,80 +75,132 @@ export const InstagramGradientIcon = React.forwardRef<SVGSVGElement, Omit<IconPr
                     <stop offset="100%" stopColor="#bc1888" />
                 </linearGradient>
             </defs>
-            <path
+            <InstagramLogo
+                size={sizeNum}
+                weight={weight}
                 fill="url(#instagram-gradient)"
-                d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"
             />
         </svg>
     )
-)
+}
 InstagramGradientIcon.displayName = 'InstagramGradientIcon'
 
-
-export const TikTokIcon = createIcon(
-    <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z" />
-)
+export const TikTokIcon = createIconWrapper(TiktokLogo)
 TikTokIcon.displayName = 'TikTokIcon'
 
-export const LinkedInIcon = createIcon(
-    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
-)
+export const LinkedInIcon = createIconWrapper(LinkedinLogo)
 LinkedInIcon.displayName = 'LinkedInIcon'
 
-export const YouTubeIcon = createIcon(
-    <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
-)
+export const YouTubeIcon = createIconWrapper(YoutubeLogo)
 YouTubeIcon.displayName = 'YouTubeIcon'
 
-export const SpotifyIcon = createIcon(
-    <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z" />
-)
+export const SpotifyIcon = createIconWrapper(SpotifyLogo)
 SpotifyIcon.displayName = 'SpotifyIcon'
 
-export const GitHubIcon = createIcon(
-    <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" />
-)
+export const GitHubIcon = createIconWrapper(GithubLogo)
 GitHubIcon.displayName = 'GitHubIcon'
 
-export const WhatsAppIcon = createIcon(
-    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
-)
+export const WhatsAppIcon = createIconWrapper(WhatsappLogo)
 WhatsAppIcon.displayName = 'WhatsAppIcon'
 
-export const DiscordIcon = createIcon(
-    <path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189z" />
-)
+export const DiscordIcon = createIconWrapper(DiscordLogo)
 DiscordIcon.displayName = 'DiscordIcon'
 
-// ============ 通用图标 ============
+// ============ 通用图标 (Phosphor Icons) ============
 
-export const LinkIcon = createIcon(
-    <path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z" />
+export const LinkIcon = React.forwardRef<SVGSVGElement, IconProps>(
+    ({ size = 24, color = 'currentColor', weight = 'regular', ...props }, ref) => {
+        const sizeNum = typeof size === 'string' ? parseInt(size, 10) : size
+        return (
+            <LinkSimple 
+                ref={ref}
+                size={sizeNum} 
+                color={color}
+                weight={weight}
+                {...props}
+            />
+        )
+    }
 )
 LinkIcon.displayName = 'LinkIcon'
 
-export const MapPinIcon = createIcon(
-    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
+export const MapPinIcon = React.forwardRef<SVGSVGElement, IconProps>(
+    ({ size = 24, color = 'currentColor', weight = 'regular', ...props }, ref) => {
+        const sizeNum = typeof size === 'string' ? parseInt(size, 10) : size
+        return (
+            <MapPin 
+                ref={ref}
+                size={sizeNum} 
+                color={color}
+                weight={weight}
+                {...props}
+            />
+        )
+    }
 )
 MapPinIcon.displayName = 'MapPinIcon'
 
-export const ExternalLinkIcon = createIcon(
-    <path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z" />
+export const ExternalLinkIcon = React.forwardRef<SVGSVGElement, IconProps>(
+    ({ size = 24, color = 'currentColor', weight = 'regular', ...props }, ref) => {
+        const sizeNum = typeof size === 'string' ? parseInt(size, 10) : size
+        return (
+            <ArrowSquareOut 
+                ref={ref}
+                size={sizeNum} 
+                color={color}
+                weight={weight}
+                {...props}
+            />
+        )
+    }
 )
 ExternalLinkIcon.displayName = 'ExternalLinkIcon'
 
-export const PlayIcon = createIcon(
-    <path d="M8 5v14l11-7z" />
+export const PlayIcon = React.forwardRef<SVGSVGElement, IconProps>(
+    ({ size = 24, color = 'currentColor', weight = 'regular', ...props }, ref) => {
+        const sizeNum = typeof size === 'string' ? parseInt(size, 10) : size
+        return (
+            <Play 
+                ref={ref}
+                size={sizeNum} 
+                color={color}
+                weight={weight}
+                {...props}
+            />
+        )
+    }
 )
 PlayIcon.displayName = 'PlayIcon'
 
-export const PauseIcon = createIcon(
-    <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
+export const PauseIcon = React.forwardRef<SVGSVGElement, IconProps>(
+    ({ size = 24, color = 'currentColor', weight = 'regular', ...props }, ref) => {
+        const sizeNum = typeof size === 'string' ? parseInt(size, 10) : size
+        return (
+            <Pause 
+                ref={ref}
+                size={sizeNum} 
+                color={color}
+                weight={weight}
+                {...props}
+            />
+        )
+    }
 )
 PauseIcon.displayName = 'PauseIcon'
 
-export const MusicIcon = createIcon(
-    <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
+export const MusicIcon = React.forwardRef<SVGSVGElement, IconProps>(
+    ({ size = 24, color = 'currentColor', weight = 'regular', ...props }, ref) => {
+        const sizeNum = typeof size === 'string' ? parseInt(size, 10) : size
+        return (
+            <MusicNote 
+                ref={ref}
+                size={sizeNum} 
+                color={color}
+                weight={weight}
+                {...props}
+            />
+        )
+    }
 )
 MusicIcon.displayName = 'MusicIcon'
 

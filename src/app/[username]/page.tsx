@@ -12,7 +12,7 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { BentoCard, BENTO_GAP } from '@/bento/core'
 import { ProfileSection } from '@/bento/editor'
-import { getUserByUsername, useBentoStore, type User } from '@/stores'
+import { getUserByHandle, useBentoStore, type User } from '@/stores'
 import { ThemeProvider } from '@/design-system/foundation/theme'
 import type { WidgetConfig, LinkWidgetConfig, ImageWidgetConfig, TextWidgetConfig, MapWidgetConfig } from '@/bento/widgets/types'
 
@@ -161,20 +161,26 @@ export default function ProfilePage({ params }: ProfilePageProps) {
         async function loadProfile() {
             const { username } = await params
 
-            // Get user data
-            const userData = getUserByUsername(username)
-            if (!userData) {
+            try {
+                // Get user data by handle/username
+                const userData = await getUserByHandle(username)
+                if (!userData) {
+                    setNotFoundState(true)
+                    setLoading(false)
+                    return
+                }
+
+                setUser(userData)
+
+                // Get user's layout
+                const layout = await loadPublicLayout(username)
+                setWidgets(layout || [])
+                setLoading(false)
+            } catch (error) {
+                console.error('Load profile error:', error)
                 setNotFoundState(true)
                 setLoading(false)
-                return
             }
-
-            setUser(userData)
-
-            // Get user's layout
-            const layout = loadPublicLayout(username)
-            setWidgets(layout || [])
-            setLoading(false)
         }
 
         loadProfile()

@@ -104,7 +104,7 @@ export const EditorLayout: React.FC<EditorLayoutProps> = ({
                     }}
                 >
                     {/* Top Section: Profile Content */}
-                    <div className="flex-1 overflow-y-auto px-6 pt-12 min-h-0" style={{ overflowX: 'hidden' }}>
+                    <div className="flex-1 overflow-y-auto px-12 pt-12 min-h-0" style={{ overflowX: 'hidden' }}>
                         <ProfileSection
                             name={displayName}
                             description={displayDescription}
@@ -119,8 +119,8 @@ export const EditorLayout: React.FC<EditorLayoutProps> = ({
                     </div>
                     
                     {/* Footer content at bottom, above toolbar - Figma design style */}
-                    <div className="shrink-0 px-6 pb-24 pt-4">
-                        <div className="bg-white rounded-[12px] px-[10px] py-[5px] flex items-center gap-[8px] w-fit">
+                    <div className="shrink-0 px-12 pb-[42px] pt-4">
+                        <div className="bg-white rounded-[12px] px-0 py-[5px] flex items-center gap-[8px] w-fit">
                             {/* Left: Settings & Social Icons */}
                             <div className="flex items-center gap-[8px]">
                                 <button
@@ -221,7 +221,7 @@ export const EditorLayout: React.FC<EditorLayoutProps> = ({
 
                     {/* Footer content at bottom - Figma design style */}
                     <div className="mt-8 mb-4">
-                        <div className="bg-white rounded-[12px] px-[10px] py-[5px] flex items-center gap-[8px] w-fit">
+                        <div className="bg-white rounded-[12px] px-0 py-[5px] flex items-center gap-[8px] w-fit">
                             {/* Left: Settings & Social Icons */}
                             <div className="flex items-center gap-[8px]">
                                 <button

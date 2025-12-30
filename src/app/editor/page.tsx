@@ -82,7 +82,11 @@ const EditableWidget: React.FC<EditableWidgetProps & { onUpdate: (updates: Parti
                 }
             }}
         >
-            <WidgetRenderer config={widget} isEditing={isEditing} />
+            <WidgetRenderer 
+                config={widget} 
+                isEditing={isEditing}
+                onConfigChange={(updates) => onUpdate(updates)}
+            />
             {isEditing && isSelected && (
                 <WidgetEditOverlay
                     widget={widget}

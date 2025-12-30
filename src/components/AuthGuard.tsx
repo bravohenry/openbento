@@ -18,24 +18,25 @@ interface AuthGuardProps {
 
 export function AuthGuard({ children, fallback }: AuthGuardProps) {
     const router = useRouter()
-    const { isAuthenticated, hydrate } = useUserStore()
+    const { isAuthenticated, isLoading, refreshUser } = useUserStore()
     const [isHydrated, setIsHydrated] = useState(false)
 
-    // Hydrate user state from localStorage
+    // Check user session on mount
     useEffect(() => {
-        hydrate()
-        setIsHydrated(true)
-    }, [hydrate])
+        refreshUser().then(() => {
+            setIsHydrated(true)
+        })
+    }, [refreshUser])
 
     // Redirect if not authenticated after hydration
     useEffect(() => {
-        if (isHydrated && !isAuthenticated) {
+        if (isHydrated && !isLoading && !isAuthenticated) {
             router.push('/auth/login')
         }
-    }, [isHydrated, isAuthenticated, router])
+    }, [isHydrated, isLoading, isAuthenticated, router])
 
-    // Show loading during hydration
-    if (!isHydrated) {
+    // Show loading during hydration or while checking auth
+    if (!isHydrated || isLoading) {
         return fallback || <LoadingSpinner />
     }
 

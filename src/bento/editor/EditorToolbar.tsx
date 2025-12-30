@@ -2,7 +2,7 @@
 
 /**
  * [INPUT]: (EditorContext, useDeviceDetection) - Editor context providing viewMode, setViewMode, addWidget functions, and device detection hook
- * [OUTPUT]: React component - Fixed bottom toolbar with widget creation buttons, view mode toggle, link input modal, and conditional share button (desktop only)
+ * [OUTPUT]: React component - Fixed bottom toolbar with widget creation buttons (Link, Image, Text, Map, Section Title), view mode toggle, link/section title input modals, and conditional share button (desktop only)
  * [POS]: Located at /bento/editor, provides primary editing interface with widget creation, sharing (desktop only), and view mode switching, adapts UI based on device detection
  * 
  * [PROTOCOL]:
@@ -27,43 +27,128 @@ import {
     createImageWidgetConfig,
     createTextWidgetConfig,
     createMapWidgetConfig,
+    createSectionTitleConfig,
 } from '@/bento/widgets'
 import { cn } from '@/design-system/utils/cn'
 import { useClickOutside } from './hooks/useClickOutside'
 import { useDeviceDetection } from './hooks/useDeviceDetection'
 
-// ============ Icons (Phosphor Icons) ============
+// ============ Icons (Phosphor Icons - Duotone Style with Dopamine Colors) ============
+
+// Dopamine color palette - vibrant, high-contrast combinations
+const DOPAMINE_COLORS = {
+    // Pink (Link) - Passionate & Engaging
+    linkPrimary: '#FF2E63',
+    linkSecondary: '#FF87A3',
+    // Blue (Image) - Clear & Trustworthy
+    imagePrimary: '#007AFF',
+    imageSecondary: '#6BB5FF',
+    // Orange (Text) - Warm & Energetic
+    textPrimary: '#FF9500',
+    textSecondary: '#FFC46B',
+    // Green (Map) - Fresh & Natural
+    mapPrimary: '#00C853',
+    mapSecondary: '#69EFAD',
+    // Purple (Widgets) - Creative & Mysterious
+    widgetsPrimary: '#6C5CE7',
+    widgetsSecondary: '#A29BFE',
+    // Indigo (View Mode)
+    viewPrimary: '#5D3FD3',
+    viewSecondary: '#8B78E6',
+} as const
 
 const ShareIcon = () => (
     <Share size={16} weight="fill" className="text-white" />
 )
 
+// Duotone icons with dopamine colors - direct implementation
 const LinkIcon = () => (
-    <LinkSimple size={16} weight="regular" className="text-black" />
+    <LinkSimple 
+        size={16} 
+        weight="duotone" 
+        color={DOPAMINE_COLORS.linkPrimary}
+        style={{ 
+            '--duotone-secondary': DOPAMINE_COLORS.linkSecondary 
+        } as React.CSSProperties}
+    />
 )
 
 const ImageIcon = () => (
-    <Image size={16} weight="regular" className="text-black" />
+    <Image 
+        size={16} 
+        weight="duotone" 
+        color={DOPAMINE_COLORS.imagePrimary}
+        style={{ 
+            '--duotone-secondary': DOPAMINE_COLORS.imageSecondary 
+        } as React.CSSProperties}
+    />
 )
 
 const TextIcon = () => (
-    <TextT size={16} weight="regular" className="text-black" />
+    <TextT 
+        size={16} 
+        weight="duotone" 
+        color={DOPAMINE_COLORS.textPrimary}
+        style={{ 
+            '--duotone-secondary': DOPAMINE_COLORS.textSecondary 
+        } as React.CSSProperties}
+    />
 )
 
 const MapIcon = () => (
-    <MapPin size={16} weight="regular" className="text-black" />
+    <MapPin 
+        size={16} 
+        weight="duotone" 
+        color={DOPAMINE_COLORS.mapPrimary}
+        style={{ 
+            '--duotone-secondary': DOPAMINE_COLORS.mapSecondary 
+        } as React.CSSProperties}
+    />
 )
 
 const WidgetsIcon = () => (
-    <GridFour size={16} weight="regular" className="text-black" />
+    <GridFour 
+        size={16} 
+        weight="duotone" 
+        color={DOPAMINE_COLORS.widgetsPrimary}
+        style={{ 
+            '--duotone-secondary': DOPAMINE_COLORS.widgetsSecondary 
+        } as React.CSSProperties}
+    />
+)
+
+// Section Title Icon - using TextT with different color scheme
+const SectionTitleIcon = () => (
+    <TextT 
+        size={16} 
+        weight="duotone" 
+        color={DOPAMINE_COLORS.widgetsPrimary}
+        style={{ 
+            '--duotone-secondary': DOPAMINE_COLORS.widgetsSecondary 
+        } as React.CSSProperties}
+    />
 )
 
 const DesktopIcon = ({ active }: { active: boolean }) => (
-    <Monitor size={16} weight={active ? 'fill' : 'regular'} className={active ? 'text-white' : 'text-black'} />
+    <Monitor 
+        size={16} 
+        weight="duotone" 
+        color={active ? '#ffffff' : '#999999'}
+        style={{ 
+            '--duotone-secondary': active ? '#e0e0e0' : '#cccccc'
+        } as React.CSSProperties}
+    />
 )
 
 const MobileIcon = ({ active }: { active: boolean }) => (
-    <DeviceMobile size={16} weight={active ? 'fill' : 'regular'} className={active ? 'text-white' : 'text-black'} />
+    <DeviceMobile 
+        size={16} 
+        weight="duotone" 
+        color={active ? '#ffffff' : '#999999'}
+        style={{ 
+            '--duotone-secondary': active ? '#e0e0e0' : '#cccccc'
+        } as React.CSSProperties}
+    />
 )
 
 // ============ Component ============
@@ -239,6 +324,10 @@ export const EditorToolbar: React.FC = () => {
         addWidget(createMapWidgetConfig('', '2x2'))
     }
 
+    const handleAddSectionTitle = () => {
+        addWidget(createSectionTitleConfig('', '2x1'))
+    }
+
     return (
         <>
             {/* Hidden file input for image upload */}
@@ -297,6 +386,7 @@ export const EditorToolbar: React.FC = () => {
                 </div>
             )}
 
+
             <div className="fixed bottom-10 left-1/2 -translate-x-1/2 z-[1000]">
                 <div className={cn(
                     "flex items-center gap-2 p-2",
@@ -352,8 +442,9 @@ export const EditorToolbar: React.FC = () => {
                             onClick={handleAddMap}
                         />
                         <ToolbarButton
-                            icon={<WidgetsIcon />}
-                            tooltip="More Widgets"
+                            icon={<SectionTitleIcon />}
+                            tooltip="Add Section Title"
+                            onClick={handleAddSectionTitle}
                         />
                     </div>
 

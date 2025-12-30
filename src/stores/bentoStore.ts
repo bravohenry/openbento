@@ -3,20 +3,11 @@
  * @output - Per-user bento layouts, CRUD operations
  * @pos    - /src/stores/bentoStore.ts - Bento layout state management
  * 
- * Stores layouts per-user in localStorage.
- * Migrated from EditorContext.tsx localStorage logic.
+ * Uses Supabase API for persistence.
  */
 
 import { create } from 'zustand'
-import { storage } from '@/lib/storage'
 import type { WidgetConfig } from '@/bento/widgets/types'
-
-// ============ Types ============
-
-interface LayoutData {
-    widgets: WidgetConfig[]
-    updatedAt: string
-}
 
 interface BentoState {
     // Current editing state
@@ -41,17 +32,13 @@ interface BentoState {
     setViewMode: (mode: 'desktop' | 'mobile') => void
 
     // Persistence
-    loadLayout: (userId: string) => void
-    saveLayout: (userId: string) => void
+    loadLayout: () => Promise<void>
+    saveLayout: () => Promise<void>
     clearLayout: () => void
 
     // Public profile loading
-    loadPublicLayout: (username: string) => WidgetConfig[] | null
+    loadPublicLayout: (handle: string) => Promise<WidgetConfig[] | null>
 }
-
-// ============ Storage Keys ============
-
-const LAYOUTS_KEY = 'layouts' // { [userId]: LayoutData }
 
 // ============ Store ============
 
@@ -107,45 +94,77 @@ export const useBentoStore = create<BentoState>((set, get) => ({
         set({ viewMode: mode })
     },
 
-    loadLayout: (userId) => {
-        const layouts = storage.get<Record<string, LayoutData>>(LAYOUTS_KEY) || {}
-        const userLayout = layouts[userId]
+    loadLayout: async () => {
+        try {
+            const response = await fetch('/api/bento/layout')
+            const data = await response.json()
 
-        if (userLayout && Array.isArray(userLayout.widgets)) {
-            set({ currentLayout: userLayout.widgets, isDirty: false })
-        } else {
+            if (response.ok && data.layout) {
+                const widgets = Array.isArray(data.layout.widgets) ? data.layout.widgets : []
+                set({ currentLayout: widgets, isDirty: false })
+            } else {
+                set({ currentLayout: [], isDirty: false })
+            }
+        } catch (error) {
+            console.error('Load layout error:', error)
             set({ currentLayout: [], isDirty: false })
         }
     },
 
-    saveLayout: (userId) => {
-        const { currentLayout } = get()
-        const layouts = storage.get<Record<string, LayoutData>>(LAYOUTS_KEY) || {}
+    saveLayout: async () => {
+        const { currentLayout, viewMode } = get()
 
-        layouts[userId] = {
-            widgets: currentLayout,
-            updatedAt: new Date().toISOString(),
+        try {
+            const payload: {
+                widgets: WidgetConfig[]
+                desktop_layout?: unknown
+                mobile_layout?: unknown
+            } = {
+                widgets: currentLayout,
+            }
+
+            // Save layout based on view mode
+            if (viewMode === 'desktop') {
+                payload.desktop_layout = currentLayout
+            } else {
+                payload.mobile_layout = currentLayout
+            }
+
+            const response = await fetch('/api/bento/layout', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
+            })
+
+            const data = await response.json()
+
+            if (response.ok) {
+                set({ isDirty: false })
+            } else {
+                console.error('Save layout error:', data.error)
+            }
+        } catch (error) {
+            console.error('Save layout error:', error)
         }
-
-        storage.set(LAYOUTS_KEY, layouts)
-        set({ isDirty: false })
     },
 
     clearLayout: () => {
         set({ currentLayout: [], selectedWidgetId: null, isDirty: false })
     },
 
-    loadPublicLayout: (username) => {
-        // First need to find userId by username
-        const users = storage.get<Array<{ id: string; username: string }>>('users') || []
-        const user = users.find(u => u.username.toLowerCase() === username.toLowerCase())
+    loadPublicLayout: async (handle: string): Promise<WidgetConfig[] | null> => {
+        try {
+            const response = await fetch(`/api/bento/layout/public/${handle}`)
+            const data = await response.json()
 
-        if (!user) return null
-
-        const layouts = storage.get<Record<string, LayoutData>>(LAYOUTS_KEY) || {}
-        const userLayout = layouts[user.id]
-
-        return userLayout?.widgets || null
+            if (response.ok && data.layout) {
+                return Array.isArray(data.layout.widgets) ? data.layout.widgets : []
+            }
+            return null
+        } catch (error) {
+            console.error('Load public layout error:', error)
+            return null
+        }
     },
 }))
 

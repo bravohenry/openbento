@@ -24,7 +24,7 @@ export default function AuthLayout({
             </div>
 
             {/* Right Side - Visuals (Hidden on mobile) */}
-            <div className="hidden lg:flex w-[55%] bg-[#FAFAFA] relative overflow-hidden items-center justify-center">
+            <div className="hidden lg:flex w-[55%] bg-[var(--color-white)] relative overflow-hidden items-center justify-center">
                 <motion.div
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}

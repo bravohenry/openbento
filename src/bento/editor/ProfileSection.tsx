@@ -66,14 +66,12 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
                 {avatarUrl ? (
                     <img src={avatarUrl} alt={name} className="w-full h-full object-cover" />
                 ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center relative">
-                        {/* Blue outer ring */}
-                        <div className="absolute inset-0 rounded-full border-4 border-blue-500" />
-                        {/* Light blue crescent shape */}
-                        <div className="absolute inset-0 rounded-full bg-blue-300/30" style={{
-                            clipPath: 'ellipse(60% 40% at 30% 50%)',
-                        }} />
-                    </div>
+                    <div 
+                        className="w-full h-full rounded-full"
+                        style={{
+                            backgroundColor: '#E5E7EB', // Simple gray background
+                        }}
+                    />
                 )}
             </div>
 
@@ -340,8 +338,8 @@ export const EditableProfileSection: React.FC<EditableProfileSectionProps> = ({
                             <div 
                                 className="w-full h-full border-2 border-dashed rounded-full flex flex-col items-center justify-center"
                                 style={{
-                                    borderColor: 'var(--color-border)',
-                                    backgroundColor: 'var(--color-bg-primary)',
+                                    borderColor: 'var(--color-gray-200)',
+                                    backgroundColor: 'var(--color-gray-100)',
                                 }}
                             >
                                 <Upload size={20} weight="regular" className="text-gray-400 mb-2" />
@@ -378,7 +376,7 @@ export const EditableProfileSection: React.FC<EditableProfileSectionProps> = ({
                                 e.currentTarget.blur()
                             }
                         }}
-                        className="w-full text-3xl lg:text-4xl font-extrabold tracking-tight text-black leading-tight outline-none cursor-text"
+                        className="w-full text-3xl lg:text-4xl font-medium tracking-tight text-black leading-tight outline-none cursor-text"
                         style={{
                             minHeight: '1.5em',
                             wordBreak: 'break-word',
