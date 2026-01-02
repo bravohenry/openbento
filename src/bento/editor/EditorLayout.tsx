@@ -260,6 +260,9 @@ export const EditorLayout: React.FC<EditorLayoutProps> = ({
                             </div>
                         </div>
                     </div>
+
+                    {/* Mobile bottom padding for scrollable space */}
+                    <div style={{ height: '100px', width: '100%' }} />
                 </div>
             </div>
 

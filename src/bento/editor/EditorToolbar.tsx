@@ -182,14 +182,52 @@ export const EditorToolbar: React.FC = () => {
         setLinkUrl('')
     }
 
-    const handleLinkSubmit = (e: React.FormEvent) => {
+    const handleLinkSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         if (linkUrl.trim()) {
-            // Create widget with detected platform
-            addWidget(createLinkWidgetConfig(linkUrl.trim(), '1x1'))
-            setShowLinkModal(false)
-            setLinkUrl('')
+            await handleAddLinkWithMetadata(linkUrl.trim())
         }
+    }
+
+    const handleAddLinkWithMetadata = async (url: string) => {
+        // Normalize URL
+        let normalizedUrl = url.trim()
+        if (!normalizedUrl.startsWith('http://') && !normalizedUrl.startsWith('https://')) {
+            normalizedUrl = `https://${normalizedUrl}`
+        }
+
+        // Check if it's a generic link (not a known platform)
+        const { detectPlatform } = await import('@/bento/widgets/registry')
+        const platform = detectPlatform(normalizedUrl)
+
+        // If it's a generic link, fetch metadata
+        if (platform === 'generic') {
+            try {
+                const response = await fetch(`/api/link/metadata?url=${encodeURIComponent(normalizedUrl)}`)
+                if (response.ok) {
+                    const metadata = await response.json()
+                    if (metadata.success) {
+                        // Create widget with metadata
+                        addWidget(createLinkWidgetConfig(normalizedUrl, '1x1', {
+                            title: metadata.title,
+                            customIcon: metadata.favicon,
+                            subtitle: metadata.description,
+                        }))
+                        setShowLinkModal(false)
+                        setLinkUrl('')
+                        return
+                    }
+                }
+            } catch (error) {
+                console.error('Failed to fetch metadata:', error)
+                // Fall through to default behavior
+            }
+        }
+
+        // Default: Create widget without metadata (or if metadata fetch failed)
+        addWidget(createLinkWidgetConfig(normalizedUrl, '1x1'))
+        setShowLinkModal(false)
+        setLinkUrl('')
     }
 
     const handleLinkModalClose = () => {
@@ -223,12 +261,10 @@ export const EditorToolbar: React.FC = () => {
                 new URL(normalizedUrl)
                 
                 // Small delay to ensure user finished typing/pasting
-                const timer = setTimeout(() => {
+                const timer = setTimeout(async () => {
                     // Double-check the URL hasn't changed
                     if (linkUrl.trim() === trimmedUrl && showLinkModal) {
-                        addWidget(createLinkWidgetConfig(normalizedUrl, '1x1'))
-                        setShowLinkModal(false)
-                        setLinkUrl('')
+                        await handleAddLinkWithMetadata(normalizedUrl)
                     }
                 }, 300) // 300ms debounce - enough time for paste to complete
 

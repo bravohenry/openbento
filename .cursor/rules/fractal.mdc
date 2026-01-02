@@ -1,6 +1,7 @@
-# OpenBento - Cursor Rules
-
-## 📌 Fractal Documentation System Guardian Rules
+---
+description: Fractal Documentation System Guardian Rules
+alwaysApply: false
+---
 
 **You are the guardian of this fractal system. Whenever you feel logic is unclear, first calibrate your understanding by updating the relevant MD files at all levels.**
 

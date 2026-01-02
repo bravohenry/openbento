@@ -353,7 +353,34 @@ const PLATFORM_ICON_MAP: Record<string, string> = {
     generic: 'unknown',
 }
 
-function getPlatformIconComponent(platform: string, iconSize: number = 40) {
+function getPlatformIconComponent(platform: string, iconSize: number = 40, customIcon?: string) {
+    // If customIcon (favicon) is provided, use it
+    if (customIcon) {
+        return (
+            <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Image
+                    src={customIcon}
+                    alt={platform}
+                    width={iconSize}
+                    height={iconSize}
+                    style={{
+                        width: iconSize,
+                        height: iconSize,
+                        objectFit: 'contain',
+                    }}
+                    unoptimized // Allow external images
+                    onError={(e) => {
+                        // Fallback to default icon if favicon fails to load
+                        const target = e.target as HTMLImageElement
+                        const iconName = PLATFORM_ICON_MAP[platform] || PLATFORM_ICON_MAP.generic
+                        target.src = `/icons/social/${iconName}.svg`
+                    }}
+                />
+            </div>
+        )
+    }
+
+    // Default: use platform SVG icon
     const iconName = PLATFORM_ICON_MAP[platform] || PLATFORM_ICON_MAP.generic
     const iconPath = `/icons/social/${iconName}.svg`
 
@@ -427,7 +454,7 @@ export const LinkWidget: React.FC<WidgetProps<LinkWidgetConfig>> = ({
     onClick,
     isEditing = false,
 }) => {
-    const { url, size, platform: configPlatform, title, subtitle, ctaLabel, customColor } = config
+    const { url, size, platform: configPlatform, title, subtitle, ctaLabel, customColor, customIcon } = config
 
     // Auto-detect platform if not provided
     const platform = configPlatform || extractPlatformInfo(url).platform
@@ -457,7 +484,7 @@ export const LinkWidget: React.FC<WidgetProps<LinkWidgetConfig>> = ({
             target={isEditing ? undefined : "_blank"}
         >
             <PlatformCardContent
-                icon={getPlatformIconComponent(platform, layout.iconSize)}
+                icon={getPlatformIconComponent(platform, layout.iconSize, customIcon)}
                 iconBg={iconBg}
                 title={displayTitle}
                 subtitle={displaySubtitle}

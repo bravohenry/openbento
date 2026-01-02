@@ -42,9 +42,25 @@ export async function POST(request: Request) {
     })
 
     if (authError) {
-      console.error('Login auth error:', authError)
+      console.error('Login auth error:', {
+        message: authError.message,
+        status: authError.status,
+        code: authError.code,
+        name: authError.name,
+      })
+      
+      // Provide more specific error messages
+      let errorMessage = 'Invalid email or password'
+      if (authError.message?.includes('Email not confirmed')) {
+        errorMessage = 'Please confirm your email address before logging in'
+      } else if (authError.message?.includes('Invalid login credentials')) {
+        errorMessage = 'Invalid email or password'
+      } else if (authError.message) {
+        errorMessage = authError.message
+      }
+      
       return NextResponse.json(
-        { error: authError.message || 'Invalid email or password' },
+        { error: errorMessage },
         { status: 401 }
       )
     }

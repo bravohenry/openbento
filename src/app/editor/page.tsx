@@ -19,6 +19,7 @@ import { MIN_CANVAS_WIDTH } from '@/bento/editor/constants'
 import { WidgetEditOverlay } from '@/bento/editor'
 import { BentoGrid } from '@/bento/grid'
 import { GridDndProvider, DraggableGridItem, swapItems, type GridItem } from '@/bento/dnd'
+import { compactGridLayout } from '@/bento/grid/compactGridLayout'
 import {
     WidgetRenderer,
     createLinkWidgetConfig,
@@ -100,10 +101,9 @@ const EditableWidget: React.FC<EditableWidgetProps & { onUpdate: (updates: Parti
     )
 
     // Use Framer Motion for smooth layout animations with CSS Grid dense flow
+    // Note: layout animation is disabled to allow gridAutoFlow: 'dense' to work properly
     return (
         <motion.div
-            layout
-            layoutId={`widget-${widget.id}`}
             id={`widget-${widget.id}`}
             transition={{
                 layout: {
@@ -119,14 +119,14 @@ const EditableWidget: React.FC<EditableWidgetProps & { onUpdate: (updates: Parti
         >
             {isEditing ? (
                 <DraggableGridItem id={widget.id}>
-                    <motion.div layout className="w-full h-full">
+                    <div className="w-full h-full">
                         {content}
-                    </motion.div>
+                    </div>
                 </DraggableGridItem>
             ) : (
-                <motion.div layout className="w-full h-full">
+                <div className="w-full h-full">
                     {content}
-                </motion.div>
+                </div>
             )}
         </motion.div>
     )
@@ -149,6 +149,7 @@ const EditorContent: React.FC = () => {
         mobileWidgets,
     } = useEditor()
     const containerRef = useRef<HTMLDivElement>(null)
+    const gridContainerRef = useRef<HTMLDivElement>(null)
     const hasInitialized = useRef(false)
 
     // Initialize with example data if empty
@@ -209,8 +210,27 @@ const EditorContent: React.FC = () => {
     }, [isEditing, setSelectedWidgetId])
 
     const handleSizeChange = useCallback((widgetId: string, newSize: WidgetSize) => {
+        const updatedWidgets = widgets.map(w => w.id === widgetId ? { ...w, size: newSize } : w)
         updateWidget(widgetId, { size: newSize })
-    }, [updateWidget])
+        // Compact layout after size change
+        setTimeout(() => {
+            const compacted = compactGridLayout(updatedWidgets, currentViewMode === 'mobile' ? 2 : 4)
+            reorderWidgets(compacted)
+        }, 50)
+    }, [updateWidget, widgets, reorderWidgets, currentViewMode])
+
+    // Handle widget deletion with layout compaction
+    const handleDeleteWidget = useCallback((widgetId: string) => {
+        const remainingWidgets = widgets.filter(w => w.id !== widgetId)
+        removeWidget(widgetId)
+        // Compact layout after deletion - reorder widgets to fill gaps
+        setTimeout(() => {
+            if (remainingWidgets.length > 0) {
+                const compacted = compactGridLayout(remainingWidgets, currentViewMode === 'mobile' ? 2 : 4)
+                reorderWidgets(compacted)
+            }
+        }, 50)
+    }, [removeWidget, widgets, reorderWidgets, currentViewMode])
 
     // Convert to GridItem for DnD
     const gridItems: GridItem[] = useMemo(() => {
@@ -231,14 +251,18 @@ const EditorContent: React.FC = () => {
     const gridColumns = currentViewMode === 'mobile' ? 2 : 4
 
     const gridContent = (
-        <BentoGrid columns={gridColumns} centered>
+        <BentoGrid 
+            ref={gridContainerRef}
+            columns={gridColumns} 
+            centered
+        >
             {widgets.map((widget) => (
                         <EditableWidget
                             key={widget.id}
                             widget={widget}
                             isSelected={selectedWidgetId === widget.id}
                             onSelect={() => setSelectedWidgetId(widget.id)}
-                            onDelete={() => removeWidget(widget.id)}
+                            onDelete={() => handleDeleteWidget(widget.id)}
                             onSizeChange={(size) => handleSizeChange(widget.id, size)}
                             isEditing={isEditing}
                             onUpdate={(updates) => updateWidget(widget.id, updates)}

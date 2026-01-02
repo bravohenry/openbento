@@ -430,8 +430,15 @@ export const WidgetEditOverlay: React.FC<WidgetEditOverlayProps> = ({
                 <LocationSearch
                     rect={rect}
                     onSelect={(location) => {
+                        const mapConfig = widget as MapWidgetConfig
+                        // When searching, set a reasonable default zoom (13-15 for specific locations)
+                        // If user already has a zoom level, keep it; otherwise use 13
+                        const newZoom = mapConfig.zoom ?? 13
                         onUpdate({
                             location,
+                            zoom: newZoom,
+                            // Update title to match location label for synchronization
+                            title: location.label,
                         } as Partial<MapWidgetConfig>)
                         setShowLocationSearch(false)
                     }}

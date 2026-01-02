@@ -95,6 +95,7 @@ export interface TextWidgetConfig extends BaseWidgetConfig {
     variant: TextWidgetVariant
     content: string
     attribution?: string // Quote attribution
+    emoji?: string // Custom emoji for note variant (default: 📝)
 }
 
 // ============ Map Widget ============
@@ -107,6 +108,7 @@ export interface MapWidgetConfig extends BaseWidgetConfig {
         lng: number
         label?: string
     }
+    zoom?: number // Map zoom level (default: 11)
     style?: 'light' | 'dark' | 'satellite'
 }
 

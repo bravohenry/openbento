@@ -1,9 +1,9 @@
 'use client'
 
 /**
- * [INPUT]: (query: string, onSelect: (location) => void) - Search query string and selection callback
- * [OUTPUT]: React component - Location search dropdown with Google Maps Places API integration
- * [POS]: Located at /bento/editor, provides location search functionality for map widget editing
+ * [INPUT]: (rect: DOMRect, onSelect: (location) => void, onClose: () => void) - Widget position rect, selection callback, close callback
+ * [OUTPUT]: React component - Location search dropdown with OpenStreetMap Nominatim API integration
+ * [POS]: Located at /bento/editor, provides location search functionality for map widget editing using free OSM Nominatim service
  * 
  * [PROTOCOL]:
  * 1. Once this file's logic changes, this Header must be synchronized immediately.
@@ -41,138 +41,169 @@ export interface LocationSearchProps {
     onClose: () => void
 }
 
-// ============ Google Maps Places API Service ============
+// ============ OpenStreetMap Nominatim API Service ============
 
-class PlacesService {
-    private apiKey: string | null = null
-    private autocompleteService: google.maps.places.AutocompleteService | null = null
-    private placesService: google.maps.places.PlacesService | null = null
-    private isLoaded = false
-
-    constructor() {
-        if (typeof window !== 'undefined') {
-            this.apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || null
-        }
+interface NominatimResult {
+    place_id: number
+    display_name: string
+    lat: string
+    lon: string
+    address?: {
+        city?: string
+        town?: string
+        village?: string
+        state?: string
+        country?: string
     }
+}
 
-    async loadScript(): Promise<boolean> {
-        if (this.isLoaded) return true
-        if (!this.apiKey) {
-            console.warn('Google Maps API key not configured. Set NEXT_PUBLIC_GOOGLE_MAPS_API_KEY environment variable.')
-            return false
+class LocationSearchService {
+    private readonly baseUrl = 'https://nominatim.openstreetmap.org'
+    private readonly userAgent = 'OpenBento/1.0' // Required by Nominatim usage policy
+
+    // Extract short location name from full display name
+    // Example: "Savannah, Chatham County, Georgia, United States" -> "Savannah, Georgia"
+    // Or: "San Francisco, CA, United States" -> "San Francisco, CA"
+    private extractShortLabel(displayName: string, address?: NominatimResult['address']): string {
+        const parts = displayName.split(',').map(p => p.trim())
+        
+        // If we have structured address data, prefer it
+        if (address) {
+            const city = address.city || address.town || address.village
+            const state = address.state
+            
+            if (city && state) {
+                // Use city and state (state might be abbreviation or full name)
+                return `${city}, ${state}`
+            } else if (city) {
+                return city
+            } else if (state) {
+                return state
+            }
         }
-
-        return new Promise((resolve) => {
-            // Check if script already exists
-            if (window.google?.maps?.places) {
-                this.isLoaded = true
-                this.initializeServices()
-                resolve(true)
-                return
-            }
-
-            // Load Google Maps script
-            const script = document.createElement('script')
-            script.src = `https://maps.googleapis.com/maps/api/js?key=${this.apiKey}&libraries=places`
-            script.async = true
-            script.defer = true
-            script.onload = () => {
-                this.isLoaded = true
-                this.initializeServices()
-                resolve(true)
-            }
-            script.onerror = () => {
-                console.error('Failed to load Google Maps script')
-                resolve(false)
-            }
-            document.head.appendChild(script)
-        })
-    }
-
-    private initializeServices() {
-        if (window.google?.maps?.places) {
-            this.autocompleteService = new window.google.maps.places.AutocompleteService()
-            // Create a dummy div for PlacesService (it requires a DOM element)
-            const dummyDiv = document.createElement('div')
-            this.placesService = new window.google.maps.places.PlacesService(dummyDiv)
+        
+        // Fallback: use first 2 parts of display_name
+        // Usually format is: "City, State/Province/County, Country"
+        // We want: "City, State/Province" (skip county if present)
+        if (parts.length >= 3) {
+            // Skip middle parts that might be county, use city and state
+            return `${parts[0]}, ${parts[parts.length - 2]}`
+        } else if (parts.length === 2) {
+            return `${parts[0]}, ${parts[1]}`
+        } else if (parts.length === 1) {
+            return parts[0]
         }
+        
+        return displayName
     }
 
     async searchPlaces(query: string): Promise<LocationResult[]> {
-        if (!this.isLoaded) {
-            const loaded = await this.loadScript()
-            if (!loaded) return []
-        }
+        if (!query.trim()) return []
 
-        if (!this.autocompleteService) {
-            console.error('AutocompleteService not initialized')
+        try {
+            const url = new URL(`${this.baseUrl}/search`)
+            url.searchParams.set('q', query)
+            url.searchParams.set('format', 'json')
+            url.searchParams.set('limit', '10')
+            url.searchParams.set('addressdetails', '1')
+            url.searchParams.set('extratags', '1')
+
+            const response = await fetch(url.toString(), {
+                headers: {
+                    'User-Agent': this.userAgent,
+                    'Accept': 'application/json',
+                },
+            })
+
+            if (!response.ok) {
+                console.error('Nominatim API error:', response.statusText)
+                return []
+            }
+
+            const data: NominatimResult[] = await response.json()
+
+            return data.map((item) => {
+                // Extract main text and secondary text from display_name
+                const parts = item.display_name.split(',')
+                const mainText = parts[0]?.trim() || ''
+                const secondaryText = parts.slice(1, 3).join(',').trim() || ''
+
+                return {
+                    place_id: item.place_id.toString(),
+                    description: item.display_name,
+                    structured_formatting: {
+                        main_text: mainText,
+                        secondary_text: secondaryText,
+                    },
+                    geometry: {
+                        location: {
+                            lat: parseFloat(item.lat),
+                            lng: parseFloat(item.lon),
+                        },
+                    },
+                }
+            })
+        } catch (error) {
+            console.error('Error searching places:', error)
             return []
         }
-
-        return new Promise((resolve) => {
-            this.autocompleteService!.getPlacePredictions(
-                {
-                    input: query,
-                    types: ['geocode'], // Restrict to addresses
-                },
-                (predictions, status) => {
-                    if (status === 'OK' && predictions) {
-                        const results: LocationResult[] = predictions.map((p) => ({
-                            place_id: p.place_id,
-                            description: p.description,
-                            structured_formatting: {
-                                main_text: p.structured_formatting.main_text,
-                                secondary_text: p.structured_formatting.secondary_text,
-                            },
-                        }))
-                        resolve(results)
-                    } else {
-                        resolve([])
-                    }
-                }
-            )
-        })
     }
 
-    async getPlaceDetails(placeId: string): Promise<{
+    async getPlaceDetails(placeId: string, lat?: number, lng?: number, label?: string): Promise<{
         lat: number
         lng: number
         label: string
     } | null> {
-        if (!this.isLoaded) {
-            const loaded = await this.loadScript()
-            if (!loaded) return null
+        // If we already have coordinates from search results, use them
+        if (lat !== undefined && lng !== undefined && label) {
+            // Extract short label from full display name
+            const shortLabel = this.extractShortLabel(label)
+            return {
+                lat,
+                lng,
+                label: shortLabel,
+            }
         }
 
-        if (!this.placesService) {
-            console.error('PlacesService not initialized')
+        // Otherwise, fetch details by place_id
+        try {
+            const url = new URL(`${this.baseUrl}/lookup`)
+            url.searchParams.set('osm_ids', `N${placeId}`)
+            url.searchParams.set('format', 'json')
+            url.searchParams.set('addressdetails', '1')
+
+            const response = await fetch(url.toString(), {
+                headers: {
+                    'User-Agent': this.userAgent,
+                    'Accept': 'application/json',
+                },
+            })
+
+            if (!response.ok) {
+                console.error('Nominatim lookup error:', response.statusText)
+                return null
+            }
+
+            const data: NominatimResult[] = await response.json()
+            if (data.length === 0) return null
+
+            const item = data[0]
+            // Extract short label from full display name
+            const shortLabel = this.extractShortLabel(item.display_name, item.address)
+            return {
+                lat: parseFloat(item.lat),
+                lng: parseFloat(item.lon),
+                label: shortLabel,
+            }
+        } catch (error) {
+            console.error('Error getting place details:', error)
             return null
         }
-
-        return new Promise((resolve) => {
-            this.placesService!.getDetails(
-                {
-                    placeId,
-                    fields: ['geometry', 'formatted_address', 'name'],
-                },
-                (place, status) => {
-                    if (status === 'OK' && place?.geometry?.location) {
-                        resolve({
-                            lat: place.geometry.location.lat(),
-                            lng: place.geometry.location.lng(),
-                            label: place.formatted_address || place.name || '',
-                        })
-                    } else {
-                        resolve(null)
-                    }
-                }
-            )
-        })
     }
 }
 
 // Global service instance
-const placesService = new PlacesService()
+const locationSearchService = new LocationSearchService()
 
 // ============ Component ============
 
@@ -205,7 +236,7 @@ export const LocationSearch: React.FC<LocationSearchProps> = ({ rect, onSelect, 
         setIsLoading(true)
         searchTimeoutRef.current = setTimeout(async () => {
             try {
-                const searchResults = await placesService.searchPlaces(query)
+                const searchResults = await locationSearchService.searchPlaces(query)
                 setResults(searchResults)
             } catch (error) {
                 console.error('Error searching places:', error)
@@ -213,7 +244,7 @@ export const LocationSearch: React.FC<LocationSearchProps> = ({ rect, onSelect, 
             } finally {
                 setIsLoading(false)
             }
-        }, 300) // 300ms debounce
+        }, 500) // 500ms debounce (Nominatim has rate limits, slightly longer debounce)
 
         return () => {
             if (searchTimeoutRef.current) {
@@ -244,7 +275,18 @@ export const LocationSearch: React.FC<LocationSearchProps> = ({ rect, onSelect, 
     const handleSelectResult = async (result: LocationResult) => {
         setIsLoading(true)
         try {
-            const details = await placesService.getPlaceDetails(result.place_id)
+            // Use coordinates from search result if available, otherwise fetch details
+            const lat = result.geometry?.location.lat
+            const lng = result.geometry?.location.lng
+            const label = result.description
+
+            const details = await locationSearchService.getPlaceDetails(
+                result.place_id,
+                lat,
+                lng,
+                label
+            )
+            
             if (details) {
                 onSelect(details)
                 onClose()
@@ -363,14 +405,6 @@ export const LocationSearch: React.FC<LocationSearchProps> = ({ rect, onSelect, 
                 </div>
             )}
 
-            {/* No API Key Warning */}
-            {!process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY && (
-                <div className="p-3 border-t border-white/10">
-                    <div className="text-xs text-white/60">
-                        Configure NEXT_PUBLIC_GOOGLE_MAPS_API_KEY to enable location search
-                    </div>
-                </div>
-            )}
         </motion.div>
     )
 }

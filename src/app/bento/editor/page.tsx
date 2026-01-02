@@ -118,11 +118,10 @@ const EditableWidget: React.FC<EditableWidgetProps> = ({
         </div>
     )
 
-    // Use Framer Motion for smooth layout animations with CSS Grid dense flow
+    // Use CSS Grid dense flow for automatic layout
+    // Removed Framer Motion layout to allow gridAutoFlow: 'dense' to work properly
     return (
         <motion.div
-            layout
-            layoutId={`widget-${widget.id}`}
             id={`widget-${widget.id}`}
             transition={{
                 layout: {
@@ -138,14 +137,14 @@ const EditableWidget: React.FC<EditableWidgetProps> = ({
         >
             {isEditing ? (
                 <DraggableGridItem id={widget.id}>
-                    <motion.div layout className="w-full h-full">
+                    <div className="w-full h-full">
                         {content}
-                    </motion.div>
+                    </div>
                 </DraggableGridItem>
             ) : (
-                <motion.div layout className="w-full h-full">
+                <div className="w-full h-full">
                     {content}
-                </motion.div>
+                </div>
             )}
         </motion.div>
     )
